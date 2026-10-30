@@ -10,6 +10,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import dev.nikelauncher.data.BlockOffsets
 import dev.nikelauncher.data.HomeBlock
 import dev.nikelauncher.data.HomePins
 
@@ -49,10 +50,12 @@ internal fun HomeStack(
     viewportHeightPx: () -> Int,
     bottomInsetPx: () -> Int,
     pins: () -> HomePins,
+    offsets: () -> BlockOffsets,
     metrics: StackMetrics,
     content: @Composable () -> Unit,
 ) {
-    val gapPx = with(LocalDensity.current) { BLOCK_GAP_DP.dp.roundToPx() }
+    val density = LocalDensity.current
+    val gapPx = with(density) { BLOCK_GAP_DP.dp.roundToPx() }
     Layout(content = content, modifier = modifier) { measurables, constraints ->
         val loose = Constraints(maxWidth = constraints.maxWidth, maxHeight = Constraints.Infinity)
         val placeables = HashMap<HomeBlock, Placeable>()
@@ -78,7 +81,10 @@ internal fun HomeStack(
         val width = if (constraints.hasBoundedWidth) constraints.maxWidth
         else placeables.values.maxOfOrNull { it.width } ?: 0
         layout(width, placement.contentHeightPx.coerceAtLeast(0)) {
-            placeables.forEach { (id, placeable) -> placement.tops[id]?.let { placeable.placeRelative(0, it) } }
+            val sideways = offsets()
+            placeables.forEach { (id, placeable) ->
+                placement.tops[id]?.let { placeable.placeRelative(with(density) { sideways[id].dp.roundToPx() }, it) }
+            }
         }
     }
 }

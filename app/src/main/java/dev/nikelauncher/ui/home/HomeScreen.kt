@@ -3,6 +3,7 @@ package dev.nikelauncher.ui.home
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -54,6 +55,8 @@ import dev.nikelauncher.ui.home.edit.BlockFrame
 import dev.nikelauncher.ui.home.edit.EditToolbar
 import dev.nikelauncher.ui.home.edit.EditToolbarActions
 import dev.nikelauncher.ui.home.edit.FrameCallbacks
+import dev.nikelauncher.ui.home.edit.NudgePanel
+import dev.nikelauncher.ui.home.edit.NudgeState
 import dev.nikelauncher.ui.home.edit.PinEditor
 import dev.nikelauncher.ui.home.edit.SnapGuideOverlay
 import dev.nikelauncher.ui.home.rows.RowStyle
@@ -181,6 +184,7 @@ fun HomeScreen(
                     viewportHeightPx = { scroll.viewportHeight },
                     bottomInsetPx = { bottomInsetPx },
                     pins = { editor.pins },
+                    offsets = { data.blockOffsets },
                     metrics = metrics,
                 ) {
                     fun frame(block: HomeBlock) = FrameCallbacks(
@@ -295,11 +299,30 @@ fun HomeScreen(
                 bottomInsetPx = { bottomInsetPx },
                 modifier = Modifier.fillMaxSize(),
             )
-            EditToolbar(
-                visible = editMode,
-                actions = editToolbarActions(editor.selected, settings, data, actions, editor::resetSelected) { onEditModeChange(false) },
-                modifier = Modifier.align(Alignment.BottomCenter),
-            )
+            val selectedBlock = editor.selected
+            Column(Modifier.align(Alignment.BottomCenter), horizontalAlignment = Alignment.CenterHorizontally) {
+                NudgePanel(
+                    visible = editMode,
+                    state = selectedBlock?.let { block ->
+                        NudgeState(
+                            offsetDp = data.blockOffsets[block],
+                            edgeDp = if (block == HomeBlock.WIDGET) settings.widgetSidePaddingDp else settings.sidePaddingDp,
+                            onMove = { dx, dy ->
+                                if (dx != 0) actions.layout.onNudgeX(block, dx)
+                                if (dy != 0) editor.nudge(block, with(density) { dy.dp.roundToPx() })
+                            },
+                            onEdge = { delta -> actions.layout.onNudgeEdge(block, delta) },
+                        )
+                    },
+                )
+                EditToolbar(
+                    visible = editMode,
+                    actions = editToolbarActions(selectedBlock, settings, data, actions, {
+                        editor.resetSelected()
+                        selectedBlock?.let(actions.layout.onResetOffset)
+                    }) { onEditModeChange(false) },
+                )
+            }
         }
     }
 }

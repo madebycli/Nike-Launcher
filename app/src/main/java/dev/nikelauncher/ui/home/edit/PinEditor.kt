@@ -8,8 +8,11 @@ import androidx.compose.runtime.setValue
 import dev.nikelauncher.data.BlockPin
 import dev.nikelauncher.data.HomeBlock
 import dev.nikelauncher.data.HomePins
+import dev.nikelauncher.data.PinEdge
 import dev.nikelauncher.ui.home.stack.SnapGuide
 import dev.nikelauncher.ui.home.stack.StackMetrics
+import dev.nikelauncher.ui.home.stack.pinForTop
+import dev.nikelauncher.ui.home.stack.pinnedTopPx
 import dev.nikelauncher.ui.home.stack.snapped
 import kotlin.math.roundToInt
 
@@ -77,6 +80,21 @@ internal class PinEditor(
         guide = null
     }
 
+    /**
+     * Moves a block by [deltaPx] from where it is held, keeping the edge it is held by. For a block
+     * with no pin yet that is its top edge, which is where it is now.
+     */
+    fun nudge(block: HomeBlock, deltaPx: Int) {
+        val current = pins
+        val pin = current[block]
+        val height = metrics.height(block)
+        val top = if (pin != null) pinnedTopPx(pin, height, metrics.viewportPx, metrics.bottomInsetPx) else metrics.top(block)
+        val moved = pinForTop(pin?.edge ?: PinEdge.TOP, top + deltaPx, height, metrics.viewportPx, metrics.bottomInsetPx)
+        selected = block
+        live = current.with(block, moved)
+        commit(block, moved)
+    }
+
     /** Puts the selected block back to its default place. */
     fun resetSelected() {
         selected?.let { commit(it, null) }
@@ -85,7 +103,9 @@ internal class PinEditor(
 
     /** The stored pins moved on, so the live ones are no longer needed. */
     fun onStoredChanged() {
-        if (dragging == null) live = null
+        // Only once the store has caught up with the last move. Cleared on any change, a run of
+        // quick nudges would be answered by an older value from the store and lose steps.
+        if (dragging == null && (live == null || live == stored())) live = null
     }
 
     fun clear() {

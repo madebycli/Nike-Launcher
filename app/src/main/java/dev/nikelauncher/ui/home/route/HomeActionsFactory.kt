@@ -12,6 +12,7 @@ import dev.nikelauncher.R
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.BlockPin
 import dev.nikelauncher.data.FavoritesSource
+import dev.nikelauncher.data.BlockOffsets
 import dev.nikelauncher.data.HomeBlock
 import dev.nikelauncher.data.QuickLaunchSlot
 import dev.nikelauncher.data.folderToken
@@ -30,6 +31,9 @@ import dev.nikelauncher.widget.WidgetSlotActions
 import kotlinx.coroutines.launch
 
 /** The route's pieces the home actions reach into. */
+/** The furthest a block can be held from the screen edge. */
+private const val EDGE_DISTANCE_MAX_DP = 120
+
 internal class HomeRouteHooks(
     val launchEntry: (AppInfo) -> Boolean,
     val controller: AppListController,
@@ -42,6 +46,7 @@ internal class HomeRouteHooks(
     /** True while something other than the plain home screen is up, so measurements are ignored. */
     val homeBusy: () -> Boolean,
     val viewportHeightPx: () -> Int,
+    val blockOffsets: () -> BlockOffsets,
     val minBandHeightPx: () -> Float,
 )
 
@@ -106,6 +111,16 @@ internal fun rememberHomeActions(
                     }
                 },
                 onCommitPin = { block: HomeBlock, pin: BlockPin? -> scope.launch { app.prefs.home.setHomePin(block, pin) } },
+                onNudgeX = { block, dp ->
+                    scope.launch { app.prefs.home.nudgeBlockOffset(block, dp) }
+                },
+                onNudgeEdge = { block, dp ->
+                    scope.launch {
+                        if (block == HomeBlock.WIDGET) app.prefs.home.nudgeWidgetSidePadding(dp, EDGE_DISTANCE_MAX_DP)
+                        else app.prefs.appearance.nudgeSidePaddingDp(dp, EDGE_DISTANCE_MAX_DP)
+                    }
+                },
+                onResetOffset = { block -> scope.launch { app.prefs.home.setBlockOffset(block, 0) } },
                 onResizeNowPlaying = { scope.launch { app.prefs.home.setNowPlayingHeightDp(it) } },
                 onFavoritesBoundsChanged = { top, bottom ->
                     // Measured in window space, so a home screen still travelling under the open

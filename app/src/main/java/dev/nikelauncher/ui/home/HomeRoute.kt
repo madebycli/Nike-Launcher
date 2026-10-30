@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -135,6 +136,7 @@ fun HomeRoute(
     val openDistancePx = with(density) { SWIPE_OPEN_DISTANCE.toPx() }
     val listState = rememberLazyListState()
     val flingDecay = rememberSplineBasedDecay<Float>()
+    val currentSettings by rememberUpdatedState(settings)
     val controller = remember {
         AppListController(
             scope = scope,
@@ -143,13 +145,16 @@ fun HomeRoute(
             openDistancePx = openDistancePx,
             listState = listState,
             flingDecay = flingDecay,
-            swipeOpensSearch = { settings.swipeUpOpensSearch },
+            swipeOpensSearch = { currentSettings.swipeUpOpensSearch },
         )
     }
 
+    // Read through state: a lambda kept by remember would otherwise hold the first value for good,
+    // so a range saved by hand was written to the store and then never shown.
+    val storedBand by rememberUpdatedState(scrubBandFractions)
     val bands = remember {
         BandEditing(
-            stored = { scrubBandFractions },
+            stored = { storedBand },
             viewportPx = { viewportHeightPx },
             save = { top, height -> scope.launch { app.prefs.strip.setScrubBand(top, height) } },
         )
@@ -187,6 +192,7 @@ fun HomeRoute(
             onNavigate = onNavigate,
             homeBusy = { controller.visible || homeEditMode },
             viewportHeightPx = { viewportHeightPx },
+            blockOffsets = { data.blockOffsets },
             minBandHeightPx = { minBandHeightPx },
         ),
     )

@@ -7,6 +7,7 @@ import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.BlockPin
 import dev.nikelauncher.data.Folder
 import dev.nikelauncher.data.HomeBlock
+import dev.nikelauncher.data.BlockOffsets
 import dev.nikelauncher.data.HomePins
 import dev.nikelauncher.data.QuickLaunchSlot
 import dev.nikelauncher.data.folderToken
@@ -35,6 +36,7 @@ data class HomeData(
     val widgetHeightDp: Int,
     val nowPlayingHasContent: Boolean,
     val pins: HomePins,
+    val blockOffsets: BlockOffsets,
 ) {
     fun displayName(app: AppInfo, markWorkApps: Boolean, workSuffix: String): String {
         val base = nameOverrides[app.key] ?: app.label
@@ -79,6 +81,12 @@ class FolderActions(
 class LayoutActions(
     val onReorderFavorites: (List<String>) -> Unit,
     val onCommitPin: (HomeBlock, BlockPin?) -> Unit,
+    /** Moves a block sideways by this many dp, left negative. */
+    val onNudgeX: (HomeBlock, Int) -> Unit,
+    /** Changes how far the block keeps from the screen edge by this many dp. */
+    val onNudgeEdge: (HomeBlock, Int) -> Unit,
+    /** Puts the sideways move back to nothing. */
+    val onResetOffset: (HomeBlock) -> Unit,
     val onResizeNowPlaying: (Int) -> Unit,
     val onFavoritesBoundsChanged: (topPx: Float, bottomPx: Float) -> Unit,
     val onEditScrubBand: () -> Unit,

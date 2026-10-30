@@ -102,6 +102,7 @@ fun NikeNavHost(
                     widgetHeightDp = library.widgetHeightDp,
                     nowPlayingHasContent = false,
                     pins = library.pins,
+                    blockOffsets = library.blockOffsets,
                 ),
                 folders = library.folders,
                 favoriteKeys = library.favoriteKeys,

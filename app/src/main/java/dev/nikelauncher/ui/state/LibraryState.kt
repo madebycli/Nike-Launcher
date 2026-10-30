@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dev.nikelauncher.data.FavoritesSource
 import dev.nikelauncher.data.Folder
+import dev.nikelauncher.data.BlockOffsets
 import dev.nikelauncher.data.HomePins
 import dev.nikelauncher.data.Prefs
 
@@ -28,6 +29,7 @@ class LibraryState(
     val widgetIds: List<Int>,
     val widgetHeightDp: Int,
     val pins: HomePins,
+    val blockOffsets: BlockOffsets,
     val scrubBand: Pair<Float, Float>?,
     val layoutDefaultsVersion: Int?,
     val welcomeSeen: Boolean,
@@ -57,12 +59,13 @@ fun rememberLibraryState(prefs: Prefs): LibraryState {
     val widgetIds by home.widgetIds.collectAsState(emptyList())
     val widgetHeightDp by home.widgetHeightDp.collectAsState(180)
     val pins by home.homePins.collectAsState(HomePins.Default)
+    val blockOffsets by home.blockOffsets.collectAsState(BlockOffsets())
     val scrubBand by prefs.strip.scrubBand.collectAsState(null)
     val layoutDefaultsVersion by home.layoutDefaultsVersion.collectAsState(null)
     val welcomeSeen by home.welcomeSeen.collectAsState(true)
     return LibraryState(
         hiddenApps, favoriteKeys, frequentExcluded, favoritesEverSet, folders, nameOverrides, launchCounts,
         favoritesSource, frequentCount, cornerButtonKey, quickLeft, quickRight, widgetIds, widgetHeightDp,
-        pins, scrubBand, layoutDefaultsVersion, welcomeSeen,
+        pins, blockOffsets, scrubBand, layoutDefaultsVersion, welcomeSeen,
     )
 }

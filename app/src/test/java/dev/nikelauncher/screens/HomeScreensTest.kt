@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
@@ -51,12 +52,19 @@ class HomeScreensTest {
         rule.onAllNodesWithText("Edit icon & name").onFirst().performClick()
         rule.waitForIdle()
         rule.shoot("h1c-edit-app")
-        rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
-        rule.waitForIdle()
+        rule.onNodeWithContentDescription("Cancel").performClick()
+        rule.waitUntil(10_000) { rule.onAllNodesWithText("Edit app").fetchSemanticsNodes().isEmpty() }
         rule.onRoot().performTouchInput { longClick(Offset(width / 2f, height * 0.85f)) }
         rule.onAllNodesWithText("Edit layout").onFirst().performClick()
         rule.waitForIdle()
         rule.shoot("h2-edit")
+        rule.onAllNodesWithText("Favorites").onFirst().performClick()
+        rule.waitForIdle()
+        rule.shoot("h2b-edit-selected")
+        repeat(12) { rule.onNodeWithContentDescription("Move right").performClick() }
+        repeat(30) { rule.onNodeWithContentDescription("Move up").performClick() }
+        rule.waitForIdle()
+        rule.shoot("h2c-edit-moved")
         // Still there a moment later: the layout must not snap back on its own.
         rule.mainClock.advanceTimeBy(2_000)
         rule.shoot("h3-edit-later")

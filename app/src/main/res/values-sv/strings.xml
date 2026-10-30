@@ -655,4 +655,10 @@
     <string name="font_google_sans_flex">Google Sans Flex</string>
     <string name="font_niagara">Niagara / Nunito Sans</string>
     <string name="widget_clock_color_reset">Återställ klockans färg till vitt</string>
+    <string name="edit_move_left">Flytta åt vänster</string>
+    <string name="edit_move_up">Flytta uppåt</string>
+    <string name="edit_move_down">Flytta nedåt</string>
+    <string name="edit_move_right">Flytta åt höger</string>
+    <string name="edit_edge_distance">Avstånd från kanten</string>
+    <string name="edit_value_dp">%1$d dp</string>
 </resources>

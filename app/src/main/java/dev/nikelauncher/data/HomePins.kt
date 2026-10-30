@@ -44,6 +44,23 @@ data class BlockPin(val edge: PinEdge, val fraction: Float) {
     }
 }
 
+/** How far each block is moved sideways from where its alignment puts it, in dp: left negative, right positive. */
+data class BlockOffsets(
+    val widget: Int = 0,
+    val nowPlaying: Int = 0,
+    val favorites: Int = 0,
+) {
+    operator fun get(block: HomeBlock): Int = when (block) {
+        HomeBlock.WIDGET -> widget
+        HomeBlock.NOW_PLAYING -> nowPlaying
+        HomeBlock.FAVORITES -> favorites
+    }
+
+    companion object {
+        const val LIMIT_DP = 300
+    }
+}
+
 /** The pin of every block; null means the block follows the one above it. */
 data class HomePins(
     val widget: BlockPin? = null,

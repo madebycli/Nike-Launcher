@@ -680,4 +680,10 @@
     <string name="font_google_sans_flex">Google Sans Flex</string>
     <string name="font_niagara">Niagara / Nunito Sans</string>
     <string name="widget_clock_color_reset">Przywróć biały kolor zegara</string>
+    <string name="edit_move_left">W lewo</string>
+    <string name="edit_move_up">W górę</string>
+    <string name="edit_move_down">W dół</string>
+    <string name="edit_move_right">W prawo</string>
+    <string name="edit_edge_distance">Odstęp od krawędzi</string>
+    <string name="edit_value_dp">%1$d dp</string>
 </resources>

@@ -675,5 +675,11 @@
     <string name="font_google_sans_flex">Google Sans Flex</string>
     <string name="font_niagara">Niagara / Nunito Sans</string>
     <string name="widget_clock_color_reset">Сбросить цвет часов на белый</string>
+    <string name="edit_move_left">Влево</string>
+    <string name="edit_move_up">Вверх</string>
+    <string name="edit_move_down">Вниз</string>
+    <string name="edit_move_right">Вправо</string>
+    <string name="edit_edge_distance">Отступ от края</string>
+    <string name="edit_value_dp">%1$d dp</string>
 </resources>
 

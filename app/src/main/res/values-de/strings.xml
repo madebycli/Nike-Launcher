@@ -651,4 +651,10 @@
     <string name="font_niagara">Niagara / Nunito Sans</string>
     <string name="font_google_sans_flex">Google Sans Flex</string>
     <string name="widget_clock_color_reset">Uhrfarbe auf Weiß zurücksetzen</string>
+    <string name="edit_move_left">Nach links</string>
+    <string name="edit_move_up">Nach oben</string>
+    <string name="edit_move_down">Nach unten</string>
+    <string name="edit_move_right">Nach rechts</string>
+    <string name="edit_edge_distance">Abstand vom Rand</string>
+    <string name="edit_value_dp">%1$d dp</string>
 </resources>

@@ -185,6 +185,11 @@ class AppearancePrefs internal constructor(private val store: DataStore<Preferen
         store.edit { it[PrefKeys.LABEL_SIZE_SP] = v }
     }
 
+    /** The rows' distance from the screen edge, changed by [deltaDp] from what is stored. */
+    suspend fun nudgeSidePaddingDp(deltaDp: Int, max: Int) {
+        store.edit { it[PrefKeys.SIDE_PADDING_DP] = ((it[PrefKeys.SIDE_PADDING_DP] ?: 20) + deltaDp).coerceIn(0, max) }
+    }
+
     suspend fun setSidePaddingDp(v: Int) {
         store.edit { it[PrefKeys.SIDE_PADDING_DP] = v }
     }

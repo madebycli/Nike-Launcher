@@ -52,6 +52,40 @@ class HomePrefs internal constructor(private val store: DataStore<Preferences>) 
         }
     }.distinctUntilChanged()
 
+    /** How far each home block has been moved sideways. */
+    val blockOffsets: Flow<BlockOffsets> = data.map { pref ->
+        fun at(key: androidx.datastore.preferences.core.Preferences.Key<Int>) =
+            (pref[key] ?: 0).coerceIn(-BlockOffsets.LIMIT_DP, BlockOffsets.LIMIT_DP)
+        BlockOffsets(at(PrefKeys.BLOCK_OFFSET_WIDGET), at(PrefKeys.BLOCK_OFFSET_NOW_PLAYING), at(PrefKeys.BLOCK_OFFSET_FAVORITES))
+    }.distinctUntilChanged()
+
+    /** Moves a block sideways by [deltaDp] from what is stored, so quick repeats never overwrite each other. */
+    suspend fun nudgeBlockOffset(block: HomeBlock, deltaDp: Int) {
+        val key = when (block) {
+            HomeBlock.WIDGET -> PrefKeys.BLOCK_OFFSET_WIDGET
+            HomeBlock.NOW_PLAYING -> PrefKeys.BLOCK_OFFSET_NOW_PLAYING
+            HomeBlock.FAVORITES -> PrefKeys.BLOCK_OFFSET_FAVORITES
+        }
+        store.edit { it[key] = ((it[key] ?: 0) + deltaDp).coerceIn(-BlockOffsets.LIMIT_DP, BlockOffsets.LIMIT_DP) }
+    }
+
+    /** The widget's distance from the screen edge, changed by [deltaDp] from what is stored. */
+    suspend fun nudgeWidgetSidePadding(deltaDp: Int, max: Int) {
+        store.edit {
+            val current = it[PrefKeys.WIDGET_SIDE_PADDING_DP] ?: it[PrefKeys.SIDE_PADDING_DP] ?: 20
+            it[PrefKeys.WIDGET_SIDE_PADDING_DP] = (current + deltaDp).coerceIn(0, max)
+        }
+    }
+
+    suspend fun setBlockOffset(block: HomeBlock, dp: Int) {
+        val key = when (block) {
+            HomeBlock.WIDGET -> PrefKeys.BLOCK_OFFSET_WIDGET
+            HomeBlock.NOW_PLAYING -> PrefKeys.BLOCK_OFFSET_NOW_PLAYING
+            HomeBlock.FAVORITES -> PrefKeys.BLOCK_OFFSET_FAVORITES
+        }
+        store.edit { it[key] = dp.coerceIn(-BlockOffsets.LIMIT_DP, BlockOffsets.LIMIT_DP) }
+    }
+
     suspend fun setHomePin(block: HomeBlock, pin: BlockPin?) {
         val key = when (block) {
             HomeBlock.WIDGET -> PrefKeys.HOME_PIN_WIDGET

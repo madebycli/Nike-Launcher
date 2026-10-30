@@ -655,4 +655,10 @@
     <string name="font_google_sans_flex">Google Sans Flex</string>
     <string name="font_niagara">Niagara / Nunito Sans</string>
     <string name="widget_clock_color_reset">Reset clock color to white</string>
+    <string name="edit_move_left">Move left</string>
+    <string name="edit_move_up">Move up</string>
+    <string name="edit_move_down">Move down</string>
+    <string name="edit_move_right">Move right</string>
+    <string name="edit_edge_distance">Distance from the edge</string>
+    <string name="edit_value_dp">%1$d dp</string>
 </resources>
