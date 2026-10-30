@@ -106,6 +106,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
         val APP_LIST_BACKGROUND_IMAGE = stringPreferencesKey("app_list_background_image")
         val APP_LIST_BACKGROUND_EDGES = booleanPreferencesKey("app_list_background_edges")
         val APP_LIST_TINT = intPreferencesKey("app_list_tint")
+        val APP_LIST_TEXT_CLOUD = intPreferencesKey("app_list_text_cloud_strength")
         val APP_LIST_GRAIN = intPreferencesKey("app_list_grain")
         val QUICK_ZONE_BOTTOM = intPreferencesKey("quick_zone_bottom")
         val QUICK_ZONE_HEIGHT = intPreferencesKey("quick_zone_height")

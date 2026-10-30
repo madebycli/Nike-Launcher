@@ -43,6 +43,7 @@ internal fun backgroundEntries(env: SettingsEnv): List<SettingsEntry> {
     val edges by list.backgroundEdges.collectAsState(false)
     val image by list.backgroundImage.collectAsState(null)
     val tint by list.tint.collectAsState(null)
+    val cloud by list.textCloud.collectAsState(0)
     var pickingTint by remember { mutableStateOf(false) }
     // The picker's grant lasts only as long as the import: what is kept is a copy in our own storage.
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -52,11 +53,13 @@ internal fun backgroundEntries(env: SettingsEnv): List<SettingsEntry> {
     }
     val blurTitle = stringResource(R.string.settings_app_list_effect_blur)
     val strengthTitle = stringResource(R.string.settings_app_list_effect_strength)
+    val cloudTitle = stringResource(R.string.settings_app_list_text_cloud)
     val grainTitle = stringResource(R.string.settings_app_list_grain)
     val imageTitle = stringResource(R.string.settings_app_list_background_image)
     val edgesTitle = stringResource(R.string.settings_app_list_background_edges)
     val removeTitle = stringResource(R.string.action_remove)
     val none = stringResource(R.string.settings_quick_launch_none)
+    val pixelTitle = stringResource(R.string.settings_app_list_effect_pixel)
     val tintTitle = stringResource(R.string.settings_app_list_tint)
     val resetTitle = stringResource(R.string.action_reset)
     if (pickingTint) {
@@ -72,15 +75,18 @@ internal fun backgroundEntries(env: SettingsEnv): List<SettingsEntry> {
         if (tint != null) SettingsEntry(SECTION, settingsItem(resetTitle, { env.write { list.setTint(null) } }), "tint reset") else null,
         SettingsEntry(SECTION, settingsBlock(blurTitle) {
             ChoiceChips(
-                options = listOf(AppListBackgroundEffect.NONE, AppListBackgroundEffect.BLUR),
+                options = AppListBackgroundEffect.entries,
                 selected = effect,
-                label = { if (it == AppListBackgroundEffect.BLUR) blurTitle else none },
+                label = { when (it) { AppListBackgroundEffect.BLUR -> blurTitle; AppListBackgroundEffect.PIXEL -> pixelTitle; AppListBackgroundEffect.NONE -> none } },
                 onSelect = { env.write { list.setBackgroundEffect(it) } },
             )
         }, "blur wallpaper background"),
-        if (effect == AppListBackgroundEffect.BLUR) SettingsEntry(SECTION, settingsBlock(strengthTitle, value = "$strength%") {
+        if (effect != AppListBackgroundEffect.NONE) SettingsEntry(SECTION, settingsBlock(strengthTitle, value = "$strength%") {
             SettingsSlider(strength.toFloat(), 0f..100f, { env.write { list.setBackgroundStrength(it.toInt()) } }, step = 5f)
         }, "blur strength") else null,
+        SettingsEntry(SECTION, settingsBlock(cloudTitle, value = "$cloud%") {
+            SettingsSlider(cloud.toFloat(), 0f..100f, { env.write { list.setTextCloud(it.toInt()) } }, step = 5f)
+        }, "text contrast cloud halo"),
         SettingsEntry(SECTION, settingsBlock(grainTitle, value = "$grain%") {
             SettingsSlider(grain.toFloat(), 0f..100f, { env.write { list.setGrain(it.toInt()) } }, step = 5f)
         }, "grain noise"),

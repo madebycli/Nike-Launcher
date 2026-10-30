@@ -42,6 +42,7 @@ import dev.nikelauncher.data.CORNER_SIZE_RANGE
 import dev.nikelauncher.data.CornerAction
 import dev.nikelauncher.data.CornerAppearance
 import dev.nikelauncher.data.CornerColorMode
+import dev.nikelauncher.data.CornerIcon
 import dev.nikelauncher.data.CornerSettings
 import dev.nikelauncher.data.CornerShape
 import dev.nikelauncher.ui.kit.settings.ChoiceChips
@@ -83,6 +84,7 @@ internal fun CornerSettingsSheet(
     val backgroundTitle = stringResource(R.string.corner_background_color)
     val autoIconTitle = stringResource(R.string.corner_auto_icon_color)
     val iconColorTitle = stringResource(R.string.corner_icon_color)
+    val badgeTitle = stringResource(R.string.corner_badge)
     val tapLabel = stringResource(current.tap.label)
     val swipeLabel = stringResource(current.swipe.label)
 
@@ -121,6 +123,9 @@ internal fun CornerSettingsSheet(
                 block(sizeTitle, value = "${current.sizeDp} dp") {
                     SettingsSlider(current.sizeDp.toFloat(), CORNER_SIZE_RANGE.first.toFloat()..CORNER_SIZE_RANGE.last.toFloat(), { v -> scope.launch { prefs.setSize(v.toInt()) } })
                 }
+            }
+            SettingsGroup {
+                switchItem(badgeTitle, appearance.icon == CornerIcon.BADGE, { v -> scope.launch { prefs.setIcon(if (v) CornerIcon.BADGE else CornerIcon.ACTION) } })
             }
             ChoiceChips(
                 options = CornerColorMode.entries,

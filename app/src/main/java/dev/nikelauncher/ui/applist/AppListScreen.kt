@@ -73,6 +73,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.LocalTextStyle
 import dev.nikelauncher.ui.theme.launcherTextShadow
+import dev.nikelauncher.ui.theme.textContrastCloud
 import androidx.compose.runtime.Composable
 import dev.nikelauncher.ui.home.rows.FolderIcon
 import androidx.compose.runtime.CompositionLocalProvider
@@ -1366,7 +1367,7 @@ fun AppListScreen(
                         ?.let { onLaunch(it.app) }
                 },
                 atBottom = true,
-                modifier = Modifier.focusRequester(searchFocus),
+                modifier = Modifier.focusRequester(searchFocus).smoothSearchImeJumps(enabled = true),
             )
         }
         }
@@ -1535,7 +1536,7 @@ private fun AppRow(
             val gap = if (LocalIconConfig.current.showIcons) 16.dp else 0.dp
             // fill = false so the label takes only the width it needs and the icon stays
             // beside it; a plain weight spans the row and pins the icon to the far edge.
-            val labelModifier = Modifier.weight(1f, fill = false)
+            val labelModifier = Modifier.weight(1f, fill = false).textContrastCloud(contentColor)
             val text: @Composable () -> Unit = {
                 Text(
                     label,

@@ -20,12 +20,16 @@ enum class CornerShape { CIRCLE, SQUIRCLE, OUTLINE, MINIMAL }
 
 enum class CornerColorMode { CLASSIC, MATERIAL, CUSTOM }
 
+/** The icon can follow the action or keep the launcher's own mark whatever the action is. */
+enum class CornerIcon { ACTION, BADGE }
+
 data class CornerAppearance(
     val colorMode: CornerColorMode = CornerColorMode.CLASSIC,
     val background: Int = 0xFFFFFFFF.toInt(),
     val foreground: Int = 0xFF153E49.toInt(),
     val automaticForeground: Boolean = true,
     val backgroundOpacity: Int = 100,
+    val icon: CornerIcon = CornerIcon.ACTION,
 )
 
 /** Everything the corner button is set to, read as one so it never draws half of a change. */

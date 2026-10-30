@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -37,7 +38,11 @@ internal fun NotificationReply(
     modifier: Modifier = Modifier,
 ) {
     // The target is the action and input themselves, not a position in a list that may change.
-    val action = preview.actions.firstOrNull { a -> a.inputs.any { it.allowFreeFormInput || !it.choices.isNullOrEmpty() } } ?: return
+    val targets = preview.actions.filter { a -> a.inputs.any { it.allowFreeFormInput || !it.choices.isNullOrEmpty() } }
+    if (targets.isEmpty()) return
+    // An app can offer several places to answer, such as two accounts; the first is chosen until another is.
+    var chosen by remember(preview.key) { mutableStateOf(0) }
+    val action = targets[chosen.coerceIn(0, targets.lastIndex)]
     val input = action.inputs.firstOrNull { it.allowFreeFormInput } ?: action.inputs.first()
     val target = PreviewReplyTarget(action.intent, input.resultKey)
     var text by remember(preview.key) { mutableStateOf("") }
@@ -49,6 +54,13 @@ internal fun NotificationReply(
         }
     }
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (targets.size > 1) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                targets.forEachIndexed { index, target ->
+                    FilterChip(selected = index == chosen, onClick = { chosen = index }, label = { Text(target.title.ifBlank { stringResource(R.string.notification_reply) }) })
+                }
+            }
+        }
         input.choices?.takeIf { it.isNotEmpty() }?.let { choices ->
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 choices.forEach { choice -> AssistChip(onClick = { send(choice.toString()) }, label = { Text(choice.toString()) }) }

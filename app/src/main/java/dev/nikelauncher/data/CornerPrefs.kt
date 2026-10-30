@@ -25,6 +25,7 @@ class CornerPrefs internal constructor(private val store: DataStore<Preferences>
         val FOREGROUND = intPreferencesKey("corner_foreground")
         val AUTO_FOREGROUND = booleanPreferencesKey("corner_auto_foreground")
         val BACKGROUND_OPACITY = intPreferencesKey("corner_background_opacity")
+        val ICON = stringPreferencesKey("corner_icon")
         val BUTTON_KEY = stringPreferencesKey("corner_button_key")
         val SEARCH_FLOATING = booleanPreferencesKey("search_button_floating")
         val SEARCH_HIDE_WHILE_SCROLLING = booleanPreferencesKey("search_button_hide_while_scrolling")
@@ -57,6 +58,7 @@ class CornerPrefs internal constructor(private val store: DataStore<Preferences>
                 foreground = pref[Keys.FOREGROUND] ?: CornerAppearance().foreground,
                 automaticForeground = pref[Keys.AUTO_FOREGROUND] ?: true,
                 backgroundOpacity = (pref[Keys.BACKGROUND_OPACITY] ?: 100).coerceIn(0, 100),
+                icon = pref[Keys.ICON].toEnum(CornerIcon.ACTION),
             ),
         )
     }.distinctUntilChanged()
@@ -71,6 +73,8 @@ class CornerPrefs internal constructor(private val store: DataStore<Preferences>
     suspend fun setForeground(v: Int) = store.edit { it[Keys.FOREGROUND] = v }.let { }
     suspend fun setAutomaticForeground(v: Boolean) = store.edit { it[Keys.AUTO_FOREGROUND] = v }.let { }
     suspend fun setBackgroundOpacity(v: Int) = store.edit { it[Keys.BACKGROUND_OPACITY] = v.coerceIn(0, 100) }.let { }
+
+    suspend fun setIcon(v: CornerIcon) = store.edit { it[Keys.ICON] = v.name }.let { }
 
     suspend fun resetColors() {
         store.edit {

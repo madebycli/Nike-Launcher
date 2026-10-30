@@ -72,7 +72,7 @@ internal fun NotificationDetail(
             picture?.let {
                 Image(it, null, Modifier.fillMaxWidth().heightIn(max = 240.dp), contentScale = ContentScale.Fit)
             }
-            if (preview.messages.isNotEmpty()) NotificationMessages(preview.messages) else if (preview.text.isNotBlank()) {
+            if (preview.messages.isNotEmpty()) NotificationMessages(preview.key, preview.messages) else if (preview.text.isNotBlank()) {
                 Text(preview.text, style = MaterialTheme.typography.bodyLarge)
             }
             if (failed) {

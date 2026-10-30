@@ -634,4 +634,13 @@
         <item quantity="one">%1$d App ausgenommen</item>
         <item quantity="other">%1$d Apps ausgenommen</item>
     </plurals>
+    <string name="settings_app_list_effect_pixel">Pixeln</string>
+    <string name="corner_badge">Immer das Launcher-Zeichen zeigen</string>
+    <string name="notification_hide_message">Nachricht hier ausblenden</string>
+    <string name="notification_photo">Foto</string>
+    <plurals name="notification_earlier_messages">
+        <item quantity="one">%1$d frühere Nachricht</item>
+        <item quantity="other">%1$d frühere Nachrichten</item>
+    </plurals>
+    <string name="settings_app_list_text_cloud">Kontrastwolke hinter Text</string>
 </resources>

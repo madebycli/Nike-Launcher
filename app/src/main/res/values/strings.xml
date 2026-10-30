@@ -638,4 +638,13 @@
     <string name="widget_pages_dim">Dim widget pages</string>
     <string name="widget_pages_dim_strength">Dimming strength</string>
     <string name="settings_app_list_tint">Tint behind the list</string>
+    <string name="settings_app_list_effect_pixel">Pixelate</string>
+    <string name="corner_badge">Always show the launcher mark</string>
+    <string name="notification_hide_message">Hide message here</string>
+    <string name="notification_photo">Photo</string>
+    <plurals name="notification_earlier_messages">
+        <item quantity="one">%1$d earlier message</item>
+        <item quantity="other">%1$d earlier messages</item>
+    </plurals>
+    <string name="settings_app_list_text_cloud">Text contrast cloud</string>
 </resources>

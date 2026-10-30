@@ -55,7 +55,6 @@ class AppListPrefs internal constructor(private val store: DataStore<Preferences
     val backgroundEffect: Flow<AppListBackgroundEffect> = data.map {
         runCatching { AppListBackgroundEffect.valueOf(it[PrefKeys.APP_LIST_BACKGROUND_EFFECT] ?: "NONE") }
             .getOrDefault(AppListBackgroundEffect.NONE)
-            .let { effect -> if (effect == AppListBackgroundEffect.PIXEL) AppListBackgroundEffect.NONE else effect }
     }.distinctUntilChanged()
 
     val backgroundStrength: Flow<Int> =
@@ -75,6 +74,14 @@ class AppListPrefs internal constructor(private val store: DataStore<Preferences
 
     suspend fun setTint(v: Int?) {
         store.edit { if (v == null) it.remove(PrefKeys.APP_LIST_TINT) else it[PrefKeys.APP_LIST_TINT] = v or 0xFF000000.toInt() }
+    }
+
+    /** A soft halo behind each name in the list, for text that is hard to read on a busy wallpaper. */
+    val textCloud: Flow<Int> =
+        data.map { (it[PrefKeys.APP_LIST_TEXT_CLOUD] ?: 0).coerceIn(0, 100) }.distinctUntilChanged()
+
+    suspend fun setTextCloud(v: Int) {
+        store.edit { it[PrefKeys.APP_LIST_TEXT_CLOUD] = v.coerceIn(0, 100) }
     }
 
     suspend fun setBackgroundEffect(v: AppListBackgroundEffect) {

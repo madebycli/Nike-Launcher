@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Rocket
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
@@ -26,6 +28,7 @@ import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.CornerAction
 import dev.nikelauncher.data.CornerAppearance
 import dev.nikelauncher.data.CornerColorMode
+import dev.nikelauncher.data.CornerIcon
 import dev.nikelauncher.data.CornerShape
 import dev.nikelauncher.ui.common.AppIcon
 
@@ -93,7 +96,9 @@ internal fun CornerButtonFace(
         shadowElevation = if (minimal || outline || appearance.backgroundOpacity < 40) 0.dp else 6.dp,
     ) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            if (action == CornerAction.APP && app != null) {
+            if (appearance.icon == CornerIcon.BADGE) {
+                Icon(Icons.Filled.Rocket, stringResource(action.label), Modifier.size((sizeDp * .44f).coerceIn(22f, 30f).dp))
+            } else if (action == CornerAction.APP && app != null) {
                 AppIcon(app, (sizeDp * .5f).toInt())
             } else {
                 Icon(action.icon, stringResource(action.label), Modifier.size((sizeDp * .44f).coerceIn(22f, 30f).dp))

@@ -3,6 +3,7 @@ package dev.nikelauncher.ui.home.route
 
 import android.app.SearchManager
 import dev.nikelauncher.ui.home.corner.FloatingSearchButton
+import dev.nikelauncher.ui.theme.LocalTextCloudStrength
 import dev.nikelauncher.data.CornerAppearance
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -10,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
@@ -64,6 +66,8 @@ internal fun AppListHost(
     val hideWhileScrolling by app.prefs.corner.hideSearchWhileScrolling.collectAsState(true)
     val searchAppearance by app.prefs.corner.searchAppearance.collectAsState(CornerAppearance())
 
+    val textCloud by app.prefs.appList.textCloud.collectAsState(0)
+    CompositionLocalProvider(LocalTextCloudStrength provides textCloud) {
     Box(Modifier.fillMaxSize()) {
         AppListScreen(
             model = models.list,
@@ -160,5 +164,6 @@ internal fun AppListHost(
                 modifier = Modifier.align(Alignment.BottomEnd),
             )
         }
+    }
     }
 }
