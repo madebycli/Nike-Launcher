@@ -165,3 +165,10 @@ Floating search exposes the existing independent foreground and automatic-foregr
 CornerSettingsPreview stays above scrolling controls and the title wraps at large German text.
 The real backup round-trip test restores defaults, clock options under a newly allocated widget id,
 horizontal offsets, quick-launch region and search colours without changing backup format 2.
+
+## Widget pages and weather verification
+
+WidgetGridToolbar uses stock Material button shapes and wrapping minimum-height controls.
+The grid now fits the regular 400-line cap; its size exception is removed. WidgetPagesScreensTest
+renders the real grid and confirms resizing. WeatherScreensTest injects live-state fixtures into
+the actual overview/daily/hourly sheets and checks German headers at 150% font scale.

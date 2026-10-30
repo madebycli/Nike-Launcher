@@ -9,7 +9,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -18,7 +17,6 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.*
@@ -70,13 +68,14 @@ fun ClockOverviewSheet(
     initialMode: String,
     onDismiss: () -> Unit,
     configOverride: ClockWidgetConfig? = null,
+    liveStateOverride: ClockLiveState? = null,
 ) {
     val context = LocalContext.current
     val mode = if (initialMode == "weather") "weather" else "agenda"
     var permissionRevision by remember { mutableIntStateOf(0) }
     var weatherPage by remember { mutableStateOf(WeatherPage.OVERVIEW) }
     val liveState =
-        key(permissionRevision) {
+        liveStateOverride ?: key(permissionRevision) {
             rememberClockLiveState(
                 widgetId,
                 override = configOverride,

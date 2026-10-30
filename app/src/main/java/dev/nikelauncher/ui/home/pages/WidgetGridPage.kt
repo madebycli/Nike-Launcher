@@ -1,14 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.home.pages
 
-import androidx.compose.material3.AlertDialog
 import android.appwidget.AppWidgetManager
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -19,13 +15,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,21 +28,8 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -70,13 +50,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
@@ -84,16 +62,13 @@ import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import dev.nikelauncher.R
+import dev.nikelauncher.ui.home.pages.components.WidgetGridToolbar
 import dev.nikelauncher.data.GridWidget
 import dev.nikelauncher.data.WidgetPageSide
-import dev.nikelauncher.data.resizeGridWidget
 import dev.nikelauncher.data.moveGridWidget
-import dev.nikelauncher.ui.kit.settings.ChoiceChips
-import dev.nikelauncher.ui.kit.settings.SettingsSlider
 import dev.nikelauncher.widget.WidgetPage
 import dev.nikelauncher.widget.WidgetSettingsButton
 
@@ -258,39 +233,9 @@ internal fun WidgetGridPage(
                 )
             },
     ) {
-        AnimatedVisibility(visible = editing) {
-            Row(
-                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                FilledTonalButton(
-                    onClick = {
-                        if (selected == null) onAdd()
-                        else { onRemove(selected.id); selectedId = null }
-                    },
-                    shape = CircleShape,
-                    modifier = Modifier.weight(1f, fill = false).height(48.dp),
-                ) {
-                    Icon(if (selected == null) Icons.Filled.Add else Icons.Filled.Close, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(if (selected == null) R.string.widget_add else R.string.widget_pages_remove_short),
-                        maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                Spacer(Modifier.width(12.dp))
-                val done: @Composable () -> Unit = {
-                    Icon(Icons.Filled.Check, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.widget_pages_done))
-                }
-                if (selected == null) {
-                    FilledTonalButton(onClick = onDone, shape = CircleShape, modifier = Modifier.height(48.dp)) { done() }
-                } else {
-                    OutlinedButton(onClick = onDone, shape = CircleShape, border = BorderStroke(1.dp, accent),
-                        modifier = Modifier.height(48.dp)) { done() }
-                }
-            }
-        }
+        WidgetGridToolbar(editing, selected != null, onPrimary = {
+            if (selected == null) onAdd() else { onRemove(selected.id); selectedId = null }
+        }, onDone = onDone)
         // Also intentionally empty when there are no widgets. A hold opens Add / Done.
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
