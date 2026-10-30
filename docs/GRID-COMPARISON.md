@@ -10,7 +10,7 @@ that tag were also opened. The reference app was not executed in an emulator.
 | Area | Nike implementation and verification |
 |---|---|
 | Clock settings structure | Home, Clock, Styles, Calendar, Weather and Appearance; actual pages rendered by `ClockConfigScreensTest` |
-| Pinned preview | Same one-third / 120-240dp height rule and scaling as the reference; actual `ClockHeader`, Material shape and colour tokens |
+| Pinned preview | Fixed one-third / 120-240dp viewport; actual `ClockHeader`, contrast-selected Material plate in both themes |
 | Clock styles | All 20 styles, grouped gallery, selected-style preview, selected-state contrast; every gallery row rendered |
 | Time format | System, 12-hour and 24-hour choices; same stored enum values |
 | Date | All existing formats and custom entry; off/on retains the chosen format; state restoration and save exercised |
@@ -18,7 +18,7 @@ that tag were also opened. The reference app was not executed in an emulator.
 | Additional rows | Battery, next alarm and notification count retained |
 | Appearance | Time/date/calendar/battery/weather/notification size and opacity, text colour/reset, text width and clock-to-data gap retained; exact entry rejects invalid numbers |
 | Weather settings | Enabled state, Celsius/Fahrenheit, selected app, forecast and provider status retained |
-| Home editing | Vertical frame nudges, independent horizontal content offsets and edge distance; actual edit controls exercised beneath the gesture annotations |
+| Home editing | Independent reserved fields, grouped selection/movement/spacing, per-field edge distance and persistent drafts; actual edit controls exercised beneath gesture annotations |
 | Gesture zones | Left/right/both edges, band-only/full-height zones, system inset and corner keep-out geometry; quick-launch app names and configured region; up/down direction markers |
 | Notification overview | Actual sheet rendered with invented snapshots; Material swipe dismissal and explicit clear/dismiss controls |
 | Conversation | Consecutive-author grouping and pause timestamps, incoming/outgoing sides, newest-message anchoring, hide action, inline attachments and provider actions |
@@ -36,7 +36,7 @@ that tag were also opened. The reference app was not executed in an emulator.
 
 ## Resource-name audit
 
-The tagged reference contains 422 English string keys. Nike contains 613. The 94 reference key
+The tagged reference contains 422 English string keys. Nike contains 618. The 94 reference key
 names absent from Nike were reviewed by area; absent names do not by themselves indicate absent
 behaviour. Existing Nike keys were kept stable.
 

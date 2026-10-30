@@ -714,4 +714,5 @@
     <string name="edit_block_spacing">Espacio entre bloques</string>
     <string name="edit_select_all">Seleccionar todo</string>
     <string name="edit_mixed">Mixto</string>
+    <string name="edit_value_sp">%1$d sp</string>
 </resources>

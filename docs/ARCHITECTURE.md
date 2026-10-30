@@ -15,6 +15,7 @@ data/
   Prefs.kt                      owns the DataStore; settings live in Library/Appearance/Home/AppList/Strip/Corner/WidgetPagePrefs.kt, keys in PrefKeys.kt
   backup/                       the backup file: typed values, widgets with new ids, files the settings point at, widgets left to confirm
   prefs/WidgetAppPrefs.kt        default clock/calendar/weather apps for newly created clock widgets
+  prefs/HomeLayoutPrefs.kt       atomic frame pins, shared block gaps and selected-field edge distances
   Folder.kt                     folder model + JSON persistence + favorites token encoding
   HomePins.kt                   where each home block is held (edge + fraction)
   WidgetPages.kt                the grids of widgets on the pages either side of home
@@ -23,8 +24,9 @@ ui/
   NikeNavHost.kt                collects settings once, hosts the navigation graph, shows the first-run setup
   home/HomeRoute.kt             home destination: pages, app-list overlay, edge zones
   home/route/                   list host, wallpaper layers, page host, gesture exclusions; ObserveScrubBand isolates band subscriptions
-  home/stack/, blocks/, rows/   the pinned stack, its blocks, favorite and folder rows
-  home/edit/                    edit mode: frames, drag handles, snap guides; NudgePanel moves the selected frame vertically and its clipped contents horizontally
+  home/stack/, blocks/, rows/   independent reserved frames, their contents, favorite and folder rows
+  home/scroll/                 pure elastic-drag boundaries; HomeScroll owns synchronous input and one settling job
+  home/edit/                    frame selection/draft, grouped placement, nudge controls and the Material home-layout settings sheet
   home/pages/                   widget pages: pager, grid, resize and reorder; components/WidgetGridToolbar uses stock button defaults
   home/corner/                  the corner button, its sheets, a pinned CornerSettingsPreview and the floating search button
   home/setup/                   the first-run flow; StyleStep pins a StylePreview (the favorites, read from the same prefs) above the style controls
@@ -52,7 +54,11 @@ pattern survive activity recreation. Disabling the date preserves its format for
 is enabled. Every page uses the settings kit; the pinned preview uses the actual clock header.
 The style gallery is the only page that replaces the preview with its own selected-style card.
 Calendar selection and the style gallery live in separate files. Date and number entry use the
-state-based Material text-field API.
+state-based Material text-field API. The preview reserves a fixed 120-240dp viewport rather than
+resizing to the current text. PreviewContrast chooses among Material surfaces by measured contrast,
+so white text keeps a dark plate in either theme. The first-run style preview reserves 200dp and
+scrolls its unconstrained rows internally. It reuses AlignedIconLabel so large/right-side icons
+keep their requested size and cannot be squeezed by labels or earlier rows.
 
 **Setup uses the same app pickers as widget settings.** `WidgetAppPrefs` stores initial app choices
 in the main DataStore, so they travel in the existing typed backup format. The three new keys are
@@ -65,10 +71,40 @@ modifier on the entire setup consumed the down event needed by reorder handles. 
 use the existing `sh.calvin.reorderable.ReorderableColumn` and Material up/down buttons, with ordering
 in the framework-free `RowOrder.kt`.
 
-**A block frame and its contents have independent positions.** `HomePins` anchors a full-width frame
-vertically. `BlockOffsets` stores each block's horizontal content offset in `block_offset_*`; content
-is clipped to its frame. `NudgePanel` also changes row/widget edge padding through their existing
-preferences. These keys are included in the settings backup.
+**A home block owns its field even when its contents disappear.** When Now Playing is enabled,
+its fixed-height field remains in the stack during playback, pause, dismissal and silence. Only
+content inside that field changes. Edit mode does not add padding to measured frames or insert a
+missing widget placeholder. Adding a widget remains available in the menu and toolbar.
+Pins are authoritative rather than pushed by preceding blocks. Short pinned fields are clamped
+inside the usable viewport; oversized content can still scroll. Content extent is the furthest
+frame bottom plus the navigation inset, not the last enumerated frame or the outer constrained box.
+
+MediaDismiss wraps the audio card in the stock Material SwipeToDismissBox. A short, interrupted or
+cancelled swipe rebounds under Material state ownership; there are no per-event launched snaps.
+A new MediaSession receives fresh dismissal state. HomeLayoutScreensTest checks the title's actual
+horizontal position after a partial/cancelled swipe before verifying full swipe dismissal.
+
+**Editing uses the latest settings and an acknowledged draft.** PinEditor reads current data/actions
+through updated references, freezes unpinned neighbours when placing fields, and keeps pending moves
+visible after Done until their encoded pin values match the store. Cancellation restores the earlier
+draft. Frame chips support multiple selection; vertical drags and nudges move that group together.
+HomeEditControls owns the controls and HomeLayoutSheet uses Material settings groups/sliders for
+block gaps, favorite-row spacing and common selected-field edge distances. Batch pins and edge edits
+are atomic. Changing a shared padding fallback first preserves unselected fields' inherited values.
+Nudge buttons implement ordinary clicks and hold-repeat; fractional pixel carry prevents repeated
+one-dp steps drifting on the Pixel 9's 2.625 density. Editor controls never change frame dimensions.
+
+The new persisted keys are `home_block_gap_dp` (default 12) and `home_media_side_padding_dp` (falls
+back to the existing side padding until explicitly changed). Existing pin, padding, offset and row
+spacing keys keep their names and types. All keys remain covered by typed backup format 2.
+
+**Home dragging has one animation owner.** Pointer deltas update the offset synchronously; a single
+settling job is cancelled before the next drag. Elastic travel is bounded and returns to the same
+boundary on release or cancellation. Real overflowing content retains ordinary scrolling. The
+settling spec comes from the Material motion scheme. Pull thresholds use undamped travel; a deep
+pull requests the existing notification-shade action once. Android still requires its existing
+accessibility-service route on builds that block reflection. Tests exercise cancellation, interrupted
+rebound, swipe-up completion and the actual accessibility global-action request under Robolectric.
 
 **Edit-mode gesture annotations do not receive touches.** `HomeGestureZones` uses Canvas and Material
 badges without pointer handlers, below the nudge panel and edit toolbar. `GestureZoneGeometry` follows edge side/insets/width, the optional
@@ -158,27 +194,3 @@ whichever app is the current Home.
 - No generated Baseline Profile. Recording and validating one still needs a device.
 - Robolectric verifies real Compose layouts and simulated interactions. Device gesture velocity,
   notification-provider delivery, system-role dialogs, wallpaper and frame timing need phone checks.
-
-## Elastic home input
-
-HomeScroll applies pointer deltas synchronously and owns one cancelling/settling animation using
-the Material motion scheme. HomeStack reports actual content height rather than the constrained
-outer box. Short content rebounds to its boundary, including cancelled/interrupted gestures;
-real overflow still scrolls. Deep pull uses undamped travel and requests the existing shade action
-once. HomeScrollInteractionTest drives the real draggable/clock and records the accessibility
-global-action request through SystemUi with a Robolectric service; DragMathTest covers boundaries.
-
-## Reserved home fields and grouped editing
-
-Enabled Now Playing owns a fixed-height field even during silence. MediaDismiss uses stock Material swipe state for partial/cancelled rebound and dismissal. Editing preserves the measured
-fields and does not inject an absent widget. Pins are authoritative and short pinned fields stay
-inside the usable viewport. The stack extent uses the furthest frame bottom plus navigation inset.
-PinEditor reads updated data/actions, retains drafts until encoded preference acknowledgement,
-freezes unpinned neighbours and supports grouped selection/placement without cascading movement.
-Frame chips, HomeEditControls and HomeLayoutSheet share that selection. Material settings groups
-and sliders control block gaps, favorite-row spacing and selected-field edge distances. Batch pins
-and edges are atomic in HomeLayoutPrefs; inherited values of unselected fields are preserved.
-Ordinary nudge clicks work alongside hold-repeat, with fractional pixel carry for one-dp steps.
-New keys home_block_gap_dp and home_media_side_padding_dp retain typed backup format 2 and are
-covered by the real backup round trip. HomeLayoutScreensTest asserts media transitions, swipe
-dismissal, edit-mode bounds, group moves and persisted placement in English/German large text.

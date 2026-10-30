@@ -17,6 +17,35 @@ Before every push run `testDebugUnitTest lintDebug assembleDebug`. Also build `:
 and send its APK as a ZIP at the end of the work block. Do not commit generated output or signing
 material. The perf package is `dev.nikelauncher.perf`, release-like and debug-signed.
 
+## Home and preview follow-up
+
+The user's Pixel 9 showed a short favorites list stranded above its resting position, media
+visibility moving other blocks, and unstable/low-contrast previews. This follow-up replaces the
+per-delta launched scroll snaps with synchronous input and a single Material settling animation.
+The short-home viewport cannot acquire phantom scroll space from a misplaced pinned field.
+Now Playing retains a fixed field while enabled; editing does not alter frame measurement.
+Pins no longer cascade through other pinned fields. The editor uses current references, keeps
+pending writes visible through Done, acknowledges encoded precision, and supports grouped selection,
+movement, spacing and edge distances. Its extracted Material settings sheet includes favorite-row
+spacing. All labels are resources in six locales. HomeLayoutPrefs owns the two new layout keys,
+which remain in backup format 2; selected padding edits preserve unselected inherited values.
+
+Clock previews reserve a fixed viewport and choose their Material plate by actual contrast in both
+themes. The setup style preview reserves 200dp and scrolls internally; AlignedIconLabel keeps sibling
+and right-side icons at the requested dimensions. See ARCHITECTURE.md for module details.
+
+New verification: ordinary HomeScrollInteractionTest, per-module drag/editor/contrast logic tests,
+HomeLayoutScreensTest (English/German large text) and PreviewLayoutScreensTest (light/dark).
+HomeLayoutScreensTest checks playback/pause/swipe-dismiss bounds, grouped nudging, common padding,
+block gaps and stored placement after Done/recreation. HomeScrollInteractionTest records the real
+accessibility shade action with a simulated service. Device frame timing and actual system-panel
+presentation remain device checks; do not turn those assertions into a smoothness claim.
+
+MediaDismiss wraps the audio card in the stock Material SwipeToDismissBox. A short, interrupted or
+cancelled swipe rebounds under Material state ownership; there are no per-event launched snaps.
+A new MediaSession receives fresh dismissal state. HomeLayoutScreensTest checks the title's actual
+horizontal position after a partial/cancelled swipe before verifying full swipe dismissal.
+
 ## Completed in this block
 
 - Rendered all six clock configuration pages, all 20 style previews and the date, number, app,

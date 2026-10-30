@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.platform.testTag
+import dev.nikelauncher.ui.common.previewPlate
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -17,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -49,19 +51,19 @@ internal fun PinnedPreview(state: ClockLiveState, content: @Composable ColumnSco
  */
 @Composable
 private fun ConfigPreview(state: ClockLiveState, maxHeight: Dp) {
-    val lightText = Color(state.config.textColor).luminance() >= .4f
-    val plate = if (lightText) MaterialTheme.colorScheme.inverseSurface else MaterialTheme.colorScheme.surfaceContainerHighest
-    Surface(shape = MaterialTheme.shapes.extraLarge, color = plate) {
+    val colors = MaterialTheme.colorScheme
+    val plate = previewPlate(Color(state.config.textColor), listOf(colors.surfaceContainerLowest, colors.surfaceContainerHighest, colors.inverseSurface))
+    Surface(modifier = Modifier.fillMaxWidth().height(maxHeight).testTag("clock-preview"), shape = MaterialTheme.shapes.extraLarge, color = plate) {
         Layout(
             content = { ClockHeader(state, interactive = false) },
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            modifier = Modifier.fillMaxSize().padding(20.dp),
         ) { measurables, constraints ->
             val child = measurables.single().measure(constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity))
             val available = (maxHeight - 40.dp).roundToPx().coerceAtLeast(1)
             val scale = minOf(1f, available.toFloat() / child.height.coerceAtLeast(1))
-            val height = (child.height * scale).toInt().coerceAtLeast(80.dp.roundToPx())
+            val height = constraints.maxHeight
             layout(constraints.maxWidth, height) {
-                child.placeWithLayer(0, (height - child.height * scale).toInt() / 2) {
+                child.placeWithLayer(((constraints.maxWidth - child.width * scale) / 2).toInt(), (height - child.height * scale).toInt() / 2) {
                     scaleX = scale
                     scaleY = scale
                     transformOrigin = TransformOrigin(0f, 0f)

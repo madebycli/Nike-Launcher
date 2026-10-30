@@ -10,6 +10,8 @@ Each walk-through needs a test process of its own, because the preferences store
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.SetupScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.AppScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.HomeScreensTest"
+NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.HomeLayoutScreensTest"
+NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.PreviewLayoutScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.ClockConfigScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.NotificationScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.CornerScreensTest"
@@ -48,3 +50,20 @@ Its counters measure snapshot invalidation scopes, not GPU performance or frame 
 
 Dialog window coordinates are simulated by Robolectric. Dialog content can be checked in its
 local window, but captures do not establish Android's final on-device window positioning.
+
+`HomeLayoutScreensTest` uses the real home screen, a local MediaSession and real preferences.
+It asserts identical favorite/frame bounds while playback starts, pauses and is dismissed by a
+horizontal swipe. A partial swipe interrupted by a cancelled drag must return the audio title to
+its original horizontal coordinate before full dismissal is tested. It also verifies rebound on the real home, unchanged bounds on entering editing,
+group nudging, common padding, block spacing, Done and a newly created editor. English and German
+at 150% font scale produce `home-fixed*` images. Data and app-launch boundaries are fixtures.
+
+`PreviewLayoutScreensTest` renders the real first-run StyleStep and clock PinnedPreview in light
+and dark themes. It checks exact preview bounds while changing icon size, spacing, label size and
+clock size, and checks all three icons retain their full requested dimensions, including icons to
+the right of large labels. `preview-fixed*` images include white and black clocks.
+
+`HomeScrollInteractionTest` runs in ordinary unit-test checks. It drives the real draggable and
+animation clock through release, cancellation, an interrupted rebound and swipe-up completion.
+Its deep-pull test records GLOBAL_ACTION_NOTIFICATIONS through the real SystemUi/accessibility
+service path with a Robolectric service. This verifies the request, not the on-device system panel.

@@ -739,4 +739,5 @@
     <string name="edit_block_spacing">Odstęp między blokami</string>
     <string name="edit_select_all">Zaznacz wszystko</string>
     <string name="edit_mixed">Różne</string>
+    <string name="edit_value_sp">%1$d sp</string>
 </resources>

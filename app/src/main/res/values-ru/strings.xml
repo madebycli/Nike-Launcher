@@ -734,5 +734,6 @@
     <string name="edit_block_spacing">Расстояние между блоками</string>
     <string name="edit_select_all">Выбрать всё</string>
     <string name="edit_mixed">Разные</string>
+    <string name="edit_value_sp">%1$d sp</string>
 </resources>
 

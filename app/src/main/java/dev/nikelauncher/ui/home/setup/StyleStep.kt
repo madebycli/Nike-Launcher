@@ -80,13 +80,13 @@ internal fun StyleStep(app: NikeApp, apps: List<AppInfo>, favorites: List<AppInf
         ) {
             SettingsSectionLabel(stringResource(R.string.settings_section_home))
             SettingsGroup(buildList<SettingsRow> {
-                add(settingsBlock(stringResource(R.string.settings_icon_size), Icons.Filled.PhotoSizeSelectLarge, "$iconSize dp") {
+                add(settingsBlock(stringResource(R.string.settings_icon_size), Icons.Filled.PhotoSizeSelectLarge, stringResource(R.string.edit_value_dp, iconSize)) {
                     SettingsSlider(iconSize.toFloat(), 24f..96f, { v -> scope.launch { a.setIconSizeDp(v.toInt()) } })
                 })
-                add(settingsBlock(stringResource(R.string.settings_text_size), Icons.Filled.FormatSize, "$labelSize sp") {
+                add(settingsBlock(stringResource(R.string.settings_text_size), Icons.Filled.FormatSize, stringResource(R.string.edit_value_sp, labelSize)) {
                     SettingsSlider(labelSize.toFloat(), 10f..32f, { v -> scope.launch { a.setLabelSizeSp(v.toInt()) } })
                 })
-                add(settingsBlock(stringResource(R.string.settings_favorite_spacing), Icons.Filled.SpaceBar, "$spacing dp") {
+                add(settingsBlock(stringResource(R.string.settings_favorite_spacing), Icons.Filled.SpaceBar, stringResource(R.string.edit_value_dp, spacing)) {
                     SettingsSlider(spacing.toFloat(), 0f..48f, { v -> scope.launch { a.setItemSpacingDp(v.toInt()) } })
                 })
                 add(settingsSwitch(stringResource(R.string.settings_icons_favorites), showFavoriteIcons, { v -> scope.launch { a.setShowFavoriteIcons(v) } }, Icons.Filled.Apps))
@@ -110,11 +110,11 @@ internal fun StyleStep(app: NikeApp, apps: List<AppInfo>, favorites: List<AppInf
                     Icons.Filled.BlurOn,
                 ))
                 if (effect == AppListBackgroundEffect.BLUR) {
-                    add(settingsBlock(stringResource(R.string.settings_app_list_effect_strength), value = "$strength%") {
+                    add(settingsBlock(stringResource(R.string.settings_app_list_effect_strength), value = stringResource(R.string.widget_clock_battery_percent, strength)) {
                         SettingsSlider(strength.toFloat(), 0f..100f, { v -> scope.launch { list.setBackgroundStrength(v.toInt()) } })
                     })
                 }
-                add(settingsBlock(stringResource(R.string.settings_app_list_grain), Icons.Filled.Grain, "$grain%") {
+                add(settingsBlock(stringResource(R.string.settings_app_list_grain), Icons.Filled.Grain, stringResource(R.string.widget_clock_battery_percent, grain)) {
                     SettingsSlider(grain.toFloat(), 0f..100f, { v -> scope.launch { list.setGrain(v.toInt()) } })
                 })
             })

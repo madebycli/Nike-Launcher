@@ -5,12 +5,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import dev.nikelauncher.ui.common.LocalIconConfig
+import dev.nikelauncher.ui.home.rows.AlignedIconLabel
+import dev.nikelauncher.ui.home.rows.arrangement
+import dev.nikelauncher.ui.home.rows.textAlign
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -50,10 +58,10 @@ internal fun StylePreview(app: NikeApp, apps: List<AppInfo>, favorites: List<App
     val family = fontFamilyOf(font, fontFile)
 
     val shown = (favorites.ifEmpty { apps }).take(PREVIEW_ROWS)
-    // Capped, so the biggest icons cannot leave the controls without room; what does not fit is cut.
-    Surface(modifier.fillMaxWidth().heightIn(max = 200.dp), shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+    // A fixed viewport measures every row at its requested size; overflow scrolls inside the preview.
+    Surface(modifier.fillMaxWidth().height(200.dp).testTag("setup-style-preview"), shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         Column(
-            Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
+            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(spacing.dp),
             horizontalAlignment = when (alignment) {
                 HomeAlignment.LEFT -> Alignment.Start
@@ -61,14 +69,17 @@ internal fun StylePreview(app: NikeApp, apps: List<AppInfo>, favorites: List<App
                 HomeAlignment.RIGHT -> Alignment.End
             },
         ) {
-            shown.forEach { entry ->
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    val icon: @Composable () -> Unit = { if (showIcons) AppIcon(app = entry, sizeDp = iconSize) }
-                    val label: @Composable () -> Unit = {
-                        // A row with neither would be invisible, so the name stays when the icon is off.
-                        if (showLabels || !showIcons) Text(entry.label, fontSize = labelSize.sp, fontFamily = family, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            val iconConfig = LocalIconConfig.current
+            CompositionLocalProvider(LocalIconConfig provides iconConfig.copy(showIcons = showIcons)) {
+                shown.forEach { entry ->
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = alignment.arrangement()) {
+                        AlignedIconLabel(alignment, iconSide, showLabels || !showIcons, iconSize.dp,
+                            icon = { if (showIcons) AppIcon(entry, iconSize, Modifier.testTag("setup-preview-icon-${entry.key}")) },
+                        ) { labelModifier ->
+                            Text(entry.label, labelModifier, fontSize = labelSize.sp, fontFamily = family,
+                                textAlign = alignment.textAlign(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
                     }
-                    if (iconSide == IconSide.LEFT) { icon(); label() } else { label(); icon() }
                 }
             }
             if (shown.isEmpty()) Text(stringResource(R.string.settings_preview_sample), fontSize = labelSize.sp, fontFamily = family)
