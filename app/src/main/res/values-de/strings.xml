@@ -709,4 +709,14 @@
     <string name="edit_select_all">Alle auswählen</string>
     <string name="edit_mixed">Gemischt</string>
     <string name="edit_value_sp">%1$d sp</string>
+
+    <string name="corner_place">Button platzieren</string>
+    <string name="corner_position_reset">Position zurücksetzen</string>
+    <string name="search_display_mode">Suche</string>
+    <string name="search_mode_none">Keine</string>
+    <string name="search_mode_button">Button</string>
+    <string name="search_mode_bar">Suchleiste</string>
+    <string name="search_button_position">Position der Button-Suche</string>
+    <string name="search_position_top">Oben</string>
+    <string name="search_position_bottom">Unten</string>
 </resources>

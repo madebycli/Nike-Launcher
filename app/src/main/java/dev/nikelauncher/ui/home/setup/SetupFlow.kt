@@ -26,8 +26,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -69,7 +72,14 @@ internal fun SetupFlow(
         library.favoriteKeys.mapNotNull { byKey[it] }
     }
     val backup = rememberBackupActions(app, apps.privateSpace)
-    var step by rememberSaveable { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
+    val progress by app.prefs.setup.step.collectAsState(null)
+    val step = progress
+    if (step == null) {
+        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {}
+        return
+    }
+    fun move(next: Int) { scope.launch { app.prefs.setup.setStep(next) } }
     // Every access below is granted on a system screen, so the answer only arrives on resume.
     var resumed by remember { mutableIntStateOf(0) }
     val owner = LocalLifecycleOwner.current
@@ -81,7 +91,7 @@ internal fun SetupFlow(
 
     // Back walks the steps in reverse and is swallowed on the first, so leaving by accident cannot
     // drop anyone onto a half-configured launcher.
-    BackHandler { if (step > 0) step-- }
+    BackHandler { if (step > 0) move(step - 1) }
 
     Surface(
         Modifier.fillMaxSize(),
@@ -89,7 +99,7 @@ internal fun SetupFlow(
         contentColor = MaterialTheme.colorScheme.onSurface,
     ) {
         Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 24.dp)) {
-            if (step > 0) SetupStepHeader(step, LAST, onBack = { step-- }, modifier = Modifier.padding(top = 12.dp))
+            if (step > 0) SetupStepHeader(step, LAST, onBack = { move(step - 1) }, modifier = Modifier.padding(top = 12.dp))
             val offsetSpec = AppMotion.offset()
             val effectsSpec = AppMotion.effects<Float>()
             AnimatedContent(
@@ -116,7 +126,7 @@ internal fun SetupFlow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (step > 0) TextButton(onClick = { step-- }, modifier = Modifier.heightIn(min = 56.dp)) {
+                if (step > 0) TextButton(onClick = { move(step - 1) }, modifier = Modifier.heightIn(min = 56.dp)) {
                     Text(stringResource(R.string.action_back))
                 }
                 SetupPrimaryButton(
@@ -127,7 +137,7 @@ internal fun SetupFlow(
                             else -> R.string.setup_next
                         },
                     ),
-                    onClick = { if (step == LAST) onDone() else step++ },
+                    onClick = { if (step == LAST) onDone() else move(step + 1) },
                     modifier = Modifier.weight(1f),
                 )
             }

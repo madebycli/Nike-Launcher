@@ -735,5 +735,15 @@
     <string name="edit_select_all">Выбрать всё</string>
     <string name="edit_mixed">Разные</string>
     <string name="edit_value_sp">%1$d sp</string>
+
+    <string name="corner_place">Разместить кнопку</string>
+    <string name="corner_position_reset">Сбросить положение</string>
+    <string name="search_display_mode">Поиск</string>
+    <string name="search_mode_none">Нет</string>
+    <string name="search_mode_button">Кнопка</string>
+    <string name="search_mode_bar">Строка поиска</string>
+    <string name="search_button_position">Положение поиска по кнопке</string>
+    <string name="search_position_top">Сверху</string>
+    <string name="search_position_bottom">Снизу</string>
 </resources>
 

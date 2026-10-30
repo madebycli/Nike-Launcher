@@ -713,4 +713,14 @@
     <string name="edit_select_all">Select all</string>
     <string name="edit_mixed">Mixed</string>
     <string name="edit_value_sp">%1$d sp</string>
+
+    <string name="corner_place">Place button</string>
+    <string name="corner_position_reset">Reset position</string>
+    <string name="search_display_mode">Search</string>
+    <string name="search_mode_none">None</string>
+    <string name="search_mode_button">Button</string>
+    <string name="search_mode_bar">Search bar</string>
+    <string name="search_button_position">Button search position</string>
+    <string name="search_position_top">Top</string>
+    <string name="search_position_bottom">Bottom</string>
 </resources>

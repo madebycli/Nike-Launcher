@@ -42,7 +42,8 @@ internal fun appListEntries(env: SettingsEnv): List<SettingsEntry> {
     val appearance = env.prefs.appearance
     val library = env.prefs.library
     val home = env.prefs.home
-    val search by list.appListSearchEnabled.collectAsState(false)
+    val mode by env.prefs.search.mode.collectAsState(dev.nikelauncher.data.prefs.SearchDisplayMode.BUTTON)
+    val search = mode != dev.nikelauncher.data.prefs.SearchDisplayMode.NONE
     val autoKeyboard by list.autoKeyboard.collectAsState(false)
     val searchBottom by list.appListSearchBottom.collectAsState(false)
     val searchHidden by list.appListSearchHidden.collectAsState(false)
@@ -64,9 +65,8 @@ internal fun appListEntries(env: SettingsEnv): List<SettingsEntry> {
     val dim by appearance.dimWallpaperAlpha.collectAsState(0.35f)
 
     return listOf(
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_search_bar), search, { env.write { list.setAppListSearchEnabled(it) } }, value = stringResource(R.string.settings_search_bar_detail), icon = Icons.Filled.Search), "search"),
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_auto_keyboard), autoKeyboard, { env.write { list.setAutoKeyboard(it) } }, value = stringResource(R.string.settings_auto_keyboard_detail), icon = Icons.Filled.Keyboard), "keyboard search", visible = search),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_search_bar_bottom), searchBottom, icon = Icons.Filled.VerticalAlignBottom) { env.write { list.setAppListSearchBottom(it) } }, "search position", visible = search),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_search_bar_bottom), searchBottom, icon = Icons.Filled.VerticalAlignBottom) { env.write { list.setAppListSearchBottom(it) } }, "search position", visible = mode == dev.nikelauncher.data.prefs.SearchDisplayMode.BAR),
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_search_hidden), searchHidden, { env.write { list.setAppListSearchHidden(it) } }, value = stringResource(R.string.settings_search_hidden_detail), icon = Icons.Filled.VisibilityOff), "search hidden", visible = search),
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_web_search), webSearch, { env.write { list.setWebSearchFallback(it) } }, value = stringResource(R.string.settings_web_search_detail), icon = Icons.Filled.Language), "search web browser"),
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_swipe_up_search), swipeUpSearch, { env.write { list.setSwipeUpOpensSearch(it) } }, value = stringResource(R.string.settings_swipe_up_search_detail), icon = Icons.Filled.SwipeUp), "swipe up search keyboard", visible = swipeUpList),

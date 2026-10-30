@@ -48,6 +48,7 @@ class AppScreensTest {
         installFakeApps(ApplicationProvider.getApplicationContext())
         val corner = (rule.activity.application as NikeApp).prefs.corner
         runBlocking {
+            (rule.activity.application as NikeApp).prefs.home.setWelcomeSeen(true)
             corner.setSearchColorMode(CornerColorMode.CUSTOM)
             corner.setSearchAutomaticForeground(false)
             corner.setSearchForeground(0xFF223344.toInt())
@@ -55,11 +56,6 @@ class AppScreensTest {
         rule.activityRule.scenario.recreate()
         pixel9Display(rule.activity)
         rule.waitForIdle()
-        click("Get started")
-        repeat(3) { click("Next") }
-        click("Done")
-        // The flag that ends the setup is written on another thread; wait for the screen to follow it.
-        rule.waitUntil(15_000) { rule.onAllNodesWithText("All set").fetchSemanticsNodes().isEmpty() }
         rule.shoot("home-0")
         rule.onRoot().performTouchInput { longClick(androidx.compose.ui.geometry.Offset(width / 2f, height * 0.85f)) }
         rule.shoot("home-1-menu")

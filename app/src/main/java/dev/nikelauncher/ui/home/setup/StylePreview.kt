@@ -37,11 +37,11 @@ import dev.nikelauncher.ui.common.AppIcon
 import dev.nikelauncher.ui.theme.fontFamilyOf
 
 /** How many apps the preview shows: enough to see the gap between rows, few enough to stay small. */
-private const val PREVIEW_ROWS = 3
+private const val PREVIEW_ROWS = 2
 
 /**
  * The favorites as they are being styled, drawn from the same preferences the home screen reads, so
- * what moves here is what will move there. It sits above the controls and stays put while they scroll.
+ * what moves here is what will move there. It is the first item in the same scrolling column as its controls.
  */
 @Composable
 internal fun StylePreview(app: NikeApp, apps: List<AppInfo>, favorites: List<AppInfo>, modifier: Modifier = Modifier) {
@@ -57,11 +57,12 @@ internal fun StylePreview(app: NikeApp, apps: List<AppInfo>, favorites: List<App
     val fontFile by a.fontFile.collectAsState(null)
     val family = fontFamilyOf(font, fontFile)
 
-    val shown = (favorites.ifEmpty { apps }).take(PREVIEW_ROWS)
-    // A fixed viewport measures every row at its requested size; overflow scrolls inside the preview.
-    Surface(modifier.fillMaxWidth().height(200.dp).testTag("setup-style-preview"), shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+    val byKey = apps.associateBy { it.key }
+    val shown = previewAppKeys(favorites.map { it.key }, apps.map { it.key }, PREVIEW_ROWS).mapNotNull { byKey[it] }
+    // Two largest icons plus the largest allowed spacing fit without resizing either sibling.
+    Surface(modifier.fillMaxWidth().height(264.dp).testTag("setup-style-preview"), shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         Column(
-            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp),
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(spacing.dp),
             horizontalAlignment = when (alignment) {
                 HomeAlignment.LEFT -> Alignment.Start

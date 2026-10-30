@@ -19,6 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import dev.nikelauncher.NikeApp
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +36,9 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun AccessStep(resumed: Int) {
     val context = LocalContext.current
-    val homeGranted = remember(resumed) {
+    val scope = rememberCoroutineScope()
+    var asked by remember { mutableIntStateOf(0) }
+    val homeGranted = remember(resumed, asked) {
         if (Build.VERSION.SDK_INT >= 29) context.getSystemService(RoleManager::class.java)?.isRoleHeld(RoleManager.ROLE_HOME) == true
         else {
             val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
@@ -42,11 +46,10 @@ internal fun AccessStep(resumed: Int) {
             context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName == context.packageName
         }
     }
-    val listenerGranted = remember(resumed) { isListenerEnabled(context) }
-    val calendarGranted = remember(resumed) {
+    val listenerGranted = remember(resumed, asked) { isListenerEnabled(context) }
+    val calendarGranted = remember(resumed, asked) {
         ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED
     }
-    var asked by remember { mutableIntStateOf(0) }
     val askHome = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { asked++ }
     val askCalendar = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { asked++ }
     val tint = MaterialTheme.colorScheme.primary
@@ -67,7 +70,10 @@ internal fun AccessStep(resumed: Int) {
                         if (manager != null && manager.isRoleAvailable(RoleManager.ROLE_HOME)) manager.createRequestRoleIntent(RoleManager.ROLE_HOME)
                         else Intent(Settings.ACTION_HOME_SETTINGS)
                     } else Intent(Settings.ACTION_HOME_SETTINGS)
-                    runCatching { askHome.launch(intent) }
+                    scope.launch {
+                        (context.applicationContext as NikeApp).prefs.setup.setStep(1)
+                        runCatching { askHome.launch(intent) }
+                    }
                 },
             )
             item(

@@ -61,8 +61,14 @@ internal fun AppListHost(
 
     // The list's own search field stays off unless asked for; the floating button asks.
     var searchRequested by remember { mutableStateOf(false) }
-    LaunchedEffect(controller.visible) { if (!controller.visible) searchRequested = false }
-    val floatingSearch by app.prefs.corner.floatingSearch.collectAsState(true)
+    LaunchedEffect(controller.visible, settings.searchDisplayMode) { if (!controller.visible || settings.searchDisplayMode != dev.nikelauncher.data.prefs.SearchDisplayMode.BUTTON) searchRequested = false }
+    val floatingSearch = settings.searchDisplayMode == dev.nikelauncher.data.prefs.SearchDisplayMode.BUTTON
+    LaunchedEffect(controller.searchFocusTick) {
+        if (controller.visible && controller.searchFocusTick > 0) searchRequested = true
+    }
+    LaunchedEffect(controller.visible, settings.autoKeyboard, floatingSearch) {
+        if (controller.visible && settings.autoKeyboard && floatingSearch) searchRequested = true
+    }
     val hideWhileScrolling by app.prefs.corner.hideSearchWhileScrolling.collectAsState(true)
     val searchAppearance by app.prefs.corner.searchAppearance.collectAsState(CornerAppearance())
 
@@ -143,7 +149,7 @@ internal fun AppListHost(
             },
             lastLetterToLine = settings.lastLetterToLine,
             searchEnabled = settings.appListSearch || searchRequested,
-            searchAtBottom = settings.appListSearchBottom,
+            searchAtBottom = if (settings.appListSearch) settings.appListSearchBottom else settings.buttonSearchBottom,
             sectionTopPercent = settings.sectionTopPercent,
             listState = controller.listState,
             // Distance still to travel, which is exactly what the collapse transform takes: the list

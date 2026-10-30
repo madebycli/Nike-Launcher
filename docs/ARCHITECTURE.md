@@ -204,3 +204,10 @@ profile/opt-in gates and a right-swipe overview action. Inline message rows cann
 shortcut choices survive while absent preferences default off. Notification detail actions live in
 one overflow beside the target-bound reply field. ViewportSheet shares the calendar/weather height,
 insets and compact stock handle with notifications; explicit close hides before removing its owner.
+
+SetupPrefs persists setup_step (0-4) before external home-role requests. The style page scrolls
+its fixed 264dp two-app preview together with its controls. SelectedFavorites reuses the same
+segmented Material rows as candidates, with tonal remove/drag buttons and accessibility reordering.
+SearchPrefs provides exclusive None/Button/Bar by atomically writing the existing two booleans;
+legacy conflicts prefer Bar. search_button_at_bottom is independent of the permanent bar edge.
+No persisted key was renamed or retyped; optional keys remain in typed backup format 2.

@@ -94,6 +94,8 @@ data class HomeSettings(
     val stripInsetSide: EdgeSide?,
     /** How far the live edge zones reach in, beyond their own width. */
     val edgeZoneInsetLiveDp: Int,
+    val searchDisplayMode: dev.nikelauncher.data.prefs.SearchDisplayMode = if (appListSearch) dev.nikelauncher.data.prefs.SearchDisplayMode.BAR else dev.nikelauncher.data.prefs.SearchDisplayMode.BUTTON,
+    val buttonSearchBottom: Boolean = true,
     val blockGapDp: Int = 12,
     val mediaSidePaddingDp: Int = sidePaddingDp,
 ) {

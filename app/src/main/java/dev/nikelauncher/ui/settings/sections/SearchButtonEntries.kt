@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import dev.nikelauncher.R
+import dev.nikelauncher.data.prefs.SearchDisplayMode
 import dev.nikelauncher.data.CornerAppearance
 import dev.nikelauncher.data.CornerColorMode
 import dev.nikelauncher.ui.kit.settings.ChoiceChips
@@ -35,11 +36,12 @@ private val SECTION = SettingsSection.APP_LIST
 @Composable
 internal fun searchButtonEntries(env: SettingsEnv): List<SettingsEntry> {
     val corner = env.prefs.corner
-    val floating by corner.floatingSearch.collectAsState(true)
+    val mode by env.prefs.search.mode.collectAsState(SearchDisplayMode.BUTTON)
+    val floating = mode == SearchDisplayMode.BUTTON
+    val atBottom by env.prefs.search.buttonAtBottom.collectAsState(true)
     val hide by corner.hideSearchWhileScrolling.collectAsState(true)
     val appearance by corner.searchAppearance.collectAsState(CornerAppearance())
     var picking by remember { mutableStateOf<Boolean?>(null) }
-    val floatingTitle = stringResource(R.string.search_button_floating)
     val hideTitle = stringResource(R.string.search_button_hide_scrolling)
     val colorsTitle = stringResource(R.string.corner_colors)
     val backgroundTitle = stringResource(R.string.corner_background_color)
@@ -60,7 +62,17 @@ internal fun searchButtonEntries(env: SettingsEnv): List<SettingsEntry> {
         )
     }
     return listOfNotNull(
-        SettingsEntry(SECTION, settingsSwitch(floatingTitle, floating, icon = Icons.Filled.Search) { env.write { corner.setFloatingSearch(it) } }, "search button floating"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.search_display_mode), icon = Icons.Filled.Search) {
+            ChoiceChips(SearchDisplayMode.entries, mode, { choice -> stringResource(when (choice) {
+                SearchDisplayMode.NONE -> R.string.search_mode_none
+                SearchDisplayMode.BUTTON -> R.string.search_mode_button
+                SearchDisplayMode.BAR -> R.string.search_mode_bar
+            }) }, { choice -> env.write { env.prefs.search.setMode(choice) } })
+        }, "search bar button none"),
+        if (floating) SettingsEntry(SECTION, settingsBlock(stringResource(R.string.search_button_position)) {
+            ChoiceChips(listOf(false, true), atBottom, { stringResource(if (it) R.string.search_position_bottom else R.string.search_position_top) },
+                { env.write { env.prefs.search.setButtonAtBottom(it) } })
+        }, "search button position") else null,
         if (floating) SettingsEntry(SECTION, settingsSwitch(hideTitle, hide, icon = Icons.Filled.Tune) { env.write { corner.setHideSearchWhileScrolling(it) } }, "search button scrolling") else null,
         if (floating) SettingsEntry(SECTION, settingsBlock(colorsTitle, icon = Icons.Filled.Palette) {
             ChoiceChips(

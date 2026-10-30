@@ -26,6 +26,7 @@ import dev.nikelauncher.ui.theme.rememberContentColor
 /** Collects every setting the home destination reads into the one value it takes. */
 @Composable
 fun rememberHomeSettings(prefs: Prefs, library: LibraryState, appsByKey: Map<String, AppInfo>): HomeSettings {
+    val searchMode by prefs.search.mode.collectAsState(dev.nikelauncher.data.prefs.SearchDisplayMode.BUTTON)
     val a = prefs.appearance
     val h = prefs.home
     val l = prefs.appList
@@ -58,7 +59,7 @@ fun rememberHomeSettings(prefs: Prefs, library: LibraryState, appsByKey: Map<Str
         scrubBubbleShape = s.scrubBubbleShape.collectAsState(ScrubBubbleShape.ROUNDED).value,
         rippleParams = s.rippleParams.collectAsState(RippleParams()).value,
         azStripVisibility = azVisibility,
-        shortcutSwipe = h.shortcutSwipe.collectAsState(ShortcutSwipe.RIGHT).value,
+        shortcutSwipe = h.shortcutSwipe.collectAsState(ShortcutSwipe.OFF).value,
         showAlphabet = s.showAlphabet.collectAsState(true).value,
         alignment = alignment,
         appListAlignment = a.appListAlignment.collectAsState(HomeAlignment.LEFT).value,
@@ -68,7 +69,7 @@ fun rememberHomeSettings(prefs: Prefs, library: LibraryState, appsByKey: Map<Str
         widgetOffsetXDp = h.widgetOffsetXDp.collectAsState(0).value,
         edgeZoneWidthDp = edgeZoneWidthDp,
         swipeUpOpensAppList = h.swipeUpOpensList.collectAsState(false).value,
-        appListSearch = l.appListSearchEnabled.collectAsState(false).value,
+        appListSearch = searchMode == dev.nikelauncher.data.prefs.SearchDisplayMode.BAR,
         appListSearchBottom = l.appListSearchBottom.collectAsState(false).value,
         sectionTopPercent = l.sectionTopPercent.collectAsState(26).value,
         closeFolderOnLaunch = h.closeFolderOnLaunch.collectAsState(false).value,
@@ -117,6 +118,8 @@ fun rememberHomeSettings(prefs: Prefs, library: LibraryState, appsByKey: Map<Str
         lastLetterToLine = l.lastLetterToLine.collectAsState(false).value,
         stripInsetSide = if (stripAlwaysVisible) edgeSide else null,
         edgeZoneInsetLiveDp = liveInsetDp(insetAuto, insetDp),
+        searchDisplayMode = searchMode,
+        buttonSearchBottom = prefs.search.buttonAtBottom.collectAsState(true).value,
         blockGapDp = prefs.homeLayout.blockGapDp.collectAsState(12).value,
         mediaSidePaddingDp = prefs.homeLayout.mediaSidePaddingDp.collectAsState(sidePaddingDp).value,
     )

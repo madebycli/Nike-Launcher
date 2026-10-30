@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.NikeApp
 import dev.nikelauncher.R
+import dev.nikelauncher.data.prefs.SearchDisplayMode
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.AppListBackgroundEffect
 import dev.nikelauncher.data.HomeAlignment
@@ -68,16 +69,16 @@ internal fun StyleStep(app: NikeApp, apps: List<AppInfo>, favorites: List<AppInf
     val effect by list.backgroundEffect.collectAsState(AppListBackgroundEffect.NONE)
     val strength by list.backgroundStrength.collectAsState(50)
     val grain by list.grain.collectAsState(0)
-    val search by list.appListSearchEnabled.collectAsState(false)
+    val search by app.prefs.search.mode.collectAsState(SearchDisplayMode.BUTTON)
     val pages by app.prefs.pages.config.collectAsState(WidgetPagesConfig())
 
     Column(Modifier.fillMaxSize()) {
         SetupHeadline(stringResource(R.string.setup_style), Modifier.padding(top = 12.dp, bottom = 12.dp))
-        StylePreview(app, apps, favorites)
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            StylePreview(app, apps, favorites)
             SettingsSectionLabel(stringResource(R.string.settings_section_home))
             SettingsGroup(buildList<SettingsRow> {
                 add(settingsBlock(stringResource(R.string.settings_icon_size), Icons.Filled.PhotoSizeSelectLarge, stringResource(R.string.edit_value_dp, iconSize)) {
@@ -102,7 +103,13 @@ internal fun StyleStep(app: NikeApp, apps: List<AppInfo>, favorites: List<AppInf
             SettingsSectionLabel(stringResource(R.string.settings_section_app_list))
             SettingsGroup(buildList<SettingsRow> {
                 add(settingsSwitch(stringResource(R.string.settings_icons_app_list), showAppIcons, { v -> scope.launch { a.setShowAppIcons(v) } }, Icons.Filled.Apps))
-                add(settingsSwitch(stringResource(R.string.settings_search_bar), search, { v -> scope.launch { list.setAppListSearchEnabled(v) } }, Icons.Filled.Search))
+                add(settingsBlock(stringResource(R.string.search_display_mode), Icons.Filled.Search) {
+                    ChoiceChips(SearchDisplayMode.entries, search, { stringResource(when (it) {
+                        SearchDisplayMode.NONE -> R.string.search_mode_none
+                        SearchDisplayMode.BUTTON -> R.string.search_mode_button
+                        SearchDisplayMode.BAR -> R.string.search_mode_bar
+                    }) }, { mode -> scope.launch { app.prefs.search.setMode(mode) } })
+                })
                 add(settingsSwitch(
                     stringResource(R.string.settings_app_list_effect_blur),
                     effect == AppListBackgroundEffect.BLUR,

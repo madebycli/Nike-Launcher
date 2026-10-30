@@ -715,4 +715,14 @@
     <string name="edit_select_all">Seleccionar todo</string>
     <string name="edit_mixed">Mixto</string>
     <string name="edit_value_sp">%1$d sp</string>
+
+    <string name="corner_place">Colocar botón</string>
+    <string name="corner_position_reset">Restablecer posición</string>
+    <string name="search_display_mode">Búsqueda</string>
+    <string name="search_mode_none">Ninguno</string>
+    <string name="search_mode_button">Botón</string>
+    <string name="search_mode_bar">Barra de búsqueda</string>
+    <string name="search_button_position">Posición de búsqueda del botón</string>
+    <string name="search_position_top">Arriba</string>
+    <string name="search_position_bottom">Abajo</string>
 </resources>

@@ -740,4 +740,14 @@
     <string name="edit_select_all">Zaznacz wszystko</string>
     <string name="edit_mixed">Różne</string>
     <string name="edit_value_sp">%1$d sp</string>
+
+    <string name="corner_place">Umieść przycisk</string>
+    <string name="corner_position_reset">Przywróć pozycję</string>
+    <string name="search_display_mode">Wyszukiwanie</string>
+    <string name="search_mode_none">Brak</string>
+    <string name="search_mode_button">Przycisk</string>
+    <string name="search_mode_bar">Pasek wyszukiwania</string>
+    <string name="search_button_position">Pozycja wyszukiwania z przycisku</string>
+    <string name="search_position_top">U góry</string>
+    <string name="search_position_bottom">U dołu</string>
 </resources>

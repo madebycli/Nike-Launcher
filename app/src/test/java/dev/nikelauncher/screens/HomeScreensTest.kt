@@ -44,14 +44,18 @@ class HomeScreensTest {
 
     @Test fun homeEditAndSheets() {
         installFakeApps(ApplicationProvider.getApplicationContext())
+        val prefs = (rule.activity.application as NikeApp).prefs
+        runBlocking {
+            prefs.home.setWelcomeSeen(true)
+            SAMPLE_APPS.take(3).forEach { label ->
+                val pkg = "fake." + label.lowercase()
+                prefs.library.addFavorite("$pkg/$pkg.Main")
+            }
+        }
         rule.activityRule.scenario.recreate()
+        pixel9Display(rule.activity)
         rule.waitForIdle()
-        rule.onNodeWithText("Get started").performClick()
-        repeat(2) { rule.onNodeWithText("Next").performClick() }
-        repeat(3) { rule.onAllNodesWithContentDescription("Add to favorites").onFirst().performClick() }
-        rule.onNodeWithText("Next").performClick()
-        rule.onNodeWithText("Done").performClick()
-        rule.waitUntil(15_000) { rule.onAllNodesWithText("All set").fetchSemanticsNodes().isEmpty() }
+
         rule.shoot("h1-home")
         rule.onAllNodesWithText("Calendar").onFirst().performTouchInput { longClick() }
         rule.waitForIdle()
@@ -65,7 +69,6 @@ class HomeScreensTest {
         rule.onAllNodesWithText("Edit layout").onFirst().performClick()
         rule.waitForIdle()
         rule.shoot("h2-edit")
-        val prefs = (rule.activity.application as NikeApp).prefs
         runBlocking {
             prefs.home.setSwipeUpOpensList(true)
             prefs.library.setQuickLaunch(QuickLaunchSlot.LEFT, "fake.camera/fake.camera.Main")

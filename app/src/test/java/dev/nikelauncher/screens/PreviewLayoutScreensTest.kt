@@ -60,17 +60,22 @@ class PreviewLayoutScreensTest {
         runBlocking { a.setIconSizeDp(96) }
         rule.waitForIdle()
         Assert.assertEquals(viewport, rule.onNodeWithTag("setup-style-preview").getUnclippedBoundsInRoot())
-        apps.forEach { rule.onNodeWithTag("setup-preview-icon-${it.key}").assertHeightIsEqualTo(96.dp) }
+        apps.take(2).forEach { rule.onNodeWithTag("setup-preview-icon-${it.key}").assertHeightIsEqualTo(96.dp) }
         rule.shoot("$prefix-setup-large")
         runBlocking { a.setIconSide(IconSide.RIGHT); a.setLabelSizeSp(32) }
         rule.waitForIdle()
-        apps.forEach { rule.onNodeWithTag("setup-preview-icon-${it.key}").assertWidthIsEqualTo(96.dp).assertHeightIsEqualTo(96.dp) }
+        apps.take(2).forEach { rule.onNodeWithTag("setup-preview-icon-${it.key}").assertWidthIsEqualTo(96.dp).assertHeightIsEqualTo(96.dp) }
         rule.shoot("$prefix-setup-right-large")
         runBlocking { a.setIconSizeDp(56); a.setItemSpacingDp(48); a.setLabelSizeSp(32) }
         rule.waitForIdle()
         Assert.assertEquals(viewport, rule.onNodeWithTag("setup-style-preview").getUnclippedBoundsInRoot())
-        apps.forEach { rule.onNodeWithTag("setup-preview-icon-${it.key}").assertHeightIsEqualTo(56.dp) }
+        apps.take(2).forEach { rule.onNodeWithTag("setup-preview-icon-${it.key}").assertHeightIsEqualTo(56.dp) }
         rule.shoot("$prefix-setup-spacing")
+        rule.onNodeWithTag("setup-preview-icon-${apps[2].key}").assertDoesNotExist()
+        rule.onAllNodes(hasScrollAction()).onFirst().performTouchInput { swipeUp() }
+        rule.waitForIdle()
+        Assert.assertTrue(rule.onNodeWithTag("setup-style-preview").getUnclippedBoundsInRoot().top < viewport.top)
+        rule.shoot("$prefix-setup-scrolled")
         rule.runOnIdle { clock = true }; rule.waitForIdle()
         val clockViewport = rule.onNodeWithTag("clock-preview").getUnclippedBoundsInRoot()
         rule.shoot("$prefix-clock-white-small")

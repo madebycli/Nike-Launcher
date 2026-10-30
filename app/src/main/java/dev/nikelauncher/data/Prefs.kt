@@ -38,6 +38,8 @@ class Prefs(private val context: Context) {
     val library = LibraryPrefs(store)
     val appearance = AppearancePrefs(store)
     val home = HomePrefs(store)
+    val search = dev.nikelauncher.data.prefs.SearchPrefs(store)
+    val setup = dev.nikelauncher.data.prefs.SetupPrefs(store)
     val homeLayout = dev.nikelauncher.data.prefs.HomeLayoutPrefs(store)
     val appList = AppListPrefs(store)
     val strip = StripPrefs(store)
