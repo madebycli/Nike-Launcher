@@ -98,7 +98,7 @@ object LauncherTestUtils {
         // app first ran, so a test that stores one in its set-up would otherwise decide, by
         // nothing more than the order the tests happen to run in, whether this can succeed.
         val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-        runBlocking { Prefs(context).setAppListSearchEnabled(true) }
+        runBlocking { Prefs(context).appList.setAppListSearchEnabled(true) }
 
         val device = uiDevice()
         val startX = device.displayWidth - 2

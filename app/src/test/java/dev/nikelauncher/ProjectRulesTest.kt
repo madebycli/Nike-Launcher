@@ -83,7 +83,6 @@ class ProjectRulesTest {
             "ui/home/HomeScreen.kt" to 2151,
             "ui/settings/SettingsScreen.kt" to 1932,
             "ui/applist/AppListScreen.kt" to 1866,
-            "data/Prefs.kt" to 1503,
             "ui/NikeNavHost.kt" to 1160,
             "ui/home/HomeRoute.kt" to 1154,
             "data/AppRepository.kt" to 745,

@@ -76,9 +76,9 @@ class MainActivity : ComponentActivity() {
         val app = application as NikeApp
 
         setContent {
-            val hideStatusBar by app.prefs.hideStatusBar.collectAsState(initial = false)
-            val hideStatusBarAppList by app.prefs.hideStatusBarAppList.collectAsState(initial = false)
-            val peekSeconds by app.prefs.statusBarPeekSeconds.collectAsState(initial = 5)
+            val hideStatusBar by app.prefs.appearance.hideStatusBar.collectAsState(initial = false)
+            val hideStatusBarAppList by app.prefs.appearance.hideStatusBarAppList.collectAsState(initial = false)
+            val peekSeconds by app.prefs.appearance.statusBarPeekSeconds.collectAsState(initial = 5)
             // A short pull-down peeks the status bar, then it slides away again.
             var statusBarPeek by remember { mutableStateOf(false) }
             // The two surfaces choose separately, so the overlay can keep the bar the home
@@ -102,10 +102,10 @@ class MainActivity : ComponentActivity() {
                 StatusBarFader.setVisible(window, visible = statusBarVisible, instant = hideStatusBarInstantly)
             }
 
-            val font by app.prefs.font.collectAsState(initial = AppFont.SYSTEM)
-            val fontFile by app.prefs.fontFile.collectAsState(initial = null)
+            val font by app.prefs.appearance.font.collectAsState(initial = AppFont.SYSTEM)
+            val fontFile by app.prefs.appearance.fontFile.collectAsState(initial = null)
             LaunchedEffect(font, fontFile) { app.widgetHost.typeface = widgetTypeface(font, fontFile) }
-            val allowRotation by app.prefs.allowRotation.collectAsState(initial = null)
+            val allowRotation by app.prefs.home.allowRotation.collectAsState(initial = null)
             LaunchedEffect(allowRotation, rotatesByDefault) {
                 requestedOrientation = if (allowRotation ?: rotatesByDefault) {
                     ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
@@ -113,14 +113,14 @@ class MainActivity : ComponentActivity() {
                     ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
             }
-            val iconPackPackage by app.prefs.iconPackPackage.collectAsState(initial = null)
-            val iconOverrides by app.prefs.iconOverrides.collectAsState(initial = emptyMap())
-            val showAppIcons by app.prefs.showAppIcons.collectAsState(initial = true)
-            val themedIcons by app.prefs.themedIcons.collectAsState(initial = false)
-            val notificationBadges by app.prefs.notificationBadges.collectAsState(initial = false)
-            val notificationPreviews by app.prefs.notificationPreviews.collectAsState(initial = false)
-            val notificationTextSp by app.prefs.notificationTextSp.collectAsState(initial = 12)
-            val iconShape by app.prefs.iconShape.collectAsState(initial = IconShape.SYSTEM)
+            val iconPackPackage by app.prefs.appearance.iconPackPackage.collectAsState(initial = null)
+            val iconOverrides by app.prefs.library.iconOverrides.collectAsState(initial = emptyMap())
+            val showAppIcons by app.prefs.appearance.showAppIcons.collectAsState(initial = true)
+            val themedIcons by app.prefs.appearance.themedIcons.collectAsState(initial = false)
+            val notificationBadges by app.prefs.appList.notificationBadges.collectAsState(initial = false)
+            val notificationPreviews by app.prefs.appList.notificationPreviews.collectAsState(initial = false)
+            val notificationTextSp by app.prefs.appList.notificationTextSp.collectAsState(initial = 12)
+            val iconShape by app.prefs.appearance.iconShape.collectAsState(initial = IconShape.SYSTEM)
             val iconConfig = remember(
                 iconPackPackage,
                 iconOverrides,

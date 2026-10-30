@@ -13,7 +13,7 @@ data/
   AppInfo.kt                    component + label; `key` is the flattened component name
   AppRepository.kt              PackageManager queries, launch, app-info intents
   IconPackRepository.kt         icon-pack discovery, appfilter.xml parsing, icon lookup
-  Prefs.kt                      DataStore<Preferences>: every setting, hidden apps, favorites
+  Prefs.kt                      owns the DataStore and the backup; settings live in Library/Appearance/Home/AppList/StripPrefs.kt, keys in PrefKeys.kt
   Folder.kt                     folder model + JSON persistence + favorites token encoding
   HomePaddings.kt               per-block top/bottom spacing set in edit mode
 ui/

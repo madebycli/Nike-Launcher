@@ -70,8 +70,8 @@ class PrivateSpaceLauncherTest {
         // Searching is what would reach a hidden app by name, so it is switched on here: it
         // must not be a way round the private space either.
         runBlocking {
-            Prefs(context).setAppListSearchEnabled(true)
-            Prefs(context).setAppListSearchHidden(true)
+            Prefs(context).appList.setAppListSearchEnabled(true)
+            Prefs(context).appList.setAppListSearchHidden(true)
         }
     }
 
@@ -80,8 +80,8 @@ class PrivateSpaceLauncherTest {
         if (!this::privateUser.isInitialized) return
         device.executeShellCommand("pm install-existing --user 0 $PRIVATE_APP_PACKAGE")
         runBlocking {
-            favoritesAdded.forEach { key -> Prefs(context).removeFavorite(key) }
-            foldersAdded.forEach { id -> Prefs(context).deleteFolder(id) }
+            favoritesAdded.forEach { key -> Prefs(context).library.removeFavorite(key) }
+            foldersAdded.forEach { id -> Prefs(context).library.deleteFolder(id) }
         }
         favoritesAdded.clear()
         foldersAdded.clear()
@@ -159,7 +159,7 @@ class PrivateSpaceLauncherTest {
         // Still stored, so it comes back rather than being quietly forgotten.
         assertTrue(
             "the favorite must survive the space being locked",
-            runBlocking { Prefs(context).favorites.first() }.contains(key),
+            runBlocking { Prefs(context).library.favorites.first() }.contains(key),
         )
     }
 
@@ -289,13 +289,13 @@ class PrivateSpaceLauncherTest {
     private fun folder(name: String, apps: List<String>) {
         val id = "test-" + SystemClock.uptimeMillis().toString(36)
         foldersAdded += id
-        runBlocking { Prefs(context).upsertFolder(Folder(id = id, name = name, apps = apps)) }
+        runBlocking { Prefs(context).library.upsertFolder(Folder(id = id, name = name, apps = apps)) }
     }
 
     /** Stores a favorite for the duration, and takes it away again in tearDown. */
     private fun favorite(key: String) {
         favoritesAdded += key
-        runBlocking { Prefs(context).addFavorite(key) }
+        runBlocking { Prefs(context).library.addFavorite(key) }
     }
 
     /**

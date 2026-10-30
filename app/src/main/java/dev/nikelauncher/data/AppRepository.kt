@@ -527,7 +527,7 @@ class AppRepository(
             Toast.makeText(context, R.string.shortcut_unpin_failed, Toast.LENGTH_SHORT).show()
             return
         }
-        scope.launch { prefs.forgetEntry(app.key) }
+        scope.launch { prefs.library.forgetEntry(app.key) }
         noteShortcutsChanged()
     }
 
@@ -550,7 +550,7 @@ class AppRepository(
     fun confirmPinnedShortcut(pkg: String, id: String, user: UserHandle, serial: Long) {
         scope.launch {
             if (waitUntilPinned(pkg, id, user)) {
-                prefs.addFavorite(EntryKeys.shortcut(pkg, id, serial))
+                prefs.library.addFavorite(EntryKeys.shortcut(pkg, id, serial))
                 noteShortcutsChanged()
             } else {
                 // This whole coroutine runs on the repository's Default-dispatched scope, so
@@ -685,7 +685,7 @@ class AppRepository(
         if (started) {
             // Counted whether or not the usage sort is on, so switching it on later has a
             // history to order by instead of starting from nothing.
-            scope.launch { prefs.incrementLaunchCount(app.key) }
+            scope.launch { prefs.library.incrementLaunchCount(app.key) }
         }
         return started
     }
@@ -714,7 +714,7 @@ class AppRepository(
             true
         }.getOrDefault(false)
         if (started) {
-            scope.launch { prefs.incrementLaunchCount(app.key) }
+            scope.launch { prefs.library.incrementLaunchCount(app.key) }
         }
         return started
     }

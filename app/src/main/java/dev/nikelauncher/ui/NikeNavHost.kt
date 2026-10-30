@@ -177,7 +177,7 @@ fun NikeNavHost(
 
     // Before anything the user does can write to the store, so "the store is empty" still
     // means "this is a first run" when it is read.
-    LaunchedEffect(Unit) { app.prefs.ensureInstallMarker() }
+    LaunchedEffect(Unit) { app.prefs.home.ensureInstallMarker() }
 
     DisposableEffect(Unit) {
         val launcherApps = context.getSystemService(LauncherApps::class.java)
@@ -281,99 +281,99 @@ fun NikeNavHost(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    val hiddenApps by app.prefs.hiddenApps.collectAsState(initial = emptySet())
-    val favoriteKeys by app.prefs.favorites.collectAsState(initial = emptyList())
-    val frequentExcluded by app.prefs.frequentExcluded.collectAsState(initial = emptySet())
-    val favoritesEverSet by app.prefs.favoritesEverSet.collectAsState(initial = true)
-    val edgeZoneBandOnly by app.prefs.edgeZoneBandOnly.collectAsState(initial = false)
-    val holdScroll by app.prefs.holdScroll.collectAsState(initial = false)
-    val dimOthersScrubbing by app.prefs.dimOthersScrubbing.collectAsState(initial = true)
-    val markWorkApps by app.prefs.markWorkApps.collectAsState(initial = true)
-    val textShadow by app.prefs.textShadow.collectAsState(initial = false)
-    val textShadowStrength by app.prefs.textShadowStrength.collectAsState(initial = DEFAULT_SHADOW_STRENGTH)
-    val compactTapArea by app.prefs.compactTapArea.collectAsState(initial = false)
-    val stayAfterPrivateUnlock by app.prefs.stayAfterPrivateUnlock.collectAsState(initial = false)
-    val privateSpaceSection by app.prefs.privateSpaceSection.collectAsState(initial = false)
-    val foldersInAppList by app.prefs.foldersInAppList.collectAsState(initial = false)
-    val recentSection by app.prefs.recentSection.collectAsState(initial = false)
-    val recentSectionCount by app.prefs.recentSectionCount.collectAsState(initial = 5)
-    val edgeZoneInsetDp by app.prefs.edgeZoneInsetDp.collectAsState(initial = 0)
-    val edgeZoneInsetAuto by app.prefs.edgeZoneInsetAuto.collectAsState(initial = true)
-    val webSearchFallback by app.prefs.webSearchFallback.collectAsState(initial = false)
-    val swipeUpOpensSearch by app.prefs.swipeUpOpensSearch.collectAsState(initial = false)
-    val holdScrollSpeed by app.prefs.holdScrollSpeed.collectAsState(initial = 4)
+    val hiddenApps by app.prefs.library.hiddenApps.collectAsState(initial = emptySet())
+    val favoriteKeys by app.prefs.library.favorites.collectAsState(initial = emptyList())
+    val frequentExcluded by app.prefs.library.frequentExcluded.collectAsState(initial = emptySet())
+    val favoritesEverSet by app.prefs.library.favoritesEverSet.collectAsState(initial = true)
+    val edgeZoneBandOnly by app.prefs.strip.edgeZoneBandOnly.collectAsState(initial = false)
+    val holdScroll by app.prefs.strip.holdScroll.collectAsState(initial = false)
+    val dimOthersScrubbing by app.prefs.strip.dimOthersScrubbing.collectAsState(initial = true)
+    val markWorkApps by app.prefs.appearance.markWorkApps.collectAsState(initial = true)
+    val textShadow by app.prefs.appearance.textShadow.collectAsState(initial = false)
+    val textShadowStrength by app.prefs.appearance.textShadowStrength.collectAsState(initial = DEFAULT_SHADOW_STRENGTH)
+    val compactTapArea by app.prefs.appearance.compactTapArea.collectAsState(initial = false)
+    val stayAfterPrivateUnlock by app.prefs.appList.stayAfterPrivateUnlock.collectAsState(initial = false)
+    val privateSpaceSection by app.prefs.appList.privateSpaceSection.collectAsState(initial = false)
+    val foldersInAppList by app.prefs.appList.foldersInAppList.collectAsState(initial = false)
+    val recentSection by app.prefs.appList.recentSection.collectAsState(initial = false)
+    val recentSectionCount by app.prefs.appList.recentSectionCount.collectAsState(initial = 5)
+    val edgeZoneInsetDp by app.prefs.strip.edgeZoneInsetDp.collectAsState(initial = 0)
+    val edgeZoneInsetAuto by app.prefs.strip.edgeZoneInsetAuto.collectAsState(initial = true)
+    val webSearchFallback by app.prefs.appList.webSearchFallback.collectAsState(initial = false)
+    val swipeUpOpensSearch by app.prefs.appList.swipeUpOpensSearch.collectAsState(initial = false)
+    val holdScrollSpeed by app.prefs.strip.holdScrollSpeed.collectAsState(initial = 4)
     // Noted the first time there is one, and never unset. Whether the hint is still wanted is a
     // question about whether someone has done this before, not about the list being empty now.
     LaunchedEffect(favoriteKeys.isNotEmpty()) {
-        if (favoriteKeys.isNotEmpty()) app.prefs.markFavoritesEverSet()
+        if (favoriteKeys.isNotEmpty()) app.prefs.library.markFavoritesEverSet()
     }
-    val nameOverrides by app.prefs.nameOverrides.collectAsState(initial = emptyMap())
-    val iconSizeDp by app.prefs.iconSizeDp.collectAsState(initial = 56)
-    val labelSizeSp by app.prefs.labelSizeSp.collectAsState(initial = 16)
-    val itemSpacingDp by app.prefs.itemSpacingDp.collectAsState(initial = 10)
-    val sidePaddingDp by app.prefs.sidePaddingDp.collectAsState(initial = 20)
-    val nowPlayingHeightDp by app.prefs.nowPlayingHeightDp.collectAsState(initial = 64)
-    val homePaddings by app.prefs.homePaddings.collectAsState(initial = HomePaddings.Default)
-    val edgeSide by app.prefs.edgeSide.collectAsState(initial = EdgeSide.RIGHT)
-    val scrubStyle by app.prefs.scrubStyle.collectAsState(initial = ScrubStyle.BELL)
-    val scrubBubbleShape by app.prefs.scrubBubbleShape.collectAsState(initial = ScrubBubbleShape.ROUNDED)
-    val rippleParams by app.prefs.rippleParams.collectAsState(initial = RippleParams())
-    val azStripVisibility by app.prefs.azStripVisibility.collectAsState(initial = AzStripVisibility.NEVER)
-    val showAlphabet by app.prefs.showAlphabet.collectAsState(initial = true)
-    val alignRight by app.prefs.alignRight.collectAsState(initial = false)
-    val dimWallpaperAlpha by app.prefs.dimWallpaperAlpha.collectAsState(initial = 0.35f)
-    val hapticsEnabled by app.prefs.hapticsEnabled.collectAsState(initial = true)
-    val dimHomeAlpha by app.prefs.dimHomeAlpha.collectAsState(initial = 0f)
-    val showFavoriteLabels by app.prefs.showFavoriteLabels.collectAsState(initial = true)
-    val textColorMode by app.prefs.textColorMode.collectAsState(initial = TextColorMode.AUTO)
-    val doubleTapToLock by app.prefs.doubleTapToLock.collectAsState(initial = false)
-    val widgetId by app.prefs.widgetId.collectAsState(initial = -1)
-    val widgetPosition by app.prefs.widgetPosition.collectAsState(initial = 0)
-    val widgetHeightDp by app.prefs.widgetHeightDp.collectAsState(initial = 180)
-    val widgetsStacked by app.prefs.widgetsStacked.collectAsState(initial = false)
-    val nowPlayingEnabled by app.prefs.nowPlayingEnabled.collectAsState(initial = false)
-    val folders by app.prefs.folders.collectAsState(initial = emptyList())
-    val widgetIds by app.prefs.widgetIds.collectAsState(initial = emptyList())
-    val widgetSidePaddingDp by app.prefs.widgetSidePaddingDp.collectAsState(initial = sidePaddingDp)
-    val widgetOffsetXDp by app.prefs.widgetOffsetXDp.collectAsState(initial = 0)
-    val swipeUpOpensList by app.prefs.swipeUpOpensList.collectAsState(initial = false)
-    val appListSearchEnabled by app.prefs.appListSearchEnabled.collectAsState(initial = false)
-    val appListSearchBottom by app.prefs.appListSearchBottom.collectAsState(initial = false)
-    val sectionTopPercent by app.prefs.sectionTopPercent.collectAsState(initial = 26)
-    val closeFolderOnLaunch by app.prefs.closeFolderOnLaunch.collectAsState(initial = false)
-    val showListHeaders by app.prefs.showListHeaders.collectAsState(initial = true)
-    val showSettingsRow by app.prefs.showSettingsRow.collectAsState(initial = true)
-    val cornerButtonKey by app.prefs.cornerButtonKey.collectAsState(initial = null)
-    val autoKeyboard by app.prefs.autoKeyboard.collectAsState(initial = false)
-    val lastLetterToLine by app.prefs.lastLetterToLine.collectAsState(initial = false)
-    val showFavoriteIcons by app.prefs.showFavoriteIcons.collectAsState(initial = true)
-    val favoritesSource by app.prefs.favoritesSource.collectAsState(initial = FavoritesSource.MANUAL)
-    val frequentCount by app.prefs.frequentCount.collectAsState(initial = 6)
-    val appListSearchHidden by app.prefs.appListSearchHidden.collectAsState(initial = false)
-    val sortByUsage by app.prefs.sortByUsage.collectAsState(initial = false)
-    val launchCounts by app.prefs.launchCounts.collectAsState(initial = emptyMap())
-    val edgeZoneWidthDp by app.prefs.edgeZoneWidthDp.collectAsState(initial = 56)
-    val quickLaunchLeftKey by app.prefs.quickLaunchLeft.collectAsState(initial = null)
-    val quickLaunchRightKey by app.prefs.quickLaunchRight.collectAsState(initial = null)
-    val showAppIcons by app.prefs.showAppIcons.collectAsState(initial = true)
-    val notificationBadges by app.prefs.notificationBadges.collectAsState(initial = false)
-    val notificationPreviews by app.prefs.notificationPreviews.collectAsState(initial = false)
-    val notificationTextSp by app.prefs.notificationTextSp.collectAsState(initial = 12)
-    val fontFile by app.prefs.fontFile.collectAsState(initial = null)
-    val textColorCustom by app.prefs.textColorCustom.collectAsState(initial = 0xFFFFFFFF.toInt())
-    val dimColor by app.prefs.dimColor.collectAsState(initial = 0xFF000000.toInt())
+    val nameOverrides by app.prefs.library.nameOverrides.collectAsState(initial = emptyMap())
+    val iconSizeDp by app.prefs.appearance.iconSizeDp.collectAsState(initial = 56)
+    val labelSizeSp by app.prefs.appearance.labelSizeSp.collectAsState(initial = 16)
+    val itemSpacingDp by app.prefs.appearance.itemSpacingDp.collectAsState(initial = 10)
+    val sidePaddingDp by app.prefs.appearance.sidePaddingDp.collectAsState(initial = 20)
+    val nowPlayingHeightDp by app.prefs.home.nowPlayingHeightDp.collectAsState(initial = 64)
+    val homePaddings by app.prefs.home.homePaddings.collectAsState(initial = HomePaddings.Default)
+    val edgeSide by app.prefs.strip.edgeSide.collectAsState(initial = EdgeSide.RIGHT)
+    val scrubStyle by app.prefs.strip.scrubStyle.collectAsState(initial = ScrubStyle.BELL)
+    val scrubBubbleShape by app.prefs.strip.scrubBubbleShape.collectAsState(initial = ScrubBubbleShape.ROUNDED)
+    val rippleParams by app.prefs.strip.rippleParams.collectAsState(initial = RippleParams())
+    val azStripVisibility by app.prefs.strip.azStripVisibility.collectAsState(initial = AzStripVisibility.NEVER)
+    val showAlphabet by app.prefs.strip.showAlphabet.collectAsState(initial = true)
+    val alignRight by app.prefs.appearance.alignRight.collectAsState(initial = false)
+    val dimWallpaperAlpha by app.prefs.appearance.dimWallpaperAlpha.collectAsState(initial = 0.35f)
+    val hapticsEnabled by app.prefs.strip.hapticsEnabled.collectAsState(initial = true)
+    val dimHomeAlpha by app.prefs.appearance.dimHomeAlpha.collectAsState(initial = 0f)
+    val showFavoriteLabels by app.prefs.appearance.showFavoriteLabels.collectAsState(initial = true)
+    val textColorMode by app.prefs.appearance.textColorMode.collectAsState(initial = TextColorMode.AUTO)
+    val doubleTapToLock by app.prefs.home.doubleTapToLock.collectAsState(initial = false)
+    val widgetId by app.prefs.home.widgetId.collectAsState(initial = -1)
+    val widgetPosition by app.prefs.home.widgetPosition.collectAsState(initial = 0)
+    val widgetHeightDp by app.prefs.home.widgetHeightDp.collectAsState(initial = 180)
+    val widgetsStacked by app.prefs.home.widgetsStacked.collectAsState(initial = false)
+    val nowPlayingEnabled by app.prefs.home.nowPlayingEnabled.collectAsState(initial = false)
+    val folders by app.prefs.library.folders.collectAsState(initial = emptyList())
+    val widgetIds by app.prefs.home.widgetIds.collectAsState(initial = emptyList())
+    val widgetSidePaddingDp by app.prefs.home.widgetSidePaddingDp.collectAsState(initial = sidePaddingDp)
+    val widgetOffsetXDp by app.prefs.home.widgetOffsetXDp.collectAsState(initial = 0)
+    val swipeUpOpensList by app.prefs.home.swipeUpOpensList.collectAsState(initial = false)
+    val appListSearchEnabled by app.prefs.appList.appListSearchEnabled.collectAsState(initial = false)
+    val appListSearchBottom by app.prefs.appList.appListSearchBottom.collectAsState(initial = false)
+    val sectionTopPercent by app.prefs.appList.sectionTopPercent.collectAsState(initial = 26)
+    val closeFolderOnLaunch by app.prefs.home.closeFolderOnLaunch.collectAsState(initial = false)
+    val showListHeaders by app.prefs.appList.showListHeaders.collectAsState(initial = true)
+    val showSettingsRow by app.prefs.home.showSettingsRow.collectAsState(initial = true)
+    val cornerButtonKey by app.prefs.library.cornerButtonKey.collectAsState(initial = null)
+    val autoKeyboard by app.prefs.appList.autoKeyboard.collectAsState(initial = false)
+    val lastLetterToLine by app.prefs.appList.lastLetterToLine.collectAsState(initial = false)
+    val showFavoriteIcons by app.prefs.appearance.showFavoriteIcons.collectAsState(initial = true)
+    val favoritesSource by app.prefs.library.favoritesSource.collectAsState(initial = FavoritesSource.MANUAL)
+    val frequentCount by app.prefs.library.frequentCount.collectAsState(initial = 6)
+    val appListSearchHidden by app.prefs.appList.appListSearchHidden.collectAsState(initial = false)
+    val sortByUsage by app.prefs.library.sortByUsage.collectAsState(initial = false)
+    val launchCounts by app.prefs.library.launchCounts.collectAsState(initial = emptyMap())
+    val edgeZoneWidthDp by app.prefs.strip.edgeZoneWidthDp.collectAsState(initial = 56)
+    val quickLaunchLeftKey by app.prefs.library.quickLaunchLeft.collectAsState(initial = null)
+    val quickLaunchRightKey by app.prefs.library.quickLaunchRight.collectAsState(initial = null)
+    val showAppIcons by app.prefs.appearance.showAppIcons.collectAsState(initial = true)
+    val notificationBadges by app.prefs.appList.notificationBadges.collectAsState(initial = false)
+    val notificationPreviews by app.prefs.appList.notificationPreviews.collectAsState(initial = false)
+    val notificationTextSp by app.prefs.appList.notificationTextSp.collectAsState(initial = 12)
+    val fontFile by app.prefs.appearance.fontFile.collectAsState(initial = null)
+    val textColorCustom by app.prefs.appearance.textColorCustom.collectAsState(initial = 0xFFFFFFFF.toInt())
+    val dimColor by app.prefs.appearance.dimColor.collectAsState(initial = 0xFF000000.toInt())
     val rotatesByDefault = LocalConfiguration.current.smallestScreenWidthDp >= 600
-    val allowRotationPref by app.prefs.allowRotation.collectAsState(initial = null)
-    val shortcutSwipe by app.prefs.shortcutSwipe.collectAsState(initial = ShortcutSwipe.RIGHT)
+    val allowRotationPref by app.prefs.home.allowRotation.collectAsState(initial = null)
+    val shortcutSwipe by app.prefs.home.shortcutSwipe.collectAsState(initial = ShortcutSwipe.RIGHT)
     val allowRotation = allowRotationPref ?: rotatesByDefault
-    val iconShape by app.prefs.iconShape.collectAsState(initial = IconShape.SYSTEM)
-    val themedIcons by app.prefs.themedIcons.collectAsState(initial = false)
-    val alignment by app.prefs.alignment.collectAsState(initial = HomeAlignment.LEFT)
-    val appListAlignment by app.prefs.appListAlignment.collectAsState(initial = HomeAlignment.LEFT)
-    val iconSide by app.prefs.iconSide.collectAsState(initial = IconSide.LEFT)
-    val statusBarPeekSeconds by app.prefs.statusBarPeekSeconds.collectAsState(initial = 5)
-    val scrubBand by app.prefs.scrubBand.collectAsState(initial = null)
-    val layoutDefaultsVersion by app.prefs.layoutDefaultsVersion.collectAsState(initial = null)
+    val iconShape by app.prefs.appearance.iconShape.collectAsState(initial = IconShape.SYSTEM)
+    val themedIcons by app.prefs.appearance.themedIcons.collectAsState(initial = false)
+    val alignment by app.prefs.appearance.alignment.collectAsState(initial = HomeAlignment.LEFT)
+    val appListAlignment by app.prefs.appearance.appListAlignment.collectAsState(initial = HomeAlignment.LEFT)
+    val iconSide by app.prefs.appearance.iconSide.collectAsState(initial = IconSide.LEFT)
+    val statusBarPeekSeconds by app.prefs.appearance.statusBarPeekSeconds.collectAsState(initial = 5)
+    val scrubBand by app.prefs.strip.scrubBand.collectAsState(initial = null)
+    val layoutDefaultsVersion by app.prefs.home.layoutDefaultsVersion.collectAsState(initial = null)
 
     // A brand new launcher gets its own clock, so the home screen is not simply empty on first
     // sight. Only ever on an install that has never been set up — the marker is written once,
@@ -393,11 +393,11 @@ fun NikeNavHost(
             return@LaunchedEffect
         }
         ClockWidgetProvider.render(context, manager, id)
-        app.prefs.addWidgetId(id)
+        app.prefs.home.addWidgetId(id)
     }
-    val welcomeSeen by app.prefs.welcomeSeen.collectAsState(initial = true)
-    val hasCustomLayout by app.prefs.hasCustomLayout.collectAsState(initial = true)
-    val hasCustomFavoritesTop by app.prefs.hasCustomFavoritesTop.collectAsState(initial = true)
+    val welcomeSeen by app.prefs.home.welcomeSeen.collectAsState(initial = true)
+    val hasCustomLayout by app.prefs.home.hasCustomLayout.collectAsState(initial = true)
+    val hasCustomFavoritesTop by app.prefs.home.hasCustomFavoritesTop.collectAsState(initial = true)
     var settingsTick by remember { mutableIntStateOf(0) }
     val contentColor = rememberContentColor(textColorMode, textColorCustom)
 
@@ -597,9 +597,9 @@ fun NikeNavHost(
             val folderId = folderIdFromToken(target)
             scope.launch {
                 if (folderId != null) {
-                    app.prefs.setFolderIcon(folderId, uri.toString())
+                    app.prefs.library.setFolderIcon(folderId, uri.toString())
                 } else {
-                    app.prefs.setIconOverride(target, uri.toString())
+                    app.prefs.library.setIconOverride(target, uri.toString())
                 }
             }
         }
@@ -610,7 +610,7 @@ fun NikeNavHost(
         if (result.resultCode == RESULT_OK) {
             val id = result.data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
             // Appended rather than replacing: picking a widget now adds a page.
-            if (id != -1) scope.launch { app.prefs.addWidgetId(id) }
+            if (id != -1) scope.launch { app.prefs.home.addWidgetId(id) }
         }
     }
 
@@ -622,7 +622,7 @@ fun NikeNavHost(
         folderWidgetTarget = null
         if (result.resultCode == RESULT_OK && folderId != null) {
             val id = result.data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
-            if (id != -1) scope.launch { app.prefs.addFolderWidget(folderId, id) }
+            if (id != -1) scope.launch { app.prefs.library.addFolderWidget(folderId, id) }
         }
     }
 
@@ -634,7 +634,7 @@ fun NikeNavHost(
                     // Releasing the host id matters: left allocated, its provider keeps
                     // broadcasting updates to a widget nobody can see.
                     if (id > 0) app.widgetHost.deleteAppWidgetId(id)
-                    app.prefs.removeWidgetId(id)
+                    app.prefs.home.removeWidgetId(id)
                 }
             },
             onWidgetSettings = { id ->
@@ -651,7 +651,7 @@ fun NikeNavHost(
                 AppWidgetManager.getInstance(context).getAppWidgetInfo(id)
                     ?.let { app.appRepository.openAppInfo(it.provider.packageName) }
             },
-            onResize = { newHeight -> scope.launch { app.prefs.setWidgetHeightDp(newHeight) } },
+            onResize = { newHeight -> scope.launch { app.prefs.home.setWidgetHeightDp(newHeight) } },
             onOpenSettings = { navController.navigate("settings") },
             onAddWidgetToFolder = { folderId ->
                 folderWidgetTarget = folderId
@@ -660,14 +660,14 @@ fun NikeNavHost(
             onRemoveFolderWidget = { folderId, id ->
                 scope.launch {
                     if (id > 0) runCatching { app.widgetHost.deleteAppWidgetId(id) }
-                    app.prefs.removeFolderWidget(folderId, id)
+                    app.prefs.library.removeFolderWidget(folderId, id)
                 }
             },
             onResizeFolderWidget = { folderId, id, height ->
-                scope.launch { app.prefs.setFolderWidgetHeight(folderId, id, height) }
+                scope.launch { app.prefs.library.setFolderWidgetHeight(folderId, id, height) }
             },
             onSetFolderNowPlaying = { folderId, on ->
-                scope.launch { app.prefs.setFolderNowPlaying(folderId, on) }
+                scope.launch { app.prefs.library.setFolderNowPlaying(folderId, on) }
             },
         )
     }
@@ -711,13 +711,13 @@ fun NikeNavHost(
                 showWelcome = layoutDefaultsVersion == 1 && !welcomeSeen,
                 onWelcomeDismissed = {
                     scope.launch {
-                        app.prefs.applyNewInstallDefaults()
-                        app.prefs.setWelcomeSeen(true)
+                        app.prefs.home.applyNewInstallDefaults()
+                        app.prefs.home.setWelcomeSeen(true)
                     }
                 },
                 scrubBandFractions = scrubBand,
-                onSetScrubBand = { top, height -> scope.launch { app.prefs.setScrubBand(top, height) } },
-                onClearScrubBand = { scope.launch { app.prefs.clearScrubBand() } },
+                onSetScrubBand = { top, height -> scope.launch { app.prefs.strip.setScrubBand(top, height) } },
+                onClearScrubBand = { scope.launch { app.prefs.strip.clearScrubBand() } },
                 onPeekStatusBar = onPeekStatusBar,
                 onAppListVisibleChange = onAppListVisibleChange,
                 onTogglePrivateSpace = {
@@ -750,7 +750,7 @@ fun NikeNavHost(
                 iconPackPackage = iconPackPackage,
                 showAppIcons = showAppIcons,
                 showFavoriteIcons = showFavoriteIcons,
-                onSetShowFavoriteIcons = { scope.launch { app.prefs.setShowFavoriteIcons(it) } },
+                onSetShowFavoriteIcons = { scope.launch { app.prefs.appearance.setShowFavoriteIcons(it) } },
                 showListHeaders = showListHeaders,
                 showSettingsRow = showSettingsRow,
                 edgeZoneBandOnly = edgeZoneBandOnly,
@@ -759,50 +759,50 @@ fun NikeNavHost(
                 markWorkApps = markWorkApps,
                 textShadow = textShadow,
                 textShadowStrength = textShadowStrength,
-                onSetTextShadowStrength = { scope.launch { app.prefs.setTextShadowStrength(it) } },
+                onSetTextShadowStrength = { scope.launch { app.prefs.appearance.setTextShadowStrength(it) } },
                 compactTapArea = compactTapArea,
                 stayAfterPrivateUnlock = stayAfterPrivateUnlock,
-                onSetStayAfterPrivateUnlock = { scope.launch { app.prefs.setStayAfterPrivateUnlock(it) } },
-                onSetCompactTapArea = { scope.launch { app.prefs.setCompactTapArea(it) } },
+                onSetStayAfterPrivateUnlock = { scope.launch { app.prefs.appList.setStayAfterPrivateUnlock(it) } },
+                onSetCompactTapArea = { scope.launch { app.prefs.appearance.setCompactTapArea(it) } },
                 privateSpaceSection = privateSpaceSection,
-                onSetPrivateSpaceSection = { scope.launch { app.prefs.setPrivateSpaceSection(it) } },
+                onSetPrivateSpaceSection = { scope.launch { app.prefs.appList.setPrivateSpaceSection(it) } },
                 foldersInAppList = foldersInAppList,
-                onSetFoldersInAppList = { scope.launch { app.prefs.setFoldersInAppList(it) } },
+                onSetFoldersInAppList = { scope.launch { app.prefs.appList.setFoldersInAppList(it) } },
                 recentSection = recentSection,
-                onSetRecentSection = { scope.launch { app.prefs.setRecentSection(it) } },
+                onSetRecentSection = { scope.launch { app.prefs.appList.setRecentSection(it) } },
                 recentSectionCount = recentSectionCount,
-                onSetRecentSectionCount = { scope.launch { app.prefs.setRecentSectionCount(it) } },
-                onSetTextShadow = { scope.launch { app.prefs.setTextShadow(it) } },
+                onSetRecentSectionCount = { scope.launch { app.prefs.appList.setRecentSectionCount(it) } },
+                onSetTextShadow = { scope.launch { app.prefs.appearance.setTextShadow(it) } },
                 edgeZoneInsetDp = edgeZoneInsetDp,
                 edgeZoneInsetAuto = edgeZoneInsetAuto,
-                onSetEdgeZoneInsetAuto = { scope.launch { app.prefs.setEdgeZoneInsetAuto(it) } },
-                onSetEdgeZoneInsetDp = { scope.launch { app.prefs.setEdgeZoneInsetDp(it) } },
-                onSetMarkWorkApps = { scope.launch { app.prefs.setMarkWorkApps(it) } },
-                onSetDimOthersScrubbing = { scope.launch { app.prefs.setDimOthersScrubbing(it) } },
+                onSetEdgeZoneInsetAuto = { scope.launch { app.prefs.strip.setEdgeZoneInsetAuto(it) } },
+                onSetEdgeZoneInsetDp = { scope.launch { app.prefs.strip.setEdgeZoneInsetDp(it) } },
+                onSetMarkWorkApps = { scope.launch { app.prefs.appearance.setMarkWorkApps(it) } },
+                onSetDimOthersScrubbing = { scope.launch { app.prefs.strip.setDimOthersScrubbing(it) } },
                 webSearchFallback = webSearchFallback,
-                onSetWebSearchFallback = { scope.launch { app.prefs.setWebSearchFallback(it) } },
+                onSetWebSearchFallback = { scope.launch { app.prefs.appList.setWebSearchFallback(it) } },
                 swipeUpOpensSearch = swipeUpOpensSearch,
-                onSetSwipeUpOpensSearch = { scope.launch { app.prefs.setSwipeUpOpensSearch(it) } },
-                onSetHoldScroll = { scope.launch { app.prefs.setHoldScroll(it) } },
+                onSetSwipeUpOpensSearch = { scope.launch { app.prefs.appList.setSwipeUpOpensSearch(it) } },
+                onSetHoldScroll = { scope.launch { app.prefs.strip.setHoldScroll(it) } },
                 holdScrollSpeed = holdScrollSpeed,
-                onSetHoldScrollSpeed = { scope.launch { app.prefs.setHoldScrollSpeed(it) } },
-                onSetEdgeZoneBandOnly = { scope.launch { app.prefs.setEdgeZoneBandOnly(it) } },
-                onSetShowSettingsRow = { scope.launch { app.prefs.setShowSettingsRow(it) } },
-                onSetShowListHeaders = { scope.launch { app.prefs.setShowListHeaders(it) } },
+                onSetHoldScrollSpeed = { scope.launch { app.prefs.strip.setHoldScrollSpeed(it) } },
+                onSetEdgeZoneBandOnly = { scope.launch { app.prefs.strip.setEdgeZoneBandOnly(it) } },
+                onSetShowSettingsRow = { scope.launch { app.prefs.home.setShowSettingsRow(it) } },
+                onSetShowListHeaders = { scope.launch { app.prefs.appList.setShowListHeaders(it) } },
                 notificationBadges = notificationBadges,
-                onSetNotificationBadges = { scope.launch { app.prefs.setNotificationBadges(it) } },
+                onSetNotificationBadges = { scope.launch { app.prefs.appList.setNotificationBadges(it) } },
                 notificationPreviews = notificationPreviews,
-                onSetNotificationPreviews = { scope.launch { app.prefs.setNotificationPreviews(it) } },
+                onSetNotificationPreviews = { scope.launch { app.prefs.appList.setNotificationPreviews(it) } },
                 notificationTextSp = notificationTextSp,
-                onSetNotificationTextSp = { scope.launch { app.prefs.setNotificationTextSp(it) } },
+                onSetNotificationTextSp = { scope.launch { app.prefs.appList.setNotificationTextSp(it) } },
                 sectionTopPercent = sectionTopPercent,
-                onSetSectionTopPercent = { scope.launch { app.prefs.setSectionTopPercent(it) } },
+                onSetSectionTopPercent = { scope.launch { app.prefs.appList.setSectionTopPercent(it) } },
                 closeFolderOnLaunch = closeFolderOnLaunch,
-                onSetCloseFolderOnLaunch = { scope.launch { app.prefs.setCloseFolderOnLaunch(it) } },
+                onSetCloseFolderOnLaunch = { scope.launch { app.prefs.home.setCloseFolderOnLaunch(it) } },
                 favoritesSource = favoritesSource,
-                onSetFavoritesSource = { scope.launch { app.prefs.setFavoritesSource(it) } },
+                onSetFavoritesSource = { scope.launch { app.prefs.library.setFavoritesSource(it) } },
                 frequentCount = frequentCount,
-                onSetFrequentCount = { scope.launch { app.prefs.setFrequentCount(it) } },
+                onSetFrequentCount = { scope.launch { app.prefs.library.setFrequentCount(it) } },
                 // The Settings app rather than whatever happens to sort first: a stable,
                 // recognizable icon to judge a size against on every device.
                 previewApp = remember(allApps) {
@@ -853,29 +853,29 @@ fun NikeNavHost(
                 iconSide = iconSide,
                 nowPlayingEnabled = nowPlayingEnabled,
                 nowPlayingListenerEnabled = listenerEnabled,
-                onSetIconPack = { scope.launch { app.prefs.setIconPackPackage(it) } },
-                onSetShowAppIcons = { scope.launch { app.prefs.setShowAppIcons(it) } },
-                onSetIconSize = { scope.launch { app.prefs.setIconSizeDp(it) } },
-                onSetLabelSize = { scope.launch { app.prefs.setLabelSizeSp(it) } },
-                onSetItemSpacing = { scope.launch { app.prefs.setItemSpacingDp(it) } },
-                onSetFont = { scope.launch { app.prefs.setFont(it) } },
-                onSetHideStatusBar = { scope.launch { app.prefs.setHideStatusBar(it) } },
-                onSetWidgetsStacked = { scope.launch { app.prefs.setWidgetsStacked(it) } },
-                onSetHideStatusBarAppList = { scope.launch { app.prefs.setHideStatusBarAppList(it) } },
-                onSetStatusBarPeekSeconds = { scope.launch { app.prefs.setStatusBarPeekSeconds(it) } },
-                onSetDimWallpaper = { scope.launch { app.prefs.setDimWallpaperAlpha(it) } },
-                onSetHaptics = { scope.launch { app.prefs.setHapticsEnabled(it) } },
-                onSetDimHome = { scope.launch { app.prefs.setDimHomeAlpha(it) } },
-                onSetShowFavoriteLabels = { scope.launch { app.prefs.setShowFavoriteLabels(it) } },
-                onSetTextColorMode = { scope.launch { app.prefs.setTextColorMode(it) } },
-                onSetTextColorCustom = { scope.launch { app.prefs.setTextColorCustom(it) } },
-                onSetDimColor = { scope.launch { app.prefs.setDimColor(it) } },
-                onSetAllowRotation = { scope.launch { app.prefs.setAllowRotation(it) } },
-                onSetShortcutSwipe = { scope.launch { app.prefs.setShortcutSwipe(it) } },
+                onSetIconPack = { scope.launch { app.prefs.appearance.setIconPackPackage(it) } },
+                onSetShowAppIcons = { scope.launch { app.prefs.appearance.setShowAppIcons(it) } },
+                onSetIconSize = { scope.launch { app.prefs.appearance.setIconSizeDp(it) } },
+                onSetLabelSize = { scope.launch { app.prefs.appearance.setLabelSizeSp(it) } },
+                onSetItemSpacing = { scope.launch { app.prefs.appearance.setItemSpacingDp(it) } },
+                onSetFont = { scope.launch { app.prefs.appearance.setFont(it) } },
+                onSetHideStatusBar = { scope.launch { app.prefs.appearance.setHideStatusBar(it) } },
+                onSetWidgetsStacked = { scope.launch { app.prefs.home.setWidgetsStacked(it) } },
+                onSetHideStatusBarAppList = { scope.launch { app.prefs.appearance.setHideStatusBarAppList(it) } },
+                onSetStatusBarPeekSeconds = { scope.launch { app.prefs.appearance.setStatusBarPeekSeconds(it) } },
+                onSetDimWallpaper = { scope.launch { app.prefs.appearance.setDimWallpaperAlpha(it) } },
+                onSetHaptics = { scope.launch { app.prefs.strip.setHapticsEnabled(it) } },
+                onSetDimHome = { scope.launch { app.prefs.appearance.setDimHomeAlpha(it) } },
+                onSetShowFavoriteLabels = { scope.launch { app.prefs.appearance.setShowFavoriteLabels(it) } },
+                onSetTextColorMode = { scope.launch { app.prefs.appearance.setTextColorMode(it) } },
+                onSetTextColorCustom = { scope.launch { app.prefs.appearance.setTextColorCustom(it) } },
+                onSetDimColor = { scope.launch { app.prefs.appearance.setDimColor(it) } },
+                onSetAllowRotation = { scope.launch { app.prefs.home.setAllowRotation(it) } },
+                onSetShortcutSwipe = { scope.launch { app.prefs.home.setShortcutSwipe(it) } },
                         onExportSettings = { exportLauncher.launch("nike-launcher-settings.json") },
                 onImportSettings = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
-                onSetIconShape = { scope.launch { app.prefs.setIconShape(it); clearIconCache() } },
-                onSetThemedIcons = { scope.launch { app.prefs.setThemedIcons(it); clearIconCache() } },
+                onSetIconShape = { scope.launch { app.prefs.appearance.setIconShape(it); clearIconCache() } },
+                onSetThemedIcons = { scope.launch { app.prefs.appearance.setThemedIcons(it); clearIconCache() } },
                 // Copied in rather than referenced: a document URI is only as durable as the
                 // file behind it, and a font picked from Downloads would break the moment it
                 // was moved or cleaned up.
@@ -902,24 +902,24 @@ fun NikeNavHost(
                         if (path == null) {
                             Toast.makeText(context, R.string.font_custom_failed, Toast.LENGTH_SHORT).show()
                         } else {
-                            app.prefs.setFontFile(path)
-                            app.prefs.setFont(AppFont.CUSTOM)
+                            app.prefs.appearance.setFontFile(path)
+                            app.prefs.appearance.setFont(AppFont.CUSTOM)
                         }
                     }
                 },
-                onSetDoubleTapToLock = { scope.launch { app.prefs.setDoubleTapToLock(it) } },
-                onSetEdgeSide = { scope.launch { app.prefs.setEdgeSide(it) } },
-                onSetScrubStyle = { scope.launch { app.prefs.setScrubStyle(it) } },
-                onSetScrubBubbleShape = { scope.launch { app.prefs.setScrubBubbleShape(it) } },
-                onSetRippleParams = { scope.launch { app.prefs.setRippleParams(it) } },
-                onSetEdgeZoneWidth = { scope.launch { app.prefs.setEdgeZoneWidthDp(it) } },
-                onSetAzStripVisibility = { scope.launch { app.prefs.setAzStripVisibility(it) } },
-                onSetShowAlphabet = { scope.launch { app.prefs.setShowAlphabet(it) } },
-                onSetSortByUsage = { scope.launch { app.prefs.setSortByUsage(it) } },
-                onSetAppListSearch = { scope.launch { app.prefs.setAppListSearchEnabled(it) } },
-                onSetAppListSearchBottom = { scope.launch { app.prefs.setAppListSearchBottom(it) } },
-                onSetAppListSearchHidden = { scope.launch { app.prefs.setAppListSearchHidden(it) } },
-                onSetSwipeUpOpensList = { scope.launch { app.prefs.setSwipeUpOpensList(it) } },
+                onSetDoubleTapToLock = { scope.launch { app.prefs.home.setDoubleTapToLock(it) } },
+                onSetEdgeSide = { scope.launch { app.prefs.strip.setEdgeSide(it) } },
+                onSetScrubStyle = { scope.launch { app.prefs.strip.setScrubStyle(it) } },
+                onSetScrubBubbleShape = { scope.launch { app.prefs.strip.setScrubBubbleShape(it) } },
+                onSetRippleParams = { scope.launch { app.prefs.strip.setRippleParams(it) } },
+                onSetEdgeZoneWidth = { scope.launch { app.prefs.strip.setEdgeZoneWidthDp(it) } },
+                onSetAzStripVisibility = { scope.launch { app.prefs.strip.setAzStripVisibility(it) } },
+                onSetShowAlphabet = { scope.launch { app.prefs.strip.setShowAlphabet(it) } },
+                onSetSortByUsage = { scope.launch { app.prefs.library.setSortByUsage(it) } },
+                onSetAppListSearch = { scope.launch { app.prefs.appList.setAppListSearchEnabled(it) } },
+                onSetAppListSearchBottom = { scope.launch { app.prefs.appList.setAppListSearchBottom(it) } },
+                onSetAppListSearchHidden = { scope.launch { app.prefs.appList.setAppListSearchHidden(it) } },
+                onSetSwipeUpOpensList = { scope.launch { app.prefs.home.setSwipeUpOpensList(it) } },
                 quickLaunchLeftLabel = quickLaunchLeftKey?.let { key ->
                     appsByKey[key]?.let { nameOverrides[it.key] ?: it.label }
                 },
@@ -935,12 +935,12 @@ fun NikeNavHost(
                 onOpenCornerPicker = { navController.navigate("cornerpicker") },
                 autoKeyboard = autoKeyboard,
                 lastLetterToLine = lastLetterToLine,
-                onSetLastLetterToLine = { scope.launch { app.prefs.setLastLetterToLine(it) } },
-                onSetAutoKeyboard = { scope.launch { app.prefs.setAutoKeyboard(it) } },
-                onSetAlignment = { scope.launch { app.prefs.setAlignment(it) } },
-                onSetAppListAlignment = { scope.launch { app.prefs.setAppListAlignment(it) } },
-                onSetIconSide = { scope.launch { app.prefs.setIconSide(it) } },
-                onSetNowPlayingEnabled = { scope.launch { app.prefs.setNowPlayingEnabled(it) } },
+                onSetLastLetterToLine = { scope.launch { app.prefs.appList.setLastLetterToLine(it) } },
+                onSetAutoKeyboard = { scope.launch { app.prefs.appList.setAutoKeyboard(it) } },
+                onSetAlignment = { scope.launch { app.prefs.appearance.setAlignment(it) } },
+                onSetAppListAlignment = { scope.launch { app.prefs.appearance.setAppListAlignment(it) } },
+                onSetIconSide = { scope.launch { app.prefs.appearance.setIconSide(it) } },
+                onSetNowPlayingEnabled = { scope.launch { app.prefs.home.setNowPlayingEnabled(it) } },
                 shadeGestureReady = remember(homeIntentTick) { SystemUi.canExpandShade() },
                 lockGestureReady = remember(homeIntentTick) { SystemUi.canLockScreen() },
                 onOpenAccessibilitySettings = {
@@ -1000,10 +1000,10 @@ fun NikeNavHost(
                 privateSpace = privateSpace,
                 nameOverrides = nameOverrides,
                 iconSizeDp = iconSizeDp,
-                onReorder = { keys -> scope.launch { app.prefs.setFavorites(keys) } },
+                onReorder = { keys -> scope.launch { app.prefs.library.setFavorites(keys) } },
                 onSetFavorite = { appInfo, add ->
                     scope.launch {
-                        if (add) app.prefs.addFavorite(appInfo.key) else app.prefs.removeFavorite(appInfo.key)
+                        if (add) app.prefs.library.addFavorite(appInfo.key) else app.prefs.library.removeFavorite(appInfo.key)
                     }
                 },
                 // Missing here can just mean a locked private space or a paused work profile,
@@ -1011,7 +1011,7 @@ fun NikeNavHost(
                 // unticking a row that IS resolved. forgetEntry's wider wipe (rename, icon,
                 // folder, hidden, launch count) is for a shortcut that is actually gone for
                 // good, which AppRepository.unpin already calls on its own.
-                onForget = { key -> scope.launch { app.prefs.removeFavorite(key) } },
+                onForget = { key -> scope.launch { app.prefs.library.removeFavorite(key) } },
                 onBack = { navController.popBackStack() },
             )
         }
@@ -1027,14 +1027,14 @@ fun NikeNavHost(
                 onSetInFolder = { appInfo, inFolder ->
                     scope.launch {
                         if (inFolder) {
-                            app.prefs.addAppToFolder(id, appInfo.key)
+                            app.prefs.library.addAppToFolder(id, appInfo.key)
                         } else {
-                            app.prefs.removeAppFromFolder(id, appInfo.key)
+                            app.prefs.library.removeAppFromFolder(id, appInfo.key)
                         }
                     }
                 },
-                onReorder = { keys -> scope.launch { app.prefs.setFolderApps(id, keys) } },
-                onForget = { key -> scope.launch { app.prefs.removeAppFromFolder(id, key) } },
+                onReorder = { keys -> scope.launch { app.prefs.library.setFolderApps(id, keys) } },
+                onForget = { key -> scope.launch { app.prefs.library.removeAppFromFolder(id, key) } },
                 onBack = { navController.popBackStack() },
             )
         }
@@ -1053,7 +1053,7 @@ fun NikeNavHost(
                 nameOverrides = nameOverrides,
                 iconSizeDp = iconSizeDp,
                 onPick = { picked ->
-                    scope.launch { app.prefs.setQuickLaunch(slot, picked?.key) }
+                    scope.launch { app.prefs.library.setQuickLaunch(slot, picked?.key) }
                     navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() },
@@ -1067,13 +1067,13 @@ fun NikeNavHost(
                 selectedKey = cornerButtonKey,
                 extraChoice = EntryKeys.SEARCH to stringResource(R.string.settings_corner_search),
                 onPickExtra = { key ->
-                    scope.launch { app.prefs.setCornerButton(key) }
+                    scope.launch { app.prefs.library.setCornerButton(key) }
                     navController.popBackStack()
                 },
                 nameOverrides = nameOverrides,
                 iconSizeDp = iconSizeDp,
                 onPick = { picked ->
-                    scope.launch { app.prefs.setCornerButton(picked?.key) }
+                    scope.launch { app.prefs.library.setCornerButton(picked?.key) }
                     navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() },
@@ -1087,7 +1087,7 @@ fun NikeNavHost(
                 nameOverrides = nameOverrides,
                 iconSizeDp = iconSizeDp,
                 onToggleHidden = { appInfo, hidden ->
-                    scope.launch { app.prefs.setHidden(appInfo.key, hidden) }
+                    scope.launch { app.prefs.library.setHidden(appInfo.key, hidden) }
                 },
                 onBack = { navController.popBackStack() },
             )
@@ -1100,7 +1100,7 @@ fun NikeNavHost(
                 nameOverrides = nameOverrides,
                 iconSizeDp = iconSizeDp,
                 onToggleHidden = { appInfo, excluded ->
-                    scope.launch { app.prefs.setFrequentExcluded(appInfo.key, excluded) }
+                    scope.launch { app.prefs.library.setFrequentExcluded(appInfo.key, excluded) }
                 },
                 onBack = { navController.popBackStack() },
                 titleRes = R.string.settings_frequent_excluded,
@@ -1121,9 +1121,9 @@ fun NikeNavHost(
             fun applyIcon(value: String?) {
                 scope.launch {
                     if (folderId != null) {
-                        app.prefs.setFolderIcon(folderId, value)
+                        app.prefs.library.setFolderIcon(folderId, value)
                     } else {
-                        app.prefs.setIconOverride(key, value)
+                        app.prefs.library.setIconOverride(key, value)
                     }
                 }
             }

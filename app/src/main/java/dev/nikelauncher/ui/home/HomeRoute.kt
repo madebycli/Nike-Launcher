@@ -656,9 +656,9 @@ fun HomeRoute(
                 sidePaddingDp = settings.sidePaddingDp,
                 widgetSidePaddingDp = settings.widgetSidePaddingDp,
                 widgetOffsetXDp = settings.widgetOffsetXDp,
-                onSetSidePadding = { scope.launch { app.prefs.setSidePaddingDp(it) } },
-                onSetWidgetSidePadding = { scope.launch { app.prefs.setWidgetSidePaddingDp(it) } },
-                onSetWidgetOffsetX = { scope.launch { app.prefs.setWidgetOffsetXDp(it) } },
+                onSetSidePadding = { scope.launch { app.prefs.appearance.setSidePaddingDp(it) } },
+                onSetWidgetSidePadding = { scope.launch { app.prefs.home.setWidgetSidePaddingDp(it) } },
+                onSetWidgetOffsetX = { scope.launch { app.prefs.home.setWidgetOffsetXDp(it) } },
                 paddings = homePaddings,
                 widgetIds = widgetIds,
                 widgetPosition = widgetPosition,
@@ -667,7 +667,7 @@ fun HomeRoute(
                 hapticsEnabled = settings.hapticsEnabled,
                 nowPlayingEnabled = settings.nowPlayingEnabled,
                 nowPlayingHeightDp = settings.nowPlayingHeightDp,
-                onResizeNowPlaying = { scope.launch { app.prefs.setNowPlayingHeightDp(it) } },
+                onResizeNowPlaying = { scope.launch { app.prefs.home.setNowPlayingHeightDp(it) } },
                 widgetActions = widgetActions,
                 onLaunch = { launchEntry(it) },
                 // Remove means the same thing to whoever taps it either way: take this off my
@@ -677,29 +677,29 @@ fun HomeRoute(
                 onRemoveFavorite = {
                     scope.launch {
                         if (settings.favoritesSource == FavoritesSource.FREQUENT) {
-                            app.prefs.setFrequentExcluded(it.key, excluded = true)
+                            app.prefs.library.setFrequentExcluded(it.key, excluded = true)
                         } else {
-                            app.prefs.removeFavorite(it.key)
+                            app.prefs.library.removeFavorite(it.key)
                         }
                     }
                 },
                 onOpenFolderApp = { launchEntry(it) },
                 onRenameFolder = { folder, name ->
-                    scope.launch { app.prefs.upsertFolder(folder.copy(name = name)) }
+                    scope.launch { app.prefs.library.upsertFolder(folder.copy(name = name)) }
                 },
                 onDeleteFolder = { folder ->
                     // Its widgets go with it, released so their apps stop updating them.
                     folder.widgets.forEach { runCatching { app.widgetHost.deleteAppWidgetId(it.id) } }
-                    scope.launch { app.prefs.deleteFolder(folder.id) }
+                    scope.launch { app.prefs.library.deleteFolder(folder.id) }
                 },
                 onChangeFolderIcon = { folder -> onNavigate(iconPickerRoute(folderToken(folder.id))) },
-                onResetFolderIcon = { folder -> scope.launch { app.prefs.setFolderIcon(folder.id, null) } },
+                onResetFolderIcon = { folder -> scope.launch { app.prefs.library.setFolderIcon(folder.id, null) } },
                 onManageFolder = { folder -> onNavigate("folder/" + folder.id) },
                 onRemoveFolderFromHome = if (!settings.foldersInAppList) null else { folder ->
-                    scope.launch { app.prefs.removeFavorite(folderToken(folder.id)) }
+                    scope.launch { app.prefs.library.removeFavorite(folderToken(folder.id)) }
                 },
                 onRemoveFromFolder = { folder, appInfo ->
-                    scope.launch { app.prefs.removeAppFromFolder(folder.id, appInfo.key) }
+                    scope.launch { app.prefs.library.removeAppFromFolder(folder.id, appInfo.key) }
                 },
                 appsByKey = appsByKey,
                 onMoveToFolder = { folderPickerFor = it },
@@ -711,12 +711,12 @@ fun HomeRoute(
                         // nothing — which is exactly what a locked private space's favorites
                         // do. Whatever drew no row goes back where it was.
                         val drawn = newFavKeys.toSet()
-                        app.prefs.setFavorites(restoreConcealed(favoriteKeys, newFavKeys) { it !in drawn })
-                        app.prefs.setWidgetPosition(newWidgetPos)
+                        app.prefs.library.setFavorites(restoreConcealed(favoriteKeys, newFavKeys) { it !in drawn })
+                        app.prefs.home.setWidgetPosition(newWidgetPos)
                     }
                 },
                 onCommitPadding = { slot: PaddingSlot, value: Int ->
-                    scope.launch { app.prefs.setHomePadding(slot, value) }
+                    scope.launch { app.prefs.home.setHomePadding(slot, value) }
                 },
                 onFavoritesBoundsChanged = { top, bottom ->
                     // Measured in window space, so a home screen still travelling under the
@@ -812,7 +812,7 @@ fun HomeRoute(
                     }
                 },
                 onManageFavorites = { onNavigate("favorites") },
-                onSetName = { appInfo, name -> scope.launch { app.prefs.setNameOverride(appInfo.key, name) } },
+                onSetName = { appInfo, name -> scope.launch { app.prefs.library.setNameOverride(appInfo.key, name) } },
                 onChangeIcon = { appInfo -> onNavigate(iconPickerRoute(appInfo.key)) },
                 onAppInfo = { app.appRepository.openAppInfo(it) },
                 onUnpinShortcut = { app.appRepository.unpin(it) },
@@ -872,17 +872,17 @@ fun HomeRoute(
                 },
                 onSetFavorite = { appInfo, add ->
                     scope.launch {
-                        if (add) app.prefs.addFavorite(appInfo.key) else app.prefs.removeFavorite(appInfo.key)
+                        if (add) app.prefs.library.addFavorite(appInfo.key) else app.prefs.library.removeFavorite(appInfo.key)
                     }
                 },
-                onSetName = { appInfo, name -> scope.launch { app.prefs.setNameOverride(appInfo.key, name) } },
+                onSetName = { appInfo, name -> scope.launch { app.prefs.library.setNameOverride(appInfo.key, name) } },
                 onChangeIcon = { appInfo ->
                     closeAppList()
                     onNavigate(iconPickerRoute(appInfo.key))
                 },
                 onAppInfo = { app.appRepository.openAppInfo(it) },
                 onUnpinShortcut = { appInfo -> closeAppList(); app.appRepository.unpin(appInfo) },
-                onHideApp = { appInfo, hide -> scope.launch { app.prefs.setHidden(appInfo.key, hide) } },
+                onHideApp = { appInfo, hide -> scope.launch { app.prefs.library.setHidden(appInfo.key, hide) } },
                 hiddenApps = hiddenApps,
                 onMoveToFolder = { appInfo -> closeAppList(); folderPickerFor = appInfo },
                 onToggleFolder = { folder ->
@@ -892,16 +892,16 @@ fun HomeRoute(
                 onDeleteFolder = { folder ->
                     // Its widgets go with it, released so their apps stop updating them.
                     folder.widgets.forEach { runCatching { app.widgetHost.deleteAppWidgetId(it.id) } }
-                    scope.launch { app.prefs.deleteFolder(folder.id) }
+                    scope.launch { app.prefs.library.deleteFolder(folder.id) }
                 },
                 onSetFolderOnHome = { folder, onHome ->
                     scope.launch {
-                        if (onHome) app.prefs.addFavorite(folderToken(folder.id))
-                        else app.prefs.removeFavorite(folderToken(folder.id))
+                        if (onHome) app.prefs.library.addFavorite(folderToken(folder.id))
+                        else app.prefs.library.removeFavorite(folderToken(folder.id))
                     }
                 },
                 onRemoveFromFolder = { folder, appInfo ->
-                    scope.launch { app.prefs.removeAppFromFolder(folder.id, appInfo.key) }
+                    scope.launch { app.prefs.library.removeAppFromFolder(folder.id, appInfo.key) }
                 },
                 onOpenSettings = { closeAppList(); onNavigate("settings") },
                 onDismiss = { closeAppList() },
@@ -988,7 +988,7 @@ fun HomeRoute(
                 // space is hiding.
                 memberCount = { folder -> folder.apps.count { it in appsByKey } },
                 onPickFolder = { folder ->
-                    scope.launch { app.prefs.addAppToFolder(folder.id, target.key) }
+                    scope.launch { app.prefs.library.addAppToFolder(folder.id, target.key) }
                     folderPickerFor = null
                 },
                 onCreateFolder = { name ->
@@ -998,10 +998,10 @@ fun HomeRoute(
                             name = name,
                             apps = listOf(target.key),
                         )
-                        app.prefs.upsertFolder(folder)
+                        app.prefs.library.upsertFolder(folder)
                         // Drop the app's own row and give the folder one in its place.
-                        app.prefs.removeFavorite(target.key)
-                        app.prefs.addFavorite(folderToken(folder.id))
+                        app.prefs.library.removeFavorite(target.key)
+                        app.prefs.library.addFavorite(folderToken(folder.id))
                     }
                     folderPickerFor = null
                 },

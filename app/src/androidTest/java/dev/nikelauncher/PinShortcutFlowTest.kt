@@ -77,7 +77,7 @@ class PinShortcutFlowTest {
         val launcherApps = context.getSystemService(LauncherApps::class.java)
         runCatching { launcherApps.pinShortcuts(targetPackage, emptyList(), Process.myUserHandle()) }
         val prefs = Prefs(context.applicationContext)
-        pinnedIds.forEach { id -> prefs.forgetEntry(EntryKeys.shortcut(targetPackage, id, 0L)) }
+        pinnedIds.forEach { id -> prefs.library.forgetEntry(EntryKeys.shortcut(targetPackage, id, 0L)) }
         pinnedIds.clear()
     }
 
