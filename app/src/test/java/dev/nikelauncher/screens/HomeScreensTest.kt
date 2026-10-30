@@ -15,6 +15,10 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.core.app.ApplicationProvider
 import dev.nikelauncher.MainActivity
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.data.QuickLaunchSlot
+import kotlinx.coroutines.runBlocking
 import org.junit.Assume
 import org.junit.Before
 import org.junit.Rule
@@ -27,13 +31,16 @@ import org.robolectric.annotation.GraphicsMode
 /** Home with favorites, edit mode, the edit-app sheet and the app list. */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [35], qualifiers = "w411dp-h924dp-xxhdpi")
+@Config(sdk = [35], qualifiers = "w411dp-h923dp-420dpi")
 class HomeScreensTest {
     @get:Rule val rule = createAndroidComposeRule<MainActivity>()
 
     // The preferences store lives as long as the test process, so these walk-throughs each need a
     // process of their own: run one class at a time with NIKE_SCREENS=1 (see docs/SCREENS.md).
-    @Before fun optIn() = Assume.assumeTrue(System.getenv("NIKE_SCREENS") != null)
+    @Before fun optIn() {
+        Assume.assumeTrue(System.getenv("NIKE_SCREENS") != null)
+        pixel9Display(rule.activity)
+    }
 
     @Test fun homeEditAndSheets() {
         installFakeApps(ApplicationProvider.getApplicationContext())
@@ -58,6 +65,19 @@ class HomeScreensTest {
         rule.onAllNodesWithText("Edit layout").onFirst().performClick()
         rule.waitForIdle()
         rule.shoot("h2-edit")
+        val prefs = (rule.activity.application as NikeApp).prefs
+        runBlocking {
+            prefs.home.setSwipeUpOpensList(true)
+            prefs.library.setQuickLaunch(QuickLaunchSlot.LEFT, "fake.camera/fake.camera.Main")
+            prefs.library.setQuickLaunch(QuickLaunchSlot.RIGHT, "fake.messages/fake.messages.Main")
+            prefs.strip.setEdgeSide(EdgeSide.BOTH)
+            prefs.strip.setEdgeZoneBandOnly(false)
+        }
+        rule.waitForIdle()
+        rule.shoot("h2-zones-full")
+        runBlocking { prefs.strip.setEdgeZoneBandOnly(true) }
+        rule.waitForIdle()
+        rule.shoot("h2-zones-band")
         rule.onAllNodesWithText("Favorites").onFirst().performClick()
         rule.waitForIdle()
         rule.shoot("h2b-edit-selected")

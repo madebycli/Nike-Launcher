@@ -696,4 +696,11 @@
     <string name="widget_settings_weather_show">Wetter anzeigen</string>
     <string name="widget_settings_weather_summary">Temperatur, Vorhersage und Wetter-App</string>
     <string name="widget_settings_weather_waiting">Warte auf Wetterdaten</string>
+
+    <string name="gesture_zone_edge">A–Z</string>
+    <string name="gesture_zone_quick">Schnellstart</string>
+    <string name="gesture_zone_down">↓ Herunterziehen</string>
+    <string name="gesture_zone_up">↑ Hochwischen</string>
+    <string name="gesture_zone_left">← %1$s</string>
+    <string name="gesture_zone_right">%1$s →</string>
 </resources>

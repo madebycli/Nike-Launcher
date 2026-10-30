@@ -132,3 +132,10 @@ the style gallery; selected previews use the matching content colour. ClockAppLa
 ClockConfigScreensTest renders six pages, all twenty styles and dialogs at Pixel 9 dimensions,
 in English and German at 150% font scale. Missing clock strings are supplied in es/pl/ru/sv.
 Native Canvas software PixelCopy avoids missing unchanged RenderNodes in repeated captures.
+
+## Home edit annotations
+
+HomeGestureZones draws Canvas rectangles and stock Material badges without pointer handlers,
+below the nudge panel and toolbar. Pure GestureZoneGeometry follows edge insets, band confinement,
+corner keep-out and quick-launch region. Direction labels use resources in all six locales.
+HomeScreensTest exercises controls through the overlay; frame chips use filled Material colours.

@@ -723,5 +723,11 @@
     <string name="widget_settings_weather_summary">Температура, прогноз и приложение погоды</string>
     <string name="widget_settings_weather_waiting">Ожидание данных о погоде</string>
 
+    <string name="gesture_zone_edge">А–Я</string>
+    <string name="gesture_zone_quick">Быстрый запуск</string>
+    <string name="gesture_zone_down">↓ Потянуть вниз</string>
+    <string name="gesture_zone_up">↑ Смахнуть вверх</string>
+    <string name="gesture_zone_left">← %1$s</string>
+    <string name="gesture_zone_right">%1$s →</string>
 </resources>
 

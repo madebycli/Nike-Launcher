@@ -703,4 +703,10 @@
     <string name="widget_settings_weather_summary">Temperatur, prognos och väderapp</string>
     <string name="widget_settings_weather_waiting">Väntar på väder</string>
 
+    <string name="gesture_zone_edge">A–Ö</string>
+    <string name="gesture_zone_quick">Snabbstart</string>
+    <string name="gesture_zone_down">↓ Dra nedåt</string>
+    <string name="gesture_zone_up">↑ Svep uppåt</string>
+    <string name="gesture_zone_left">← %1$s</string>
+    <string name="gesture_zone_right">%1$s →</string>
 </resources>

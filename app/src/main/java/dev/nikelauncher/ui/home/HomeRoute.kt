@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.home
 
-import android.app.SearchManager
-import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -10,14 +8,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.rememberSplineBasedDecay
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemGestures
 import androidx.compose.foundation.lazy.rememberLazyListState
-import dev.nikelauncher.ui.kit.motion.AppMotion
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -32,9 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
@@ -51,16 +44,14 @@ import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.EdgeSide
 import dev.nikelauncher.data.EntryKind
 import dev.nikelauncher.data.Folder
-import dev.nikelauncher.data.folderToken
 import dev.nikelauncher.media.NowPlayingBus
 import dev.nikelauncher.media.isListenerEnabled
 import dev.nikelauncher.service.SystemUi
-import dev.nikelauncher.ui.applist.AppListScreen
 import dev.nikelauncher.ui.applist.BandEditOverlay
+import dev.nikelauncher.ui.home.edit.HomeGestureZones
 import dev.nikelauncher.ui.applist.EdgeScrubber
 import dev.nikelauncher.ui.applist.ScrubState
 import dev.nikelauncher.R
-import dev.nikelauncher.ui.common.FolderPickerDialog
 import dev.nikelauncher.ui.common.toast
 import dev.nikelauncher.data.WidgetPagesConfig
 import dev.nikelauncher.ui.home.route.AppListController
@@ -71,7 +62,6 @@ import dev.nikelauncher.ui.home.route.BandEditing
 import dev.nikelauncher.ui.home.route.EdgeGestureExclusion
 import dev.nikelauncher.ui.home.route.EdgeZones
 import dev.nikelauncher.ui.home.route.HomeRouteHooks
-import dev.nikelauncher.ui.home.route.iconPickerRoute
 import dev.nikelauncher.ui.home.route.rememberHomeActions
 import dev.nikelauncher.ui.home.route.FolderPickerHost
 import dev.nikelauncher.ui.home.route.rememberListModels
@@ -293,6 +283,9 @@ fun HomeRoute(
                     homeIntentTick = homeIntentTick,
                     editMode = homeEditMode,
                     onEditModeChange = { homeEditMode = it },
+                    editOverlay = {
+                        if (!controller.visible && !onSidePage) HomeGestureZones(settings, band, insetLeftDp, insetRightDp, cornerButtonBounds, data.nameOverrides)
+                    },
                 )
             }
         }

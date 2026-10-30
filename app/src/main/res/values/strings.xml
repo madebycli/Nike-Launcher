@@ -700,4 +700,11 @@
     <string name="widget_settings_weather_show">Show weather</string>
     <string name="widget_settings_weather_summary">Temperature, forecast and weather app</string>
     <string name="widget_settings_weather_waiting">Waiting for weather</string>
+
+    <string name="gesture_zone_edge">A–Z</string>
+    <string name="gesture_zone_quick">Quick launch</string>
+    <string name="gesture_zone_down">↓ Pull down</string>
+    <string name="gesture_zone_up">↑ Swipe up</string>
+    <string name="gesture_zone_left">← %1$s</string>
+    <string name="gesture_zone_right">%1$s →</string>
 </resources>

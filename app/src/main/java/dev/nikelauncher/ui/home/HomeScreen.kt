@@ -95,6 +95,7 @@ fun HomeScreen(
     editMode: Boolean,
     onEditModeChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    editOverlay: @Composable () -> Unit = {},
 ) {
     val density = LocalDensity.current
     val view = LocalView.current
@@ -294,6 +295,7 @@ fun HomeScreen(
                 item(stringResource(R.string.action_open_settings), { backgroundMenu = false; actions.onOpenSettings() }, leadingIcon = Icons.Filled.Settings)
             }
 
+            if (editMode) editOverlay()
             SnapGuideOverlay(
                 visible = editMode && editor.dragging != null,
                 active = editor.guide,

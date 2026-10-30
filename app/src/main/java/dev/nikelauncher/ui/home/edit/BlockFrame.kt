@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -94,6 +95,7 @@ internal fun BlockFrame(
         }
         AssistChip(
             onClick = { current.onSelect() },
+            colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
             label = { Text(stringResource(block.label())) },
             leadingIcon = { Icon(Icons.Filled.DragHandle, contentDescription = null) },
             // Straddles the top edge where there is room above, and sits inside where there is not.

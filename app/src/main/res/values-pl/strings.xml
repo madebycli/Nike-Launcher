@@ -728,4 +728,10 @@
     <string name="widget_settings_weather_summary">Temperatura, prognoza i aplikacja pogodowa</string>
     <string name="widget_settings_weather_waiting">Oczekiwanie na pogodę</string>
 
+    <string name="gesture_zone_edge">A–Z</string>
+    <string name="gesture_zone_quick">Szybkie uruchamianie</string>
+    <string name="gesture_zone_down">↓ Przeciągnij w dół</string>
+    <string name="gesture_zone_up">↑ Przesuń w górę</string>
+    <string name="gesture_zone_left">← %1$s</string>
+    <string name="gesture_zone_right">%1$s →</string>
 </resources>

@@ -703,4 +703,10 @@
     <string name="widget_settings_weather_summary">Temperatura, previsión y app del tiempo</string>
     <string name="widget_settings_weather_waiting">Esperando datos del tiempo</string>
 
+    <string name="gesture_zone_edge">A–Z</string>
+    <string name="gesture_zone_quick">Inicio rápido</string>
+    <string name="gesture_zone_down">↓ Deslizar hacia abajo</string>
+    <string name="gesture_zone_up">↑ Deslizar hacia arriba</string>
+    <string name="gesture_zone_left">← %1$s</string>
+    <string name="gesture_zone_right">%1$s →</string>
 </resources>
