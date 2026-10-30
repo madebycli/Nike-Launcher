@@ -20,8 +20,6 @@
 
     <!-- Home screen -->
     <string name="home_drag_handle">Ändra ordning</string>
-    <string name="home_no_favorites_title">Inga favoriter ännu</string>
-    <string name="home_no_favorites_body">Tryck på skärmkanten för att öppna applistan, eller välj dina favoriter från listan nedan.</string>
     <string name="home_choose_favorites">Välj favoriter</string>
     <string name="home_folder_choose_apps">Hantera mapp</string>
     <string name="home_folder_delete">Radera mapp</string>
@@ -32,19 +30,8 @@
     <string name="home_display_name_label">Visningsnamn</string>
 
     <!-- Edit-mode drag handles -->
-    <string name="handle_side_padding">Sidoutfyllnad</string>
-    <string name="handle_widget_top">Widgetens överkant</string>
-    <string name="handle_widget_bottom">Widgetens nederkant</string>
     <string name="handle_widget_height">Widgetens höjd</string>
-    <string name="handle_widget_side_padding">Widgetens sidoutfyllnad</string>
-    <string name="handle_widget_offset_x">Widgetens vänster / höger</string>
     <string name="handle_az_range">A-Z-remsans utsträckning</string>
-    <string name="edit_value_range">%1$d till %2$d dp</string>
-    <string name="handle_favorites_top">Favoriternas överkant</string>
-    <string name="handle_favorites_bottom">Favoriternas nederkant</string>
-    <string name="handle_now_playing_top">Nu spelas överkant</string>
-    <string name="handle_now_playing_bottom">Nu spelas nederkant</string>
-    <string name="handle_now_playing_height">Nu spelas höjd</string>
 
     <!-- App list -->
     <string name="applist_add_favorite">Lägg till i favoriter</string>
@@ -98,17 +85,14 @@
     <string name="settings_close_folder">Stäng en mapp efter att en app har öppnats</string>
     <string name="settings_close_folder_detail">Av lämnar den öppen tills du stänger den själv</string>
     <string name="settings_favorites_source">Favoriter</string>
-    <string name="settings_frequent_count">Hur många</string>
     <string name="favorites_source_manual">Listan som du gör</string>
     <string name="favorites_source_frequent">Mest använda</string>
     <string name="settings_icon_pack_no_icons">Inget</string>
-    <string name="settings_icon_pack_none">Inga ikonpaketsappar hittades på den här enheten.</string>
     <string name="settings_icon_size">Ikonstorlek</string>
     <string name="settings_text_size">Textstorlek</string>
     <string name="settings_favorite_spacing">Avstånd mellan favoriter</string>
     <string name="settings_font">Teckensnitt</string>
     <string name="settings_text_color">Textfärg</string>
-    <string name="settings_text_color_detail">Auto läser av bakgrundsbilden och väljer den som är läsbar</string>
     <string name="settings_show_names">Visa appnamn bredvid favoritikonerna</string>
     <string name="folder_add_now_playing">Lägg till Nu spelas</string>
     <string name="folder_remove_now_playing">Ta bort Nu spelas</string>
@@ -142,7 +126,6 @@
     <string name="az_visibility_never">Aldrig</string>
     <string name="az_visibility_landscape">Liggande</string>
     <string name="az_visibility_always">Alltid</string>
-    <string name="settings_always_show_az">Visa alltid A-Z</string>
     <string name="settings_show_alphabet">Visa A-Z i applistan</string>
     <string name="applist_search_web">Sök på webben efter \"%1$s\"</string>
     <string name="settings_web_search">Erbjud en webbsökning</string>
@@ -231,7 +214,6 @@
     <string name="font_monospace">Monospace</string>
     <string name="font_custom">Anpassat …</string>
     <string name="font_custom_pick">Välj en teckensnittsfil</string>
-    <string name="font_custom_detail">En .ttf- eller .otf-fil, som kopieras till startskärmsappen så att den bevaras även om filen flyttas</string>
     <string name="font_custom_failed">Den valda filen kunde inte läsas in som ett teckensnitt</string>
     <string name="text_color_material">Material</string>
     <string name="text_color_custom">Anpassad</string>
@@ -257,9 +239,7 @@
     <string name="settings_backup_failed">Den valda filen kunde inte läsas in</string>
     <string name="settings_dim_color">Dämpningsfärg</string>
     <string name="settings_dim_color_detail">Vad bakgrundsbilden dämpas med. Hur mycket anges under Startskärm och Applista.</string>
-    <string name="color_from_wallpaper">Från din bakgrundsbild</string>
     <string name="icon_shape">Ikonform</string>
-    <string name="icon_shape_detail">Omformar endast adaptiva ikoner; alla äldre lämnas oförändrade</string>
     <string name="icon_shape_system">System</string>
     <string name="icon_shape_circle">Cirkel</string>
     <string name="icon_shape_rounded">Rundad</string>
@@ -334,12 +314,9 @@
     <string name="widget_clock_size">Klockans storlek</string>
     <string name="widget_clock_date_size">Datumets storlek</string>
     <string name="widget_clock_color">Färg</string>
-    <string name="widget_clock_color_pick">Välj</string>
     <string name="widget_clock_size_preview">12:34</string>
     <string name="widget_clock_weather">Väder</string>
     <string name="widget_clock_notifications">Aviseringar</string>
-    <string name="widget_clock_weather_show">Väder</string>
-    <string name="widget_clock_weather_hide">Inget väder</string>
     <string name="widget_clock_weather_celsius">°C</string>
     <string name="widget_clock_weather_fahrenheit">°F</string>
     <string name="widget_clock_weather_size">Vädrets storlek</string>
@@ -348,7 +325,6 @@
     <string name="widget_clock_date_custom">Anpassat datumformat</string>
     <string name="widget_clock_date_custom_label">Mönster</string>
     <string name="widget_clock_date_custom_invalid">Detta är inget mönster som denna kan skriva ut</string>
-    <string name="widget_clock_date_custom_hint">d dag, M månad, y år, E veckodag. Upprepa en bokstav för en längre form: d, dd, EEE, EEEE.</string>
     <string name="widget_clock_agenda">På gång</string>
     <string name="widget_clock_event_untitled">(Ingen titel)</string>
     <string name="widget_clock_event_at">%1$s  %2$s</string>
@@ -358,8 +334,6 @@
     <string name="widget_clock_event_all_day">%1$s  i dag</string>
     <string name="widget_clock_event_now">%1$s  nu</string>
     <string name="widget_clock_alarm_at">Alarm %1$s</string>
-    <string name="widget_clock_agenda_show">På gång</string>
-    <string name="widget_clock_agenda_hide">Ingenting</string>
     <string name="widget_clock_agenda_size">På gångs storlek</string>
     <string name="widget_clock_agenda_opacity">På gångs opacitet</string>
     <string name="widget_clock_agenda_count">Hur många händelser</string>
@@ -367,20 +341,12 @@
     <string name="widget_clock_agenda_relative">Om 20 minuter</string>
     <string name="widget_clock_agenda_absolute">Kl. 12:30</string>
     <string name="widget_clock_alarm_show">Nästa alarm</string>
-    <string name="widget_clock_alarm_hide">Inget alarm</string>
-    <string name="widget_clock_agenda_permission">Tillåt åtkomst till din kalender</string>
     <string name="widget_clock_agenda_empty">Ingenting på gång</string>
-    <string name="widget_clock_agenda_hint">Läsning av din kalender kräver behörighet. Ingenting lämnar telefonen: Nike har ingen nätverksåtkomst.</string>
     <string name="widget_clock_weather_opens">Vad ett tryck på vädret öppnar</string>
     <string name="widget_clock_weather_waiting">Väntar på en väderapp</string>
-    <string name="widget_clock_weather_hint">Vädret kommer från en väderapp som redan har det, så Nike behöver ingen nätverksåtkomst och frågar aldrig var du är. I Breezy Weather, aktivera Inställningar → Widgetar &amp; levande bakgrund → Datadelning.</string>
-    <string name="widget_clock_notifications_show">Aviseringsräknare</string>
-    <string name="widget_clock_notifications_hide">Ingen räknare</string>
     <string name="widget_clock_notifications_size">Räknarens storlek</string>
     <string name="widget_clock_notifications_opacity">Räknarens opacitet</string>
     <string name="widget_clock_battery">Batteri</string>
-    <string name="widget_clock_battery_show">Visa</string>
-    <string name="widget_clock_battery_hide">Dölj</string>
     <string name="widget_clock_battery_size">Batteriets storlek</string>
     <string name="widget_clock_battery_percent">%1$d %%</string>
     <string name="widget_clock_time_opacity">Klockans opacitet</string>

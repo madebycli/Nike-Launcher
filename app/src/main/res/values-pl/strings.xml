@@ -20,8 +20,6 @@
 
     <!-- Home screen -->
     <string name="home_drag_handle">Zmień kolejność</string>
-    <string name="home_no_favorites_title">Brak ulubionych</string>
-    <string name="home_no_favorites_body">Dotknij krawędzi ekranu, aby otworzyć listę aplikacji, lub wybierz ulubione z poniższej listy.</string>
     <string name="home_choose_favorites">Wybierz ulubione</string>
     <string name="home_folder_choose_apps">Zarządzaj folderem</string>
     <string name="home_folder_delete">Usuń folder</string>
@@ -32,19 +30,8 @@
     <string name="home_display_name_label">Wyświetlana nazwa</string>
 
     <!-- Edit-mode drag handles -->
-    <string name="handle_side_padding">Margines boczny</string>
-    <string name="handle_widget_top">Góra widżetu</string>
-    <string name="handle_widget_bottom">Dół widżetu</string>
     <string name="handle_widget_height">Wysokość widżetu</string>
-    <string name="handle_widget_side_padding">Margines boczny widżetu</string>
-    <string name="handle_widget_offset_x">Widżet w lewo / w prawo</string>
     <string name="handle_az_range">Zakres paska A–Z</string>
-    <string name="edit_value_range">Od %1$d do %2$d dp</string>
-    <string name="handle_favorites_top">Góra ulubionych</string>
-    <string name="handle_favorites_bottom">Dół ulubionych</string>
-    <string name="handle_now_playing_top">Góra sekcji "Teraz odtwarzane"</string>
-    <string name="handle_now_playing_bottom">Dół sekcji "Teraz odtwarzane"</string>
-    <string name="handle_now_playing_height">Wysokość sekcji "Teraz odtwarzane"</string>
 
     <!-- App list -->
     <string name="applist_add_favorite">Dodaj do ulubionych</string>
@@ -95,17 +82,14 @@
     <string name="settings_close_folder">Zamknij folder po uruchomieniu aplikacji</string>
     <string name="settings_close_folder_detail">Wyłączenie pozostawia go otwartym do momentu ręcznego zamknięcia</string>
     <string name="settings_favorites_source">Ulubione</string>
-    <string name="settings_frequent_count">Ile pozycji</string>
     <string name="favorites_source_manual">Lista, którą prowadzisz</string>
     <string name="favorites_source_frequent">Najczęściej używane</string>
     <string name="settings_icon_pack_no_icons">Brak</string>
-    <string name="settings_icon_pack_none">Nie znaleziono na tym urządzeniu aplikacji z zestawami ikon.</string>
     <string name="settings_icon_size">Rozmiar ikon</string>
     <string name="settings_text_size">Rozmiar tekstu</string>
     <string name="settings_favorite_spacing">Odstępy między ulubionymi</string>
     <string name="settings_font">Czcionka</string>
     <string name="settings_text_color">Kolor tekstu</string>
-    <string name="settings_text_color_detail">Automatycznie odczytuje tapetę i wybiera czytelny wariant</string>
     <string name="settings_show_names">Pokaż nazwy obok ikon ulubionych</string>
     <string name="settings_hide_status_bar">Ukryj pasek stanu na ekranie startowym</string>
     <string name="settings_hide_status_bar_applist">Ukryj pasek stanu na liście aplikacji</string>
@@ -122,7 +106,6 @@
     <string name="az_visibility_never">Nigdy</string>
     <string name="az_visibility_landscape">W poziomie</string>
     <string name="az_visibility_always">Zawsze</string>
-    <string name="settings_always_show_az">Zawsze pokazuj A–Z</string>
     <string name="settings_show_alphabet">Pokaż A–Z na liście aplikacji</string>
     <string name="applist_search_web">Szukaj w internecie „%1$s”</string>
     <string name="settings_web_search">Oferuj wyszukiwanie w internecie</string>
@@ -207,7 +190,6 @@
     <string name="font_monospace">Monospace</string>
     <string name="font_custom">Własna…</string>
     <string name="font_custom_pick">Wybierz plik czcionki</string>
-    <string name="font_custom_detail">Plik .ttf lub .otf skopiowany do launchera, dzięki czemu przetrwa przenoszenie plików</string>
     <string name="font_custom_failed">Nie udało się odczytać tego pliku jako czcionki</string>
     <string name="text_color_material">Material</string>
     <string name="text_color_custom">Własny</string>
@@ -233,9 +215,7 @@
     <string name="settings_backup_failed">Nie udało się odczytać pliku</string>
     <string name="settings_dim_color">Kolor przyciemnienia</string>
     <string name="settings_dim_color_detail">Czym przyciemniana jest tapeta. Siłę ustawisz w sekcjach Ekran Główny i Lista aplikacji</string>
-    <string name="color_from_wallpaper">Z tapety</string>
     <string name="icon_shape">Kształt ikon</string>
-    <string name="icon_shape_detail">Zmienia kształt tylko ikon adaptacyjnych; starsze pozostają bez zmian</string>
     <string name="icon_shape_system">Systemowy</string>
     <string name="icon_shape_circle">Koło</string>
     <string name="icon_shape_rounded">Zaokrąglony</string>
@@ -306,12 +286,9 @@
     <string name="widget_clock_size">Rozmiar godziny</string>
     <string name="widget_clock_date_size">Rozmiar daty</string>
     <string name="widget_clock_color">Kolor</string>
-    <string name="widget_clock_color_pick">Wybierz</string>
     <string name="widget_clock_size_preview">12:34</string>
     <string name="widget_clock_weather">Pogoda</string>
     <string name="widget_clock_notifications">Powiadomienia</string>
-    <string name="widget_clock_weather_show">Pogoda</string>
-    <string name="widget_clock_weather_hide">Brak pogody</string>
     <string name="widget_clock_weather_celsius">°C</string>
     <string name="widget_clock_weather_fahrenheit">°F</string>
     <string name="widget_clock_weather_size">Rozmiar pogody</string>
@@ -320,7 +297,6 @@
     <string name="widget_clock_date_custom">Niestandardowy format daty</string>
     <string name="widget_clock_date_custom_label">Wzorzec</string>
     <string name="widget_clock_date_custom_invalid">To nie jest wzorzec, który można obsłużyć</string>
-    <string name="widget_clock_date_custom_hint">d – dzień, M – miesiąc, y – rok, E – dzień tygodnia. Powtórz literę, aby uzyskać dłuższą formę: d, dd, EEE, EEEE.</string>
     <string name="widget_clock_agenda">Nadchodzące</string>
     <string name="widget_clock_event_untitled">(Brak tytułu)</string>
     <string name="widget_clock_event_at">%1$s  %2$s</string>
@@ -330,8 +306,6 @@
     <string name="widget_clock_event_all_day">%1$s  dzisiaj</string>
     <string name="widget_clock_event_now">%1$s  teraz</string>
     <string name="widget_clock_alarm_at">Alarm %1$s</string>
-    <string name="widget_clock_agenda_show">Nadchodzące</string>
-    <string name="widget_clock_agenda_hide">Brak</string>
     <string name="widget_clock_agenda_size">Rozmiar nadchodzących</string>
     <string name="widget_clock_agenda_opacity">Nieprzezroczystość nadchodzących</string>
     <string name="widget_clock_agenda_count">Liczba wydarzeń</string>
@@ -339,20 +313,12 @@
     <string name="widget_clock_agenda_relative">Za 20 minut</string>
     <string name="widget_clock_agenda_absolute">O 12:30</string>
     <string name="widget_clock_alarm_show">Następny alarm</string>
-    <string name="widget_clock_alarm_hide">Brak alarmu</string>
-    <string name="widget_clock_agenda_permission">Zezwól na dostęp do kalendarza</string>
     <string name="widget_clock_agenda_empty">Brak nadchodzących wydarzeń</string>
-    <string name="widget_clock_agenda_hint">Odczytywanie kalendarza wymaga uprawnień. Nic nie opuszcza telefonu: Nike nie ma dostępu do sieci.</string>
     <string name="widget_clock_weather_opens">Działanie po stuknięciu w pogodę</string>
     <string name="widget_clock_weather_waiting">Oczekiwanie na aplikację pogodową</string>
-    <string name="widget_clock_weather_hint">Dane o pogodzie pochodzą z aplikacji pogodowej, która już je posiada, więc Nike nie potrzebuje dostępu do sieci ani lokalizacji. W Breezy Weather włącz Ustawienia → Widżety i żywa tapeta → Udostępnianie danych.</string>
-    <string name="widget_clock_notifications_show">Liczba powiadomień</string>
-    <string name="widget_clock_notifications_hide">Brak licznika</string>
     <string name="widget_clock_notifications_size">Rozmiar licznika</string>
     <string name="widget_clock_notifications_opacity">Nieprzezroczystość licznika</string>
     <string name="widget_clock_battery">Bateria</string>
-    <string name="widget_clock_battery_show">Pokaż</string>
-    <string name="widget_clock_battery_hide">Ukryj</string>
     <string name="widget_clock_battery_size">Rozmiar baterii</string>
     <string name="widget_clock_battery_percent">%1$d%%</string>
     <string name="widget_clock_time_opacity">Nieprzezroczystość godziny</string>

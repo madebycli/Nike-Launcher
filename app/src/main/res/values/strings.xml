@@ -24,8 +24,6 @@
     <string name="edit_block_now_playing">Now Playing</string>
     <string name="edit_block_favorites">Favorites</string>
     <string name="edit_block_reset">Reset position</string>
-    <string name="home_no_favorites_title">No favorites yet</string>
-    <string name="home_no_favorites_body">Touch the screen edge to open the app list, or pick your favorites from the list below.</string>
     <string name="home_choose_favorites">Choose favorites</string>
     <string name="home_folder_choose_apps">Manage folder</string>
     <string name="home_folder_delete">Delete folder</string>
@@ -36,19 +34,8 @@
     <string name="home_display_name_label">Display name</string>
 
     <!-- Edit-mode drag handles -->
-    <string name="handle_side_padding">Side padding</string>
-    <string name="handle_widget_top">Widget top</string>
-    <string name="handle_widget_bottom">Widget bottom</string>
     <string name="handle_widget_height">Widget height</string>
-    <string name="handle_widget_side_padding">Widget side padding</string>
-    <string name="handle_widget_offset_x">Widget left / right</string>
     <string name="handle_az_range">A-Z strip range</string>
-    <string name="edit_value_range">%1$d to %2$d dp</string>
-    <string name="handle_favorites_top">Favorites top</string>
-    <string name="handle_favorites_bottom">Favorites bottom</string>
-    <string name="handle_now_playing_top">Now Playing top</string>
-    <string name="handle_now_playing_bottom">Now Playing bottom</string>
-    <string name="handle_now_playing_height">Now Playing height</string>
 
     <!-- App list -->
     <string name="applist_add_favorite">Add to favorites</string>
@@ -105,17 +92,14 @@
     <string name="settings_close_folder">Close a folder after opening an app</string>
     <string name="settings_close_folder_detail">Off leaves it open until you close it yourself</string>
     <string name="settings_favorites_source">Favorites</string>
-    <string name="settings_frequent_count">How many</string>
     <string name="favorites_source_manual">The list you keep</string>
     <string name="favorites_source_frequent">Most used</string>
     <string name="settings_icon_pack_no_icons">None</string>
-    <string name="settings_icon_pack_none">No icon pack apps found on this device.</string>
     <string name="settings_icon_size">Icon size</string>
     <string name="settings_text_size">Text size</string>
     <string name="settings_favorite_spacing">Spacing between favorites</string>
     <string name="settings_font">Font</string>
     <string name="settings_text_color">Text color</string>
-    <string name="settings_text_color_detail">Auto reads the wallpaper and picks whichever is legible</string>
     <string name="settings_show_names">Show app names beside favorite icons</string>
     <string name="folder_add_now_playing">Add Now Playing</string>
     <string name="folder_remove_now_playing">Remove Now Playing</string>
@@ -149,7 +133,6 @@
     <string name="az_visibility_never">Never</string>
     <string name="az_visibility_landscape">Landscape</string>
     <string name="az_visibility_always">Always</string>
-    <string name="settings_always_show_az">Always show A-Z</string>
     <string name="settings_show_alphabet">Show A-Z in app list</string>
     <string name="applist_search_web">Search the web for \"%1$s\"</string>
     <string name="settings_web_search">Offer a web search</string>
@@ -238,7 +221,6 @@
     <string name="font_monospace">Monospace</string>
     <string name="font_custom">Custom…</string>
     <string name="font_custom_pick">Choose a font file</string>
-    <string name="font_custom_detail">A .ttf or .otf file, copied into the launcher so it survives the file moving</string>
     <string name="font_custom_failed">That file could not be read as a font</string>
     <string name="text_color_material">Material</string>
     <string name="text_color_custom">Custom</string>
@@ -264,10 +246,8 @@
     <string name="settings_backup_failed">That file could not be read</string>
     <string name="settings_dim_color">Dim color</string>
     <string name="settings_dim_color_detail">What the wallpaper is dimmed with. How much is set under Home screen and App list</string>
-    <string name="color_from_wallpaper">From your wallpaper</string>
     <string name="color_hex">Hex code</string>
     <string name="icon_shape">Icon shape</string>
-    <string name="icon_shape_detail">Only reshapes adaptive icons; anything older is left as it is</string>
     <string name="icon_shape_system">System</string>
     <string name="icon_shape_circle">Circle</string>
     <string name="icon_shape_rounded">Rounded</string>
@@ -342,12 +322,9 @@
     <string name="widget_clock_size">Time size</string>
     <string name="widget_clock_date_size">Date size</string>
     <string name="widget_clock_color">Color</string>
-    <string name="widget_clock_color_pick">Choose</string>
     <string name="widget_clock_size_preview">12:34</string>
     <string name="widget_clock_weather">Weather</string>
     <string name="widget_clock_notifications">Notifications</string>
-    <string name="widget_clock_weather_show">Weather</string>
-    <string name="widget_clock_weather_hide">No weather</string>
     <string name="widget_clock_weather_celsius">°C</string>
     <string name="widget_clock_weather_fahrenheit">°F</string>
     <string name="widget_clock_weather_size">Weather size</string>
@@ -356,7 +333,6 @@
     <string name="widget_clock_date_custom">Custom date format</string>
     <string name="widget_clock_date_custom_label">Pattern</string>
     <string name="widget_clock_date_custom_invalid">That is not a pattern this can draw</string>
-    <string name="widget_clock_date_custom_hint">d day, M month, y year, E weekday. Repeat a letter for a longer form: d, dd, EEE, EEEE.</string>
     <string name="widget_clock_agenda">Coming up</string>
     <string name="widget_clock_event_untitled">(No title)</string>
     <string name="widget_clock_event_at">%1$s  %2$s</string>
@@ -366,8 +342,6 @@
     <string name="widget_clock_event_all_day">%1$s  today</string>
     <string name="widget_clock_event_now">%1$s  now</string>
     <string name="widget_clock_alarm_at">Alarm %1$s</string>
-    <string name="widget_clock_agenda_show">Coming up</string>
-    <string name="widget_clock_agenda_hide">Nothing</string>
     <string name="widget_clock_agenda_size">Coming up size</string>
     <string name="widget_clock_agenda_opacity">Coming up opacity</string>
     <string name="widget_clock_agenda_count">How many events</string>
@@ -375,20 +349,12 @@
     <string name="widget_clock_agenda_relative">In 20 minutes</string>
     <string name="widget_clock_agenda_absolute">At 12:30</string>
     <string name="widget_clock_alarm_show">Next alarm</string>
-    <string name="widget_clock_alarm_hide">No alarm</string>
-    <string name="widget_clock_agenda_permission">Allow access to your calendar</string>
     <string name="widget_clock_agenda_empty">Nothing coming up</string>
-    <string name="widget_clock_agenda_hint">Reading your calendar needs permission. Nothing leaves the phone: Nike has no network access.</string>
     <string name="widget_clock_weather_opens">What tapping the weather opens</string>
     <string name="widget_clock_weather_waiting">Waiting for a weather app</string>
-    <string name="widget_clock_weather_hint">Weather comes from a weather app that already has it, so Nike needs no network access and never asks where you are. In Breezy Weather, turn on Settings → Widgets &amp; Live Wallpaper → Data sharing.</string>
-    <string name="widget_clock_notifications_show">Notification count</string>
-    <string name="widget_clock_notifications_hide">No count</string>
     <string name="widget_clock_notifications_size">Count size</string>
     <string name="widget_clock_notifications_opacity">Count opacity</string>
     <string name="widget_clock_battery">Battery</string>
-    <string name="widget_clock_battery_show">Show</string>
-    <string name="widget_clock_battery_hide">Hide</string>
     <string name="widget_clock_battery_size">Battery size</string>
     <string name="widget_clock_battery_percent">%1$d%%</string>
     <string name="widget_clock_time_opacity">Time opacity</string>

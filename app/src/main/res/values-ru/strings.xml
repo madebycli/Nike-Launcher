@@ -20,8 +20,6 @@
 
     <!-- Главный экран -->
     <string name="home_drag_handle">Сортировать</string>
-    <string name="home_no_favorites_title">Нет избранных</string>
-    <string name="home_no_favorites_body">Коснитесь края экрана, чтобы открыть список приложений или выберите избранные из списка ниже.</string>
     <string name="home_choose_favorites">Выбрать избранные</string>
     <string name="home_folder_choose_apps">Управление папкой</string>
     <string name="home_folder_delete">Удалить папку</string>
@@ -32,19 +30,8 @@
     <string name="home_display_name_label">Отображаемое имя</string>
 
     <!-- Режим редактирования -->
-    <string name="handle_side_padding">Боковой отступ</string>
-    <string name="handle_widget_top">Виджет: верхний отступ</string>
-    <string name="handle_widget_bottom">Виджет: нижний отступ</string>
     <string name="handle_widget_height">Виджет: ширина</string>
-    <string name="handle_widget_side_padding">Виджет: боковой отступ</string>
-    <string name="handle_widget_offset_x">Виджет: сдвиг влево / вправо</string>
     <string name="handle_az_range">Настройка алфавитной волны</string>
-    <string name="edit_value_range">от %1$d до %2$d dp</string>
-    <string name="handle_favorites_top">Избранное: верхний отступ</string>
-    <string name="handle_favorites_bottom">Избранное: нижний отступ</string>
-    <string name="handle_now_playing_top">Сейчас играет: верхний отступ</string>
-    <string name="handle_now_playing_bottom">Сейчас играет: нижний отступ</string>
-    <string name="handle_now_playing_height">Сейчас играет: ширина</string>
 
     <!-- Меню приложений -->
     <string name="applist_add_favorite">Добавить в избранное</string>
@@ -72,13 +59,11 @@
     <string name="settings_icon_pack">Набор иконок</string>
     <string name="settings_icon_pack_default">По умолчанию</string>
     <string name="settings_icon_pack_no_icons">Отсутствует</string>
-    <string name="settings_icon_pack_none">Наборы иконок не найдены.</string>
     <string name="settings_icon_size">Размер иконки</string>
     <string name="settings_text_size">Размер текста</string>
     <string name="settings_favorite_spacing">Отступы между избранными</string>
     <string name="settings_font">Шрифт</string>
     <string name="settings_text_color">Цвет текста</string>
-    <string name="settings_text_color_detail">При автоматическом режиме система считывает обои и выбирает наилучший вариант читаемости.</string>
     <string name="settings_show_names">Отображать названия приложений рядом с иконками</string>
     <string name="settings_hide_status_bar">Скрыть строку состояния на главном экране</string>
     <string name="settings_hide_status_bar_applist">Скрыть строку состояния в меню приложений</string>
@@ -95,7 +80,6 @@
     <string name="az_visibility_never">Никогда</string>
     <string name="az_visibility_landscape">Только в ландшафтном</string>
     <string name="az_visibility_always">Всегда</string>
-    <string name="settings_always_show_az">Всегда отображать алфавитную волну</string>
     <string name="settings_show_alphabet">Отображать алфавитную волну в меню приложений</string>
     <string name="settings_edge_zone_width">Ширина боковой области</string>
     <string name="settings_swipe_up_list">Провести вверх для открытия меню приложений</string>
@@ -141,7 +125,6 @@
     <string name="font_monospace">Моноширинный</string>
     <string name="font_custom">Свой…</string>
     <string name="font_custom_pick">Выбрать файл</string>
-    <string name="font_custom_detail">Файл формата .ttf или .otf сохранён внутри лаунчера. При удалении с устройства шрифт не сбросится.</string>
     <string name="font_custom_failed">Данный файл не является шрифтом</string>
     <string name="text_color_material">Material</string>
     <string name="text_color_custom">Свой</string>
@@ -161,9 +144,7 @@
     <string name="settings_backup_failed">Данный файл не может быть прочтён</string>
     <string name="settings_dim_color">Цвет фона</string>
     <string name="settings_dim_color_detail">Каким цветом затемняются обои. Силу затемнения можно задать в разделах «Главный экран» и «Список приложений»</string>
-    <string name="color_from_wallpaper">Цвет с обоев</string>
     <string name="icon_shape">Форма иконки</string>
-    <string name="icon_shape_detail">Меняет форму с адаптивных иконок; остальные - без изменений</string>
     <string name="icon_shape_system">Системный</string>
     <string name="icon_shape_circle">Круглый</string>
     <string name="icon_shape_rounded">Скруглённый</string>

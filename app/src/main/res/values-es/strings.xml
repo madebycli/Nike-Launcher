@@ -20,8 +20,6 @@
 
     <!-- Home screen -->
     <string name="home_drag_handle">Reordenar</string>
-    <string name="home_no_favorites_title">Aún no hay favoritos</string>
-    <string name="home_no_favorites_body">Toca el borde de la pantalla para abrir la lista de aplicaciones, o elige tus favoritos en la lista de abajo.</string>
     <string name="home_choose_favorites">Elegir favoritos</string>
     <string name="home_folder_choose_apps">Gestionar carpeta</string>
     <string name="home_folder_delete">Eliminar carpeta</string>
@@ -32,19 +30,8 @@
     <string name="home_display_name_label">Nombre mostrado</string>
 
     <!-- Edit-mode drag handles -->
-    <string name="handle_side_padding">Margen lateral</string>
-    <string name="handle_widget_top">Margen superior del widget</string>
-    <string name="handle_widget_bottom">Margen inferior del widget</string>
     <string name="handle_widget_height">Altura del widget</string>
-    <string name="handle_widget_side_padding">Margen lateral del widget</string>
-    <string name="handle_widget_offset_x">Widget izquierda / derecha</string>
     <string name="handle_az_range">Alcance de la barra A-Z</string>
-    <string name="edit_value_range">De %1$d a %2$d dp</string>
-    <string name="handle_favorites_top">Margen superior de favoritos</string>
-    <string name="handle_favorites_bottom">Margen inferior de favoritos</string>
-    <string name="handle_now_playing_top">Margen superior de Reproduciendo ahora</string>
-    <string name="handle_now_playing_bottom">Margen inferior de Reproduciendo ahora</string>
-    <string name="handle_now_playing_height">Altura de Reproduciendo ahora</string>
 
     <!-- App list -->
     <string name="applist_add_favorite">Añadir a favoritos</string>
@@ -72,13 +59,11 @@
     <string name="settings_icon_pack">Paquete de iconos</string>
     <string name="settings_icon_pack_default">Predeterminado</string>
     <string name="settings_icon_pack_no_icons">Ninguno</string>
-    <string name="settings_icon_pack_none">No se han encontrado paquetes de iconos en este dispositivo.</string>
     <string name="settings_icon_size">Tamaño de los iconos</string>
     <string name="settings_text_size">Tamaño del texto</string>
     <string name="settings_favorite_spacing">Espacio entre favoritos</string>
     <string name="settings_font">Fuente</string>
     <string name="settings_text_color">Color del texto</string>
-    <string name="settings_text_color_detail">Automático analiza el fondo de pantalla y elige el que se lea mejor</string>
     <string name="settings_show_names">Mostrar los nombres junto a los iconos de favoritos</string>
     <string name="settings_hide_status_bar">Ocultar la barra de estado en la pantalla de inicio</string>
     <string name="settings_hide_status_bar_applist">Ocultar la barra de estado en la lista de aplicaciones</string>
@@ -95,7 +80,6 @@
     <string name="az_visibility_never">Nunca</string>
     <string name="az_visibility_landscape">Horizontal</string>
     <string name="az_visibility_always">Siempre</string>
-    <string name="settings_always_show_az">Mostrar siempre A-Z</string>
     <string name="settings_show_alphabet">Mostrar A-Z en la lista de aplicaciones</string>
     <string name="settings_edge_zone_width">Ancho del deslizamiento en el borde</string>
     <string name="settings_swipe_up_list">Deslizar hacia arriba para la lista de aplicaciones</string>
@@ -141,7 +125,6 @@
     <string name="font_monospace">Monoespaciada</string>
     <string name="font_custom">Personalizada…</string>
     <string name="font_custom_pick">Elegir un archivo de fuente</string>
-    <string name="font_custom_detail">Un archivo .ttf o .otf, copiado dentro del launcher para que siga funcionando aunque muevas el archivo</string>
     <string name="font_custom_failed">No se ha podido leer ese archivo como una fuente</string>
     <string name="text_color_material">Material</string>
     <string name="text_color_custom">Personalizado</string>
@@ -159,9 +142,7 @@
     <string name="settings_backup_failed">No se ha podido leer ese archivo</string>
     <string name="settings_dim_color">Color de atenuación</string>
     <string name="settings_dim_color_detail">Con qué se atenúa el fondo de pantalla. La intensidad se ajusta en Pantalla de inicio y Lista de apps</string>
-    <string name="color_from_wallpaper">De tu fondo de pantalla</string>
     <string name="icon_shape">Forma de los iconos</string>
-    <string name="icon_shape_detail">Solo cambia la forma de los iconos adaptables; los más antiguos se dejan como están</string>
     <string name="icon_shape_system">Sistema</string>
     <string name="icon_shape_circle">Círculo</string>
     <string name="icon_shape_rounded">Redondeado</string>
