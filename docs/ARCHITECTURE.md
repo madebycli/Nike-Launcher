@@ -10,30 +10,32 @@ analytics, no ads, no accounts.
 MainActivity.kt                 Activity, window setup, status-bar peek
 NikeApp.kt                  Application; owns Prefs, repositories, widget host
 data/
-  AppInfo.kt                    component + label; `key` is the flattened component name
-  AppRepository.kt              PackageManager queries, launch, app-info intents
+  AppInfo.kt, AppRepository.kt  component + label, PackageManager queries, launch, app-info intents
   IconPackRepository.kt         icon-pack discovery, appfilter.xml parsing, icon lookup
-  Prefs.kt                      owns the DataStore and the backup; settings live in Library/Appearance/Home/AppList/StripPrefs.kt, keys in PrefKeys.kt
+  Prefs.kt                      owns the DataStore; settings live in Library/Appearance/Home/AppList/Strip/Corner/WidgetPagePrefs.kt, keys in PrefKeys.kt
+  backup/                       the backup file: typed values, widgets with new ids, files the settings point at, widgets left to confirm
   Folder.kt                     folder model + JSON persistence + favorites token encoding
-  HomePaddings.kt               per-block top/bottom spacing set in edit mode
+  HomePins.kt                   where each home block is held (edge + fraction)
+  WidgetPages.kt                the grids of widgets on the pages either side of home
+  CornerButton.kt               the corner button's actions, shapes and colors
 ui/
-  NikeNavHost.kt            collects settings once, hosts the navigation graph
-  home/HomeRoute.kt             home destination: home screen, app-list overlay, edge zones
-  home/HomeScreen.kt            widget slot + favorites/folders column + edit mode
-  applist/AppListScreen.kt      A-Z list, pull-to-collapse, per-app menus
-  applist/EdgeScrubber.kt       the A-Z strip that bows around the fingertip
-  applist/EdgeTouchZone.kt      the invisible edge strip that opens and scrubs the list
-  applist/ScrubState.kt         scrub state holder (see "Recomposition" below)
-  applist/ScrubberGeometry.kt   one source of truth for where each letter sits
-  applist/AppListModel.kt       flattens apps into headers + rows
-  common/AppIcon.kt             icon rasterisation and the bounded bitmap cache
-  common/…                      shared dialogs, icon picker, touch-position modifier
-  settings/…                    settings screen and the three picker screens
+  NikeNavHost.kt                collects settings once, hosts the navigation graph, shows the first-run setup
+  home/HomeRoute.kt             home destination: pages, app-list overlay, edge zones
+  home/route/                   the pieces of the route: list host, wallpaper layers, page host, gesture exclusions
+  home/stack/, blocks/, rows/   the pinned stack, its blocks, favorite and folder rows
+  home/edit/                    edit mode: frames, drag handles, snap guides
+  home/pages/                   widget pages: pager, grid, resize and reorder
+  home/corner/                  the corner button, its sheets and the floating search button
+  home/setup/                   the first-run flow
+  home/wallpaper/               system blur, picture and grain behind the app list
+  applist/                      A-Z list, pull-to-collapse, strip and edge zone, scrub state
+  notifications/                the notification sheet: overview, conversation, actions, reply
+  settings/                     settings screen, its sections and the picker screens
   theme/                        Material 3 Expressive theme, fonts, wallpaper-aware text color
-  kit/                          shared building blocks: motion, menu, settings rows (see docs/COMPONENTS.md)
-media/                          notification-listener service + Now Playing card
+  kit/                          shared building blocks: motion, menu, settings rows, onboarding (see docs/COMPONENTS.md)
+media/                          notification listener, preview bus and parser, Now Playing
 service/                        haptics, status-bar fader, accessibility service, system UI
-widget/                         AppWidgetHost, widget slot, widget picker
+widget/                         clock widget (model, faces, weather, calendar, overview sheets), widget host, picker, restore
 ```
 
 ## Things that look wrong until you know why
@@ -69,6 +71,16 @@ placed loses its layout and returns with its text collapsed.
 **Gesture exclusion is spent on the scrub band, not the whole edge.** Android
 honors only 200dp of exclusion per side, so `HomeRoute` clips the excluded
 rectangle to the band the strip actually occupies.
+
+**Notification content stays in memory.** The preview bus holds what the sheet shows only while
+the phone is unlocked and previews are on; locking, switching it off or losing the listener
+clears it. Replies and actions go through the bus, which checks each request against the
+notification as it is now.
+
+**A backup carries more than settings.** Widgets get new ids on another phone, so each is bound
+again and every reference (home, folders, widget pages) is remapped; a widget the system will not
+bind by itself waits in `WidgetRestoreActivity`. Files the settings point at (a font, icons, the
+list picture) travel inside the file, checked before anything is written.
 
 ## Recomposition
 
