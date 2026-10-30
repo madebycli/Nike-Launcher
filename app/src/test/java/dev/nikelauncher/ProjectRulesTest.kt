@@ -66,18 +66,12 @@ class ProjectRulesTest {
         /** Index letters are data, not prose. */
         val GERMAN_ALLOWED = setOf("AppListModel.kt")
 
-        val LEGACY_ROUNDED_SHAPES = setOf(
-            "ui/common/IconPickerScreen.kt",
-            "ui/applist/BandEditOverlay.kt",
-            "media/NowPlayingWidget.kt",
-            "widget/WidgetSlot.kt",
-        )
+        val LEGACY_ROUNDED_SHAPES = emptySet<String>()
 
         val LEGACY_TEXT_LITERALS = emptySet<String>()
 
         val LEGACY_FILE_CAPS = mapOf(
             "ui/applist/AppListScreen.kt" to 540,
-            "data/AppRepository.kt" to 745,
                     )
     }
 }

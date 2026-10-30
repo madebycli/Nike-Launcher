@@ -20,9 +20,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -137,7 +137,7 @@ fun BandEditOverlay(
                 .height(with(density) { band.heightPx.toDp() })
                 .background(
                     MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                    RoundedCornerShape(12.dp),
+                    MaterialTheme.shapes.medium,
                 )
                 .draggable(
                     orientation = Orientation.Vertical,
@@ -226,7 +226,7 @@ private fun BoxScope.BandHandle(
                 .size(HANDLE_BAR_WIDTH, HANDLE_BAR_HEIGHT)
                 .background(
                     MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                    RoundedCornerShape(HANDLE_BAR_HEIGHT / 2),
+                    CircleShape,
                 ),
             contentAlignment = Alignment.Center,
         ) {

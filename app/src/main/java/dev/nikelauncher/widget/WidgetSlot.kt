@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -31,6 +30,7 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -128,7 +128,7 @@ fun WidgetSlot(
                         )
                     },
                 color = Color.Black.copy(alpha = 0.25f),
-                shape = RoundedCornerShape(20.dp),
+                shape = MaterialTheme.shapes.largeIncreased,
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -272,7 +272,7 @@ internal fun WidgetPage(widgetId: Int, onPressAndHold: (x: Float, y: Float) -> U
                     detectTapGestures(onLongPress = { offset -> onPressAndHold(offset.x, offset.y) })
                 },
             color = Color.Black.copy(alpha = 0.25f),
-            shape = RoundedCornerShape(20.dp),
+            shape = MaterialTheme.shapes.largeIncreased,
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),

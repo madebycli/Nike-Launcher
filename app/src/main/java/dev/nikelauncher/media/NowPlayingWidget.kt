@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
@@ -139,7 +138,7 @@ fun NowPlayingWidget(
                 .fillMaxWidth()
                 .height(heightDp.dp),
             color = contentColor.copy(alpha = 0.08f),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.large,
         ) {
             Row(
                 modifier = Modifier
@@ -178,7 +177,7 @@ fun NowPlayingWidget(
             Surface(
                 modifier = modifier.fillMaxWidth().height(heightDp.dp),
                 color = contentColor.copy(alpha = 0.08f),
-                shape = RoundedCornerShape(16.dp),
+                shape = MaterialTheme.shapes.large,
             ) {
                 Row(
                     modifier = Modifier.fillMaxHeight().padding(horizontal = 16.dp),
@@ -238,7 +237,7 @@ fun NowPlayingWidget(
         // No scrim: the block sits on the wallpaper like the favorites above it do, so the
         // only thing separating it from them is its own spacing.
         color = Color.Transparent,
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.large,
     ) {
         Row(
             modifier = Modifier
@@ -263,7 +262,7 @@ fun NowPlayingWidget(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
-                            .clip(RoundedCornerShape(8.dp)),
+                            .clip(MaterialTheme.shapes.small),
                     )
                 } else {
                     Icon(
