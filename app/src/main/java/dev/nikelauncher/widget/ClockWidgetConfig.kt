@@ -173,6 +173,9 @@ data class ClockWidgetConfig(
             )
         }
 
+        fun hasConfiguration(context: Context, widgetId: Int): Boolean =
+            context.getSharedPreferences(FILE, Context.MODE_PRIVATE).contains(key("hour", widgetId))
+
         fun write(context: Context, widgetId: Int, config: ClockWidgetConfig) {
             if (!config.showAgenda || read(context, widgetId).excludedCalendars != config.excludedCalendars)
                 CalendarSnapshotCache.shared.forget(widgetId)

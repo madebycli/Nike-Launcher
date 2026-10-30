@@ -149,3 +149,12 @@ hiding local to the chosen bubble. NotificationHistory follows newest messages u
 NotificationReply keeps action/result-key identity through updates and requires explicit retargeting.
 Provider metadata supplies action icons, and large pictures decode off-thread up to 1024px.
 NotificationScreensTest covers overview, conversation, replies and invented image attachments.
+
+## Setup defaults and ordering
+
+WidgetAppPrefs adds default_widget_clock_app, default_widget_calendar_app and default_widget_weather_app
+in the existing DataStore and typed backup format. Saved clocks take precedence; setup updates an
+already-bound initial clock. AccessStep and FavoritesStep are separate modules and reuse widget pickers.
+ReorderableRows uses the existing reorderable library plus Material up/down controls; RowOrder is pure.
+The setup-wide extra clickable modifier was removed because it consumed drag-handle down events.
+SetupScreensTest verifies persisted order after both an arrow change and a simulated drag.

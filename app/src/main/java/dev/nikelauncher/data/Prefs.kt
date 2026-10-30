@@ -42,6 +42,7 @@ class Prefs(private val context: Context) {
     val strip = StripPrefs(store)
     val corner = CornerPrefs(store)
     val pages = WidgetPagePrefs(store)
+    val widgetApps = dev.nikelauncher.data.prefs.WidgetAppPrefs(store)
 
 
 

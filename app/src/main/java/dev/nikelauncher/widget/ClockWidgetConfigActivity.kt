@@ -9,6 +9,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import dev.nikelauncher.ui.theme.NikeTheme
 import dev.nikelauncher.widget.config.ClockConfigScreen
+import dev.nikelauncher.NikeApp
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 /**
  * The clock widget's own settings, reached from the widget's menu.
@@ -34,11 +38,20 @@ class ClockWidgetConfigActivity : ComponentActivity() {
         }
         setResult(Activity.RESULT_CANCELED, resultIntent())
 
+        lifecycleScope.launch {
+            val stored = ClockWidgetConfig.read(this@ClockWidgetConfigActivity, widgetId)
+            val initial = if (ClockWidgetConfig.hasConfiguration(this@ClockWidgetConfigActivity, widgetId)) stored
+                else (application as NikeApp).prefs.widgetApps.choices.first().applyTo(stored)
+            showConfig(initial)
+        }
+    }
+
+    private fun showConfig(initial: ClockWidgetConfig) {
         setContent {
             NikeTheme {
                 ClockConfigScreen(
                     widgetId = widgetId,
-                    initial = ClockWidgetConfig.read(this, widgetId),
+                    initial = initial,
                     onSave = ::save,
                     onCancel = ::finish,
                 )
