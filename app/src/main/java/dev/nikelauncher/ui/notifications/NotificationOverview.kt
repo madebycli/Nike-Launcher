@@ -8,16 +8,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,7 +43,9 @@ internal fun NotificationOverview(
         Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.notifications_title), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
             if (notifications.isNotEmpty()) {
-                TextButton(onClick = onClearAll) { Text(stringResource(R.string.notification_clear_all)) }
+                IconButton(onClick = onClearAll) {
+                    Icon(Icons.Outlined.DeleteSweep, stringResource(R.string.notification_clear_all))
+                }
             }
             IconButton(onClick = onClose) { Icon(Icons.Outlined.Close, stringResource(R.string.action_close)) }
         }
@@ -92,7 +94,7 @@ internal fun NotificationOverview(
                         )
                     }
                     IconButton(onClick = { onDismiss(preview) }) {
-                        Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.notification_dismiss), modifier = Modifier.size(20.dp))
+                        Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.notification_dismiss))
                     }
                 }
                 }

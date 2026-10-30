@@ -182,8 +182,11 @@ and other users before subscribing. A right swipe opens the app overview even wi
 optional shortcut swipes never override it. Inline rows cannot dismiss notifications. Folder excerpts
 share the same eligibility check and row gesture. The app row owns its sheet outside the optional
 preview, so provider removal cannot dispose it mid-close. Shortcut swipes default off; explicit
-stored legacy/user choices survive. Notification details put Open, provider actions and explicit dismissal in one kit overflow
-beside the reply field. Calendar/weather and notifications share `ViewportSheet`: full available
+stored legacy/user choices survive. The overview uses stock Material icon buttons: DeleteSweep
+for clearing all, DeleteOutline per notification, and Close only for the sheet. Accessible names reuse the existing localized resources;
+there is no visible Clear all text button. Clearing all uses a click-time snapshot so synchronous
+provider updates cannot skip an entry. Notification details put Open, provider actions and explicit
+dismissal in one kit overflow beside the reply field. Calendar/weather and notifications share `ViewportSheet`: full available
 height below the status bar/cutout, one 24dp stock-handle slot and the same bottom/horizontal insets.
 There is no separate Open row between history and reply. The send symbol is the stock rounded
 Material Send icon. The state-based reply field grows to four lines, then scrolls internally, while

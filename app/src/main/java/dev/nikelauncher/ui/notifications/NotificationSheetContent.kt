@@ -40,7 +40,7 @@ internal fun NotificationSheetContent(
                 notifications = notifications,
                 onSelect = { selected = it.key },
                 onDismiss = { controller.dismiss(it) },
-                onClearAll = { notifications.forEach { controller.dismiss(it) } },
+                onClearAll = { notifications.toList().forEach { controller.dismiss(it) } },
                 onClose = onClose,
             )
         } else {

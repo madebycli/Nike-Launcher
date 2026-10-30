@@ -85,11 +85,11 @@ class UserFlowScreensTest {
         rule.onNodeWithText(text(R.string.action_edit_layout)).assertIsDisplayed()
         rule.shoot("flow-home-app-menu")
         rule.onNodeWithText(text(R.string.notifications_title)).performClick()
-        rule.onNodeWithText(text(R.string.notification_clear_all)).assertIsDisplayed()
+        rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).assertIsDisplayed()
         closeSheet()
         rule.onAllNodesWithText("Weekend plans").onFirst().performTouchInput { swipeRight() }
         rule.onNodeWithText(text(R.string.notifications_title)).assertIsDisplayed()
-        rule.onNodeWithText(text(R.string.notification_clear_all)).assertIsDisplayed()
+        rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).assertIsDisplayed()
         Assert.assertTrue(cancelled.isEmpty())
         rule.shoot("flow-home-notification-overview")
         rule.onAllNodesWithText("Weekend plans").onLast().performClick()
@@ -110,7 +110,7 @@ class UserFlowScreensTest {
         rule.shoot("flow-list-notification")
         rule.onAllNodes(hasScrollToIndexAction()).onLast().performScrollToNode(hasText("Weekend plans"))
         rule.onAllNodesWithText("Weekend plans").onLast().performTouchInput { swipeRight() }
-        rule.onNodeWithText(text(R.string.notification_clear_all)).assertIsDisplayed()
+        rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).assertIsDisplayed()
         Assert.assertTrue(cancelled.isEmpty())
         rule.shoot("flow-list-notification-overview")
         closeSheet()

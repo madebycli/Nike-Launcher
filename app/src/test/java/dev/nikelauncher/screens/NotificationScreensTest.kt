@@ -46,6 +46,8 @@ class NotificationScreensTest {
             }
         }
         fun text(id: Int) = rule.activity.getString(id)
+        rule.onNodeWithText(text(R.string.notification_clear_all)).assertDoesNotExist()
+        rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).assertIsDisplayed()
         rule.shoot("$prefix-overview")
         rule.onNodeWithText("Weekend plans").performClick()
         rule.waitUntil(5000) { rule.onAllNodesWithContentDescription(text(R.string.notification_photo)).fetchSemanticsNodes().isNotEmpty() }
@@ -86,5 +88,10 @@ class NotificationScreensTest {
         rule.shoot("$prefix-actions")
         rule.onNodeWithText(text(R.string.notification_dismiss)).performClick()
         Assert.assertEquals(2, controller.items.size)
+        rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).performClick()
+        Assert.assertTrue(controller.items.isEmpty())
+        rule.onNodeWithText(text(R.string.notification_none)).assertIsDisplayed()
+        rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).assertDoesNotExist()
+        rule.shoot("$prefix-empty")
     }
 }
