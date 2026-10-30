@@ -41,6 +41,11 @@ import dev.nikelauncher.ui.common.AppShortcutMenu
 import dev.nikelauncher.ui.common.recordTouchPosition
 import dev.nikelauncher.ui.common.swipeForShortcuts
 import dev.nikelauncher.ui.kit.menu.TouchMenu
+import dev.nikelauncher.media.NotificationPreviewBus
+import dev.nikelauncher.ui.notifications.NotificationSheet
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import dev.nikelauncher.ui.home.edit.DragHandle
 import dev.nikelauncher.ui.home.edit.DragHandleReserve
 
@@ -74,6 +79,9 @@ internal fun FavoriteRow(
 ) {
     val density = LocalDensity.current
     var shortcutMenu by remember { mutableStateOf(false) }
+    var notificationSheet by remember { mutableStateOf(false) }
+    val posted by NotificationPreviewBus.notifications.collectAsState()
+    val hasNotifications = app.kind == EntryKind.APP && posted.any { it.packageName == app.packageName }
     val alignment = style.alignment
 
     Box(Modifier.fillMaxWidth()) {
@@ -131,8 +139,13 @@ internal fun FavoriteRow(
         }
 
         AppShortcutMenu(app, shortcutMenu) { shortcutMenu = false }
+        if (notificationSheet) NotificationSheet(app = app, onDismiss = { notificationSheet = false })
 
         TouchMenu(expanded = menuExpanded, offset = menuOffset, onDismissRequest = onDismissMenu) {
+            // Only while this app has something on the shade, and only if previews are on.
+            if (hasNotifications) {
+                item(stringResource(R.string.notifications_title), { notificationSheet = true }, leadingIcon = Icons.Filled.Notifications)
+            }
             item(stringResource(R.string.action_move_to_folder), menu.onMoveToFolder, leadingIcon = Icons.Filled.Folder)
             item(stringResource(R.string.action_edit_layout), menu.onEditLayout, leadingIcon = Icons.Filled.Edit)
             // Only an installed app has a settings screen to open; a row that stands for something

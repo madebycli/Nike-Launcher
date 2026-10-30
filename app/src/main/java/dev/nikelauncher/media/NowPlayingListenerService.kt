@@ -2,7 +2,10 @@
 package dev.nikelauncher.media
 
 import android.app.Notification
+import android.content.BroadcastReceiver
 import android.content.ComponentName
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.Context
 import android.provider.Settings
 import android.media.MediaMetadata
@@ -11,7 +14,16 @@ import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import androidx.core.content.ContextCompat
+import dev.nikelauncher.NikeApp
 import dev.nikelauncher.widget.ClockWidgetProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NowPlayingListenerService : NotificationListenerService() {
 
@@ -47,6 +59,54 @@ class NowPlayingListenerService : NotificationListenerService() {
 
     private var watched: MediaController? = null
 
+    private val previewScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var previewsEnabled = false
+
+    /** Notification content stays in memory only while the phone is unlocked and the setting is on. */
+    private val lockReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Intent.ACTION_SCREEN_OFF) NotificationPreviewBus.clear() else refreshPreviews()
+        }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        ContextCompat.registerReceiver(
+            this,
+            lockReceiver,
+            IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_USER_PRESENT)
+                addAction(Intent.ACTION_USER_UNLOCKED)
+            },
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+        previewScope.launch {
+            (application as NikeApp).prefs.appList.notificationPreviews.collectLatest { enabled ->
+                previewsEnabled = enabled
+                if (enabled) refreshPreviews() else NotificationPreviewBus.clear()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        previewScope.cancel()
+        unregisterReceiver(lockReceiver)
+        NotificationPreviewBus.disconnect()
+        super.onDestroy()
+    }
+
+    /** Reads everything on the shade again, off the main thread: parsing every app's notification is not cheap. */
+    private fun refreshPreviews() {
+        if (!previewsEnabled) return
+        val revision = NotificationPreviewBus.revision
+        previewScope.launch {
+            val active = withContext(Dispatchers.IO) { runCatching { activeNotifications }.getOrNull() } ?: return@launch
+            val previews = withContext(Dispatchers.Default) { NotificationPreviewBus.parseSnapshot(this@NowPlayingListenerService, active) }
+            NotificationPreviewBus.updateSnapshotIfUnchanged(this@NowPlayingListenerService, revision, previews)
+        }
+    }
+
     private val controllerCallback = object : MediaController.Callback() {
         override fun onMetadataChanged(metadata: MediaMetadata?) = republish()
         override fun onPlaybackStateChanged(state: PlaybackState?) = republish()
@@ -63,7 +123,9 @@ class NowPlayingListenerService : NotificationListenerService() {
     override fun onListenerConnected() {
         super.onListenerConnected()
         NotificationCountBus.canceller = { key -> cancelNotification(key) }
+        NotificationPreviewBus.connect { key -> cancelNotification(key) }
         publishCounts()
+        refreshPreviews()
         sessionManager = getSystemService(MediaSessionManager::class.java)
         componentName = ComponentName(this, NowPlayingListenerService::class.java)
         try {
@@ -77,15 +139,25 @@ class NowPlayingListenerService : NotificationListenerService() {
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
         NotificationCountBus.canceller = null
+        NotificationPreviewBus.disconnect()
         runCatching { sessionManager.removeOnActiveSessionsChangedListener(sessionsListener) }
         detach()
         NowPlayingBus.update(null)
         NotificationCountBus.clear()
     }
 
-    override fun onNotificationPosted(sbn: StatusBarNotification?) = refresh()
+    override fun onNotificationPosted(sbn: StatusBarNotification?) {
+        // The posted payload is newer than anything a full query would return a moment later.
+        if (sbn != null) {
+            if (previewsEnabled) NotificationPreviewBus.posted(this, sbn) else NotificationPreviewBus.clear()
+        }
+        refresh()
+    }
 
-    override fun onNotificationRemoved(sbn: StatusBarNotification?) = refresh()
+    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
+        if (sbn != null) NotificationPreviewBus.removed(sbn.key)
+        refresh()
+    }
 
     private fun refresh() {
         if (::sessionManager.isInitialized) {

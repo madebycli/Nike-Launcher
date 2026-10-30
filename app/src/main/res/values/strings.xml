@@ -410,4 +410,13 @@
     <string name="backup_widget_retry">That did not work</string>
     <string name="backup_widget_missing">Its app is not installed</string>
     <string name="setup_restore">Restore a backup</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="notification_allow_access">Allow access</string>
+    <string name="notification_reply">Reply</string>
+    <string name="notification_send">Send</string>
+    <string name="notification_open">Open</string>
+    <string name="notification_dismiss">Dismiss</string>
+    <string name="notification_clear_all">Clear all</string>
+    <string name="notification_none">No notifications</string>
+    <string name="notification_failed">That did not work</string>
 </resources>

@@ -202,4 +202,13 @@
     <string name="backup_widget_retry">Das hat nicht geklappt</string>
     <string name="backup_widget_missing">Die App ist nicht installiert</string>
     <string name="setup_restore">Backup wiederherstellen</string>
+    <string name="notifications_title">Benachrichtigungen</string>
+    <string name="notification_allow_access">Zugriff erlauben</string>
+    <string name="notification_reply">Antworten</string>
+    <string name="notification_send">Senden</string>
+    <string name="notification_open">Öffnen</string>
+    <string name="notification_dismiss">Entfernen</string>
+    <string name="notification_clear_all">Alle entfernen</string>
+    <string name="notification_none">Keine Benachrichtigungen</string>
+    <string name="notification_failed">Das hat nicht geklappt</string>
 </resources>
