@@ -80,6 +80,8 @@ data class HomeSettings(
     val appListBackgroundEdges: Boolean,
     val appListGrain: Int,
     val dimColor: Int,
+    /** What the wallpaper is dimmed with while the list is open. */
+    val appListTint: Int,
     val hapticsEnabled: Boolean,
     val showFavoriteLabels: Boolean,
     val doubleTapToLock: Boolean,

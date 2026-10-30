@@ -429,4 +429,5 @@
     <string name="widget_pages_width">Breite</string>
     <string name="widget_pages_dim">Widget-Seiten abdunkeln</string>
     <string name="widget_pages_dim_strength">Stärke der Abdunklung</string>
+    <string name="settings_app_list_tint">Tönung hinter der Liste</string>
 </resources>

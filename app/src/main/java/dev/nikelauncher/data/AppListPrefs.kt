@@ -70,6 +70,13 @@ class AppListPrefs internal constructor(private val store: DataStore<Preferences
     val backgroundImage: Flow<String?> =
         data.map { it[PrefKeys.APP_LIST_BACKGROUND_IMAGE] }.distinctUntilChanged()
 
+    /** The color the wallpaper is dimmed with while the list is open, or null to use the general dim color. */
+    val tint: Flow<Int?> = data.map { it[PrefKeys.APP_LIST_TINT] }.distinctUntilChanged()
+
+    suspend fun setTint(v: Int?) {
+        store.edit { if (v == null) it.remove(PrefKeys.APP_LIST_TINT) else it[PrefKeys.APP_LIST_TINT] = v or 0xFF000000.toInt() }
+    }
+
     suspend fun setBackgroundEffect(v: AppListBackgroundEffect) {
         store.edit { it[PrefKeys.APP_LIST_BACKGROUND_EFFECT] = v.name }
     }

@@ -108,6 +108,7 @@ fun rememberHomeSettings(prefs: Prefs, library: LibraryState, appsByKey: Map<Str
         appListBackgroundEdges = l.backgroundEdges.collectAsState(false).value,
         appListGrain = l.grain.collectAsState(0).value,
         dimColor = a.dimColor.collectAsState(0xFF000000.toInt()).value,
+        appListTint = l.tint.collectAsState(null).value ?: a.dimColor.collectAsState(0xFF000000.toInt()).value,
         hapticsEnabled = s.hapticsEnabled.collectAsState(true).value,
         showFavoriteLabels = a.showFavoriteLabels.collectAsState(true).value,
         doubleTapToLock = h.doubleTapToLock.collectAsState(false).value,

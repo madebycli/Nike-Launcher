@@ -59,6 +59,6 @@ internal fun WallpaperLayers(
         visible = listVisible && !editing,
         blurLevel = blurLevel,
     )
-    if (wallpaperDim > 0f) Box(Modifier.fillMaxSize().background(Color(settings.dimColor).copy(alpha = wallpaperDim)))
+    if (wallpaperDim > 0f) Box(Modifier.fillMaxSize().background(Color(if (listVisible) settings.appListTint else settings.dimColor).copy(alpha = wallpaperDim)))
     if (listVisible && !editing) WallpaperGrain(settings.appListGrain)
 }

@@ -4,6 +4,13 @@ package dev.nikelauncher.ui.settings.sections
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import dev.nikelauncher.ui.kit.settings.ColorPickerSheet
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,6 +42,8 @@ internal fun backgroundEntries(env: SettingsEnv): List<SettingsEntry> {
     val grain by list.grain.collectAsState(0)
     val edges by list.backgroundEdges.collectAsState(false)
     val image by list.backgroundImage.collectAsState(null)
+    val tint by list.tint.collectAsState(null)
+    var pickingTint by remember { mutableStateOf(false) }
     // The picker's grant lasts only as long as the import: what is kept is a copy in our own storage.
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) scope.launch {
@@ -48,7 +57,19 @@ internal fun backgroundEntries(env: SettingsEnv): List<SettingsEntry> {
     val edgesTitle = stringResource(R.string.settings_app_list_background_edges)
     val removeTitle = stringResource(R.string.action_remove)
     val none = stringResource(R.string.settings_quick_launch_none)
+    val tintTitle = stringResource(R.string.settings_app_list_tint)
+    val resetTitle = stringResource(R.string.action_reset)
+    if (pickingTint) {
+        ColorPickerSheet(
+            initial = Color(tint ?: 0xFF000000.toInt()),
+            wallpaperColors = MaterialTheme.colorScheme.let { listOf(it.primary, it.secondary, it.tertiary, it.primaryContainer) },
+            onPick = { color -> env.write { list.setTint(color.toArgb()) } },
+            onDismiss = { pickingTint = false },
+        )
+    }
     return listOfNotNull(
+        SettingsEntry(SECTION, settingsItem(tintTitle, { pickingTint = true }, value = tint?.let { "#%06X".format(it and 0xFFFFFF) }), "tint dim color wallpaper"),
+        if (tint != null) SettingsEntry(SECTION, settingsItem(resetTitle, { env.write { list.setTint(null) } }), "tint reset") else null,
         SettingsEntry(SECTION, settingsBlock(blurTitle) {
             ChoiceChips(
                 options = listOf(AppListBackgroundEffect.NONE, AppListBackgroundEffect.BLUR),
