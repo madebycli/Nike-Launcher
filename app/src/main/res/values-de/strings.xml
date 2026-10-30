@@ -409,4 +409,24 @@
     <string name="search_button_floating">Schwebender Suchknopf</string>
     <string name="search_button_hide_scrolling">Beim Scrollen ausblenden</string>
     <string name="corner_colors">Buttonfarben</string>
+    <string name="widget_pages_add_failed">Dieses Widget konnte nicht hinzugefügt werden. Bitte erneut versuchen.</string>
+    <string name="widget_pages_done">Fertig</string>
+    <string name="widget_pages_edit">Widgets bearbeiten</string>
+    <string name="widget_pages_height">Höhe</string>
+    <string name="widget_pages_left">Linke Widget-Seite</string>
+    <string name="widget_pages_move_after">Nach hinten verschieben</string>
+    <string name="widget_pages_move_before">Nach vorne verschieben</string>
+    <string name="widget_pages_narrow">Halb</string>
+    <string name="widget_pages_remove">Widget entfernen</string>
+    <string name="widget_pages_remove_short">Entfernen</string>
+    <string name="widget_pages_resize">Widget-Größe</string>
+    <string name="widget_pages_right">Rechte Widget-Seite</string>
+    <plurals name="widget_pages_rows">
+        <item quantity="one">%1$d Zeile</item>
+        <item quantity="other">%1$d Zeilen</item>
+    </plurals>
+    <string name="widget_pages_wide">Ganz</string>
+    <string name="widget_pages_width">Breite</string>
+    <string name="widget_pages_dim">Widget-Seiten abdunkeln</string>
+    <string name="widget_pages_dim_strength">Stärke der Abdunklung</string>
 </resources>

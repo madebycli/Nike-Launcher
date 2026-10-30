@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.data.backup
 
+import dev.nikelauncher.data.MAX_GRID_WIDGET_ROWS
 import dev.nikelauncher.data.PREF_FOLDERS
+import dev.nikelauncher.data.gridWidgetsFromJson
+import dev.nikelauncher.data.gridWidgetsToJson
 import dev.nikelauncher.data.foldersFromJson
 import dev.nikelauncher.data.foldersToJson
 import org.json.JSONArray
@@ -16,6 +19,8 @@ internal object BackupValues {
     const val PENDING_WIDGETS = "restore_widgets_pending_json"
     const val BACKUP_RESTORED = "backup_restored"
 
+    private const val PAGE_LEFT = "widget_page_left_grid"
+    private const val PAGE_RIGHT = "widget_page_right_grid"
     private const val WIDGET_IDS = "widget_ids"
     private const val WIDGET_ID = "widget_id"
 
@@ -101,7 +106,18 @@ internal object BackupValues {
                 }
             }
         }.orEmpty()
-        val all = homeWidgets(values) + folderIds
+        fun grid(name: String): List<Int> {
+            val raw = values[name] as? String ?: return emptyList()
+            val array = JSONArray(raw)
+            require(array.length() <= MAX_WIDGETS)
+            return (0 until array.length()).map { index ->
+                val item = array.getJSONObject(index)
+                item.getInt("id").also {
+                    require(it > 0 && item.getInt("columns") in 1..2 && item.getInt("rows") in 1..MAX_GRID_WIDGET_ROWS)
+                }
+            }
+        }
+        val all = homeWidgets(values) + grid(PAGE_LEFT) + grid(PAGE_RIGHT) + folderIds
         require(all.size <= MAX_WIDGETS && all.distinct().size == all.size)
         return all
     }
@@ -111,6 +127,11 @@ internal object BackupValues {
         val home = homeWidgets(values)
         values[WIDGET_IDS] = home.map { mapping.getValue(it) }.joinToString(",")
         values[WIDGET_ID] = home.firstOrNull()?.let { mapping.getValue(it) } ?: -1
+        for (name in listOf(PAGE_LEFT, PAGE_RIGHT)) {
+            if (name in values) {
+                values[name] = gridWidgetsToJson(gridWidgetsFromJson(values[name] as? String).map { it.copy(id = mapping.getValue(it.id)) })
+            }
+        }
         (values[PREF_FOLDERS] as? String)?.let { raw ->
             values[PREF_FOLDERS] = foldersToJson(
                 foldersFromJson(raw).map { folder -> folder.copy(widgets = folder.widgets.map { it.copy(id = mapping.getValue(it.id)) }) },
@@ -123,6 +144,9 @@ internal object BackupValues {
         val kept = homeWidgets(values).filterNot { it in ids }
         values[WIDGET_IDS] = kept.joinToString(",")
         values[WIDGET_ID] = kept.firstOrNull() ?: -1
+        for (name in listOf(PAGE_LEFT, PAGE_RIGHT)) {
+            (values[name] as? String)?.let { values[name] = gridWidgetsToJson(gridWidgetsFromJson(it).filterNot { widget -> widget.id in ids }) }
+        }
         (values[PREF_FOLDERS] as? String)?.let { raw ->
             values[PREF_FOLDERS] = foldersToJson(
                 foldersFromJson(raw).map { folder -> folder.copy(widgets = folder.widgets.filterNot { it.id in ids }) },

@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.widget
 
+import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.Intent
+import android.content.res.Configuration
+import android.util.SizeF
+import android.widget.Toast
+import kotlin.math.roundToInt
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
@@ -33,6 +38,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import dev.nikelauncher.NikeApp
 import dev.nikelauncher.ui.theme.NikeTheme
 import dev.nikelauncher.R
+import dev.nikelauncher.data.responsiveWidgetSize
 import androidx.compose.ui.res.stringResource
 
 private const val REQUEST_CONFIGURE = 1
@@ -42,6 +48,8 @@ class WidgetPickerActivity : ComponentActivity() {
     private lateinit var appWidgetManager: AppWidgetManager
     private lateinit var widgetHost: NikeAppWidgetHost
     private var pendingWidgetId: Int = -1
+    private var reconfiguring = false
+    private var configurationOptionsBefore: Bundle? = null
 
     private val bindLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -58,6 +66,22 @@ class WidgetPickerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         appWidgetManager = AppWidgetManager.getInstance(this)
         widgetHost = (application as NikeApp).widgetHost
+        pendingWidgetId = savedInstanceState?.getInt("pending_widget_id", -1) ?: -1
+        reconfiguring = savedInstanceState?.getBoolean("reconfiguring")
+            ?: (intent.getIntExtra(EXTRA_RECONFIGURE_WIDGET_ID, -1) > 0)
+        configurationOptionsBefore = savedInstanceState?.getBundle("options_before")
+        if (reconfiguring) {
+            pendingWidgetId = savedInstanceState?.getInt("pending_widget_id", -1)
+                ?: intent.getIntExtra(EXTRA_RECONFIGURE_WIDGET_ID, -1)
+            // Existing IDs are never owned by this picker and must survive cancellation.
+            if (savedInstanceState == null) {
+                val info = appWidgetManager.getAppWidgetInfo(pendingWidgetId)
+                if (info?.configure == null) { cancel(); return }
+                configurationOptionsBefore = Bundle(appWidgetManager.getAppWidgetOptions(pendingWidgetId))
+                launchConfiguration(pendingWidgetId)
+            }
+            return
+        }
 
         setContent {
             NikeTheme {
@@ -149,13 +173,19 @@ class WidgetPickerActivity : ComponentActivity() {
         // screen usually is not exported — it expects to be started by whoever holds the
         // widget id — so starting it directly is refused, and that refusal is a crash rather
         // than a missed widget. This is the call that carries the host's standing to open it.
+        configurationOptionsBefore = Bundle(appWidgetManager.getAppWidgetOptions(id))
+        launchConfiguration(id)
+    }
+
+    private fun launchConfiguration(id: Int) {
         val started = runCatching {
             widgetHost.startAppWidgetConfigureActivityForResult(this, id, 0, REQUEST_CONFIGURE, null)
             true
         }.getOrDefault(false)
-        // A widget whose configure screen will not open is still a widget; it gets added with
-        // whatever it defaults to rather than being dropped on the floor.
-        if (!started) finishWithWidgetId(id)
+        if (!started) {
+            Toast.makeText(this, R.string.widget_unavailable, Toast.LENGTH_SHORT).show()
+            if (reconfiguring) cancel() else finishWithWidgetId(id)
+        }
     }
 
     /** Android 12 let a widget say its configure screen is optional; those can skip it. */
@@ -172,14 +202,85 @@ class WidgetPickerActivity : ComponentActivity() {
     }
 
     private fun finishWithWidgetId(id: Int) {
-        setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id))
+        val result = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+            .putExtra(EXTRA_RECONFIGURED, reconfiguring)
+        val afterOptions = appWidgetManager.getAppWidgetOptions(id)
+        val legacyAfter = legacySize(afterOptions)
+        // A half-width widget must select its own responsive variant. Screen width
+        // would pick the full-width variant when the provider changes its size list.
+        val referenceWidth = legacySize(configurationOptionsBefore)?.first
+            ?: legacyAfter?.first ?: resources.configuration.screenWidthDp
+        val modernAfter = responsiveSize(afterOptions, referenceWidth)
+        val requested = if (!reconfiguring) {
+            modernAfter ?: legacyAfter
+        } else {
+            // Either contract may be updated independently. Unchanged legacy dimensions
+            // must not mask a new responsive size, or an old host size list a legacy change.
+            modernAfter?.takeIf { it != responsiveSize(configurationOptionsBefore, referenceWidth) }
+                ?: legacyAfter?.takeIf { it != legacySize(configurationOptionsBefore) }
+        }
+        if (requested != null) {
+            // Option dimensions describe content; host dimensions also include framework
+            // padding. Do not shrink a configured widget on every round trip.
+            val info = appWidgetManager.getAppWidgetInfo(id)
+            if (info != null) {
+                val padding = AppWidgetHostView.getDefaultPaddingForWidget(this, info.provider, null)
+                val density = resources.displayMetrics.density
+                result.putExtra(EXTRA_CONFIGURED_WIDTH_DP,
+                    (requested.first + (padding.left + padding.right) / density).roundToInt().coerceIn(40, 8192))
+                result.putExtra(EXTRA_CONFIGURED_HEIGHT_DP,
+                    (requested.second + (padding.top + padding.bottom) / density).roundToInt()
+                        .coerceIn(40, dev.nikelauncher.data.MAX_GRID_WIDGET_ROWS * 100 - 12))
+            }
+        }
+        setResult(RESULT_OK, result)
+        pendingWidgetId = -1 // Ownership has passed to the launcher page.
         finish()
     }
 
     private fun cancel() {
-        if (pendingWidgetId != -1) widgetHost.deleteAppWidgetId(pendingWidgetId)
+        if (!reconfiguring && pendingWidgetId != -1) runCatching { widgetHost.deleteAppWidgetId(pendingWidgetId) }
+        pendingWidgetId = -1
         setResult(RESULT_CANCELED)
         finish()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt("pending_widget_id", pendingWidgetId)
+        outState.putBoolean("reconfiguring", reconfiguring)
+        outState.putBundle("options_before", configurationOptionsBefore)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroy() {
+        // Back from the picker must not leave an allocated widget broadcasting forever.
+        // A rotation, or a provider's configuration activity opening, still owns the id.
+        if (isFinishing && !reconfiguring && pendingWidgetId > 0) {
+            runCatching { widgetHost.deleteAppWidgetId(pendingWidgetId) }
+        }
+        super.onDestroy()
+    }
+    /** Only actual provider options can request a size; preview-only UI cannot. */
+    private fun legacySize(options: Bundle?): Pair<Int, Int>? {
+        options ?: return null
+        val landscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val width = options.getInt(if (landscape) AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH else AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+        val height = options.getInt(if (landscape) AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT else AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+        return if (width > 0 && height > 0) width to height else null
+    }
+
+    private fun responsiveSize(options: Bundle?, referenceWidthDp: Int): Pair<Int, Int>? {
+        if (options == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return null
+        @Suppress("DEPRECATION")
+        val sizes = options.getParcelableArrayList<SizeF>(AppWidgetManager.OPTION_APPWIDGET_SIZES).orEmpty()
+        return responsiveWidgetSize(sizes.map { it.width to it.height }, referenceWidthDp)
+    }
+
+    companion object {
+        const val EXTRA_RECONFIGURE_WIDGET_ID = "dev.nikelauncher.extra.RECONFIGURE_WIDGET_ID"
+        const val EXTRA_RECONFIGURED = "dev.nikelauncher.extra.RECONFIGURED"
+        const val EXTRA_CONFIGURED_WIDTH_DP = "dev.nikelauncher.extra.CONFIGURED_WIDTH_DP"
+        const val EXTRA_CONFIGURED_HEIGHT_DP = "dev.nikelauncher.extra.CONFIGURED_HEIGHT_DP"
     }
 }
 

@@ -617,4 +617,24 @@
     <string name="search_button_floating">Floating search button</string>
     <string name="search_button_hide_scrolling">Hide while scrolling</string>
     <string name="corner_colors">Button colors</string>
+    <string name="widget_pages_add_failed">Could not add this widget. Please try again.</string>
+    <string name="widget_pages_done">Done</string>
+    <string name="widget_pages_edit">Edit widgets</string>
+    <string name="widget_pages_height">Height</string>
+    <string name="widget_pages_left">Left widget page</string>
+    <string name="widget_pages_move_after">Move later</string>
+    <string name="widget_pages_move_before">Move earlier</string>
+    <string name="widget_pages_narrow">Half</string>
+    <string name="widget_pages_remove">Remove widget</string>
+    <string name="widget_pages_remove_short">Remove</string>
+    <string name="widget_pages_resize">Widget size</string>
+    <string name="widget_pages_right">Right widget page</string>
+    <plurals name="widget_pages_rows">
+        <item quantity="one">%1$d row</item>
+        <item quantity="other">%1$d rows</item>
+    </plurals>
+    <string name="widget_pages_wide">Full</string>
+    <string name="widget_pages_width">Width</string>
+    <string name="widget_pages_dim">Dim widget pages</string>
+    <string name="widget_pages_dim_strength">Dimming strength</string>
 </resources>

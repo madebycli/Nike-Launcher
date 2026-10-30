@@ -61,7 +61,9 @@ import dev.nikelauncher.ui.applist.ScrubState
 import dev.nikelauncher.R
 import dev.nikelauncher.ui.common.FolderPickerDialog
 import dev.nikelauncher.ui.common.toast
+import dev.nikelauncher.data.WidgetPagesConfig
 import dev.nikelauncher.ui.home.route.AppListController
+import dev.nikelauncher.ui.home.route.HomePagesHost
 import dev.nikelauncher.ui.home.route.WallpaperLayers
 import dev.nikelauncher.ui.home.route.AppListHost
 import dev.nikelauncher.ui.home.route.BandEditing
@@ -236,11 +238,15 @@ fun HomeRoute(
     // The gap left for the back gesture, per side: followed from the system when automatic (it
     // reports how far its gesture reaches and reports nothing with button navigation), the set
     // number otherwise.
+    var onSidePage by remember { mutableStateOf(false) }
+    val pagesConfig by app.prefs.pages.config.collectAsState(WidgetPagesConfig())
     val gestureInsets = WindowInsets.systemGestures
     val layoutDirection = LocalLayoutDirection.current
     val insetLeftDp = if (settings.edgeZoneInsetAuto) with(density) { gestureInsets.getLeft(this, layoutDirection).toDp().value.roundToInt() } else settings.edgeZoneInsetDp
     val insetRightDp = if (settings.edgeZoneInsetAuto) with(density) { gestureInsets.getRight(this, layoutDirection).toDp().value.roundToInt() } else settings.edgeZoneInsetDp
-    EdgeGestureExclusion(settings.edgeSide, settings.edgeZoneWidthDp, insetLeftDp, insetRightDp, band)
+    // A widget page keeps the system gestures in the places its controls are; the strip's own
+    // exclusion would overwrite them, and there is no strip to protect there.
+    if (!onSidePage) EdgeGestureExclusion(settings.edgeSide, settings.edgeZoneWidthDp, insetLeftDp, insetRightDp, band)
 
     val homeContentAlpha by animateFloatAsState(if (bands.editing) 0f else 1f, label = "homeContentAlpha")
     // Edit mode borrows the app list's dim: its controls are small and a busy wallpaper made them hard to read.
@@ -256,7 +262,7 @@ fun HomeRoute(
             animationSpec = if (snapNow) snap() else tween(HOME_FADE_MS, easing = LinearOutSlowInEasing),
             label = "homeAlpha",
         )
-        WallpaperLayers(settings, listVisible = controller.visible, editing = bands.editing, homeDim = homeDim, snapNow = snapNow)
+        WallpaperLayers(settings, listVisible = controller.visible, editing = bands.editing, homeDim = homeDim, snapNow = snapNow, sidePageDim = pagesConfig.wallpaperDimAlpha.takeIf { onSidePage })
 
         Box(
             Modifier
@@ -267,14 +273,22 @@ fun HomeRoute(
                 // Setting the range takes the home screen out of the picture entirely.
                 .graphicsLayer { alpha = homeContentAlpha },
         ) {
-            HomeScreen(
-                settings = settings,
-                data = data.copy(nowPlayingHasContent = settings.nowPlayingEnabled && (!listenerGranted || nowPlaying != null)),
-                actions = actions,
+            HomePagesHost(
+                app = app,
                 homeIntentTick = homeIntentTick,
-                editMode = homeEditMode,
-                onEditModeChange = { homeEditMode = it },
-            )
+                gesturesEnabled = !controller.visible && !homeEditMode,
+                config = pagesConfig,
+                onSidePageChanged = { onSidePage = it },
+            ) {
+                HomeScreen(
+                    settings = settings,
+                    data = data.copy(nowPlayingHasContent = settings.nowPlayingEnabled && (!listenerGranted || nowPlaying != null)),
+                    actions = actions,
+                    homeIntentTick = homeIntentTick,
+                    editMode = homeEditMode,
+                    onEditModeChange = { homeEditMode = it },
+                )
+            }
         }
 
         // Kept composed and measured even while hidden, just never placed: not placing it means it

@@ -64,4 +64,16 @@ class BackupValuesTest {
         assertEquals(items, pendingWidgetsFromJson(pendingWidgetsToJson(items)))
         assertEquals(emptyList<PendingWidgetRestore>(), pendingWidgetsFromJson("not json"))
     }
+
+    @Test
+    fun `widgets on the side pages are found and remapped with the rest`() {
+        val left = """[{"id":11,"columns":2,"rows":3}]"""
+        val right = """[{"id":12,"columns":1,"rows":1,"heightDp":150}]"""
+        val values = mutableMapOf<String, Any>("widget_ids" to "3", "widget_page_left_grid" to left, "widget_page_right_grid" to right)
+        assertEquals(listOf(3, 11, 12), BackupValues.widgetIds(values))
+        BackupValues.remapWidgets(values, mapOf(3 to 30, 11 to 110, 12 to 120))
+        assertEquals(listOf(30, 110, 120), BackupValues.widgetIds(values))
+        BackupValues.removeWidgets(values, setOf(110))
+        assertEquals(listOf(30, 120), BackupValues.widgetIds(values))
+    }
 }

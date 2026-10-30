@@ -31,11 +31,14 @@ internal fun WallpaperLayers(
     editing: Boolean,
     homeDim: Float,
     snapNow: Boolean,
+    /** How much a widget page dims the wallpaper, or null while the home screen is showing. */
+    sidePageDim: Float? = null,
 ) {
     val wallpaperDim by animateFloatAsState(
         targetValue = when {
             editing -> 0f
             listVisible -> settings.dimWallpaperAlpha
+            sidePageDim != null -> sidePageDim
             else -> homeDim
         },
         animationSpec = if (snapNow) snap() else tween(HOME_FADE_MS, easing = LinearOutSlowInEasing),

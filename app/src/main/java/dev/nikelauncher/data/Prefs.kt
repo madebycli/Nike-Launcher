@@ -41,6 +41,7 @@ class Prefs(private val context: Context) {
     val appList = AppListPrefs(store)
     val strip = StripPrefs(store)
     val corner = CornerPrefs(store)
+    val pages = WidgetPagePrefs(store)
 
 
 
@@ -89,6 +90,8 @@ class Prefs(private val context: Context) {
                 pref[PrefKeys.WIDGET_IDS] = values["widget_ids"] as String
                 pref[PrefKeys.WIDGET_ID] = values["widget_id"] as Int
                 (values[PREF_FOLDERS] as? String)?.let { pref[PrefKeys.FOLDERS] = it }
+                (values["widget_page_left_grid"] as? String)?.let { pref[PrefKeys.WIDGET_PAGE_LEFT] = it }
+                (values["widget_page_right_grid"] as? String)?.let { pref[PrefKeys.WIDGET_PAGE_RIGHT] = it }
             }
             val key = stringPreferencesKey(BackupValues.PENDING_WIDGETS)
             pref[key] = pendingWidgetsToJson(pendingWidgetsFromJson(pref[key]).filterNot { it.id == id })
