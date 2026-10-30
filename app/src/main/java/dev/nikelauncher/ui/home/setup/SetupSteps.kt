@@ -54,10 +54,7 @@ import dev.nikelauncher.ui.apps.AppsState
 import dev.nikelauncher.ui.kit.onboarding.IconBlob
 import dev.nikelauncher.ui.kit.onboarding.SetupHeadline
 import dev.nikelauncher.ui.kit.settings.SettingsGroup
-import dev.nikelauncher.ui.kit.settings.SettingsSlider
-import dev.nikelauncher.ui.kit.settings.block
 import dev.nikelauncher.ui.kit.settings.item
-import dev.nikelauncher.ui.kit.settings.switchItem
 import dev.nikelauncher.ui.settings.FavoritesChooser
 import dev.nikelauncher.ui.state.LibraryState
 import kotlinx.coroutines.launch
@@ -154,27 +151,6 @@ internal fun AccessStep(resumed: Int) {
                 trailing = if (calendarGranted) done else null,
                 onClick = { askCalendar.launch(Manifest.permission.READ_CALENDAR) },
             )
-        }
-    }
-}
-
-/** The few looks that change what the home screen is like at a glance. */
-@Composable
-internal fun StyleStep(app: NikeApp) {
-    val scope = rememberCoroutineScope()
-    val showIcons by app.prefs.appearance.showAppIcons.collectAsState(true)
-    val iconSize by app.prefs.appearance.iconSizeDp.collectAsState(56)
-    val search by app.prefs.appList.appListSearchEnabled.collectAsState(false)
-    val iconsTitle = stringResource(R.string.settings_icons_app_list)
-    val sizeTitle = stringResource(R.string.settings_icon_size)
-    val searchTitle = stringResource(R.string.settings_search_bar)
-    SetupPage(R.string.setup_style) {
-        SettingsGroup {
-            switchItem(iconsTitle, showIcons, { v -> scope.launch { app.prefs.appearance.setShowAppIcons(v) } })
-            block(sizeTitle, value = "$iconSize dp") {
-                SettingsSlider(iconSize.toFloat(), 24f..96f, { v -> scope.launch { app.prefs.appearance.setIconSizeDp(v.toInt()) } })
-            }
-            switchItem(searchTitle, search, { v -> scope.launch { app.prefs.appList.setAppListSearchEnabled(v) } })
         }
     }
 }

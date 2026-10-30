@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.settings.sections
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Opacity
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -52,9 +57,9 @@ internal fun searchButtonEntries(env: SettingsEnv): List<SettingsEntry> {
         )
     }
     return listOfNotNull(
-        SettingsEntry(SECTION, settingsSwitch(floatingTitle, floating) { env.write { corner.setFloatingSearch(it) } }, "search button floating"),
-        if (floating) SettingsEntry(SECTION, settingsSwitch(hideTitle, hide) { env.write { corner.setHideSearchWhileScrolling(it) } }, "search button scrolling") else null,
-        if (floating) SettingsEntry(SECTION, settingsBlock(colorsTitle) {
+        SettingsEntry(SECTION, settingsSwitch(floatingTitle, floating, icon = Icons.Filled.Search) { env.write { corner.setFloatingSearch(it) } }, "search button floating"),
+        if (floating) SettingsEntry(SECTION, settingsSwitch(hideTitle, hide, icon = Icons.Filled.Tune) { env.write { corner.setHideSearchWhileScrolling(it) } }, "search button scrolling") else null,
+        if (floating) SettingsEntry(SECTION, settingsBlock(colorsTitle, icon = Icons.Filled.Palette) {
             ChoiceChips(
                 options = CornerColorMode.entries,
                 selected = appearance.colorMode,
@@ -64,10 +69,10 @@ internal fun searchButtonEntries(env: SettingsEnv): List<SettingsEntry> {
         }, "search button color") else null,
         if (floating && appearance.colorMode == CornerColorMode.CUSTOM) SettingsEntry(
             SECTION,
-            settingsItem(backgroundTitle, { picking = true }, value = "#%06X".format(appearance.background and 0xFFFFFF)),
+            settingsItem(backgroundTitle, { picking = true }, value = "#%06X".format(appearance.background and 0xFFFFFF), icon = Icons.Filled.Palette),
             "search button color",
         ) else null,
-        if (floating) SettingsEntry(SECTION, settingsBlock(opacityTitle, value = "${appearance.backgroundOpacity}%") {
+        if (floating) SettingsEntry(SECTION, settingsBlock(opacityTitle, value = "${appearance.backgroundOpacity}%", icon = Icons.Filled.Opacity) {
             SettingsSlider(appearance.backgroundOpacity.toFloat(), 0f..100f, { v -> env.write { corner.setSearchBackgroundOpacity(v.toInt()) } }, step = 5f)
         }, "search button opacity") else null,
     )

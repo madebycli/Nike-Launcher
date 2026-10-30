@@ -134,6 +134,7 @@ import androidx.compose.material.icons.filled.Add
 import dev.nikelauncher.data.HomeAlignment
 import dev.nikelauncher.data.IconSide
 import dev.nikelauncher.data.ShortcutSwipe
+import dev.nikelauncher.ui.kit.search.SearchPill
 import dev.nikelauncher.ui.common.AppIcon
 import dev.nikelauncher.ui.common.AppShortcutMenu
 import dev.nikelauncher.ui.common.swipeForShortcuts
@@ -1800,44 +1801,12 @@ private fun SearchField(
     atBottom: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    OutlinedTextField(
-        value = query,
-        onValueChange = onQueryChange,
-        singleLine = true,
-        // The key is already there and already means this; asking is the long way round to the
-        // one app you have just finished spelling. Nothing happens when nothing matched.
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
-        keyboardActions = KeyboardActions(onGo = { onGo() }),
-        placeholder = { Text(stringResource(R.string.applist_search), color = contentColor.copy(alpha = 0.6f)) },
-        leadingIcon = {
-            Icon(Icons.Filled.Search, contentDescription = null, tint = contentColor.copy(alpha = 0.7f))
-        },
-        trailingIcon = {
-            if (query.isNotEmpty()) {
-                IconButton(onClick = { onQueryChange("") }) {
-                    Icon(
-                        Icons.Filled.Close,
-                        contentDescription = stringResource(R.string.icon_picker_clear_search),
-                        tint = contentColor.copy(alpha = 0.7f),
-                    )
-                }
-            }
-        },
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = contentColor,
-            unfocusedTextColor = contentColor,
-            cursorColor = contentColor,
-            focusedBorderColor = contentColor.copy(alpha = 0.5f),
-            unfocusedBorderColor = contentColor.copy(alpha = 0.3f),
-            // No fill of its own. A fixed black tint read as a separate panel laid over the
-            // overlay, and how separate depended on the wallpaper dim underneath it: barely
-            // visible undimmed, a slab of black at full dim. Transparent composites to
-            // exactly the overlay's own background at every dim, so the outline and the icons
-            // are what say this is a field.
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-        ),
+    SearchPill(
+        query = query,
+        onQueryChange = onQueryChange,
+        placeholder = stringResource(R.string.applist_search),
+        contentColor = contentColor,
+        onGo = onGo,
         modifier = modifier
             // The overlay draws under both system bars, so without this the field sits behind
             // the clock at the top, or the gesture pill at the bottom.

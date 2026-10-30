@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -10,12 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.RemoveCircleOutline
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -86,6 +89,7 @@ fun ManageFavoritesScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 /** The ticked apps in their home order, then a search over the rest. Shared with the first-run setup. */
 @Composable
 internal fun FavoritesChooser(
@@ -179,7 +183,9 @@ internal fun FavoritesChooser(
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f),
                         )
-                        Checkbox(checked = true, onCheckedChange = { onSetFavorite(app, false) })
+                        IconButton(onClick = { onSetFavorite(app, false) }) {
+                            Icon(Icons.Filled.RemoveCircleOutline, contentDescription = stringResource(R.string.favorites_remove))
+                        }
                     }
 
                     // Whatever this key was is gone: an app uninstalled, or a shortcut
@@ -193,7 +199,9 @@ internal fun FavoritesChooser(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                             modifier = Modifier.weight(1f),
                         )
-                        Checkbox(checked = true, onCheckedChange = { onForget(key) })
+                        IconButton(onClick = { onForget(key) }) {
+                            Icon(Icons.Filled.RemoveCircleOutline, contentDescription = stringResource(R.string.favorites_remove))
+                        }
                     }
                 }
             }
@@ -208,22 +216,20 @@ internal fun FavoritesChooser(
             )
         }
 
-        items(candidates, key = { it.key }) { app ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onSetFavorite(app, true) }
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                AppIcon(app = app, sizeDp = minOf(iconSizeDp, 44))
-                Spacer(Modifier.width(16.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(nameOverrides[app.key] ?: app.label, style = MaterialTheme.typography.bodyLarge)
-                }
-                Checkbox(checked = false, onCheckedChange = { onSetFavorite(app, true) })
-            }
-            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+        itemsIndexed(candidates, key = { _, app -> app.key }) { index, app ->
+            SegmentedListItem(
+                onClick = { onSetFavorite(app, true) },
+                shapes = ListItemDefaults.segmentedShapes(index, candidates.size),
+                colors = ListItemDefaults.segmentedColors(),
+                modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = ListItemDefaults.SegmentedGap),
+                leadingContent = { AppIcon(app = app, sizeDp = minOf(iconSizeDp, 44)) },
+                trailingContent = {
+                    FilledTonalIconButton(onClick = { onSetFavorite(app, true) }) {
+                        Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.favorites_add))
+                    }
+                },
+                content = { Text(nameOverrides[app.key] ?: app.label) },
+            )
         }
     }
 

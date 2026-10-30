@@ -168,6 +168,8 @@
 
     <!-- Избранное / скрытое / Папки -->
     <string name="favorites_title">Избранное</string>
+    <string name="favorites_remove">Убрать из избранного</string>
+    <string name="favorites_add">Добавить в избранное</string>
     <string name="favorites_count">Избранных: %1$d</string>
     <string name="folder_title_fallback">Папка</string>
     <string name="folder_gone">Данной папки не существует.</string>
@@ -636,6 +638,7 @@
     <string name="widget_pages_done">Готово</string>
     <string name="widget_pages_edit">Править виджеты</string>
     <string name="widget_pages_height">Высота</string>
+    <string name="settings_section_widgets">Виджеты</string>
     <string name="widget_pages_left">Страница виджетов слева</string>
     <string name="widget_pages_move_after">Переместить позже</string>
     <string name="widget_pages_move_before">Переместить раньше</string>

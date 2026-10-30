@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.settings.sections
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.Info
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -38,7 +41,7 @@ internal fun aboutEntries(@Suppress("UNUSED_PARAMETER") env: SettingsEnv): List<
             settingsItem(
                 stringResource(R.string.app_name),
                 onClick = {},
-                value = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
+                value = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME), icon = Icons.Filled.Info,
             ),
         ),
         SettingsEntry(
@@ -52,7 +55,7 @@ internal fun aboutEntries(@Suppress("UNUSED_PARAMETER") env: SettingsEnv): List<
                     CrashLog.clear(context)
                     crashCleared = true
                 },
-                value = stringResource(R.string.settings_crash_detail),
+                value = stringResource(R.string.settings_crash_detail), icon = Icons.Filled.BugReport,
             ),
             visible = crash != null && !crashCleared,
         ),

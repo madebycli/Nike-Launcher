@@ -1,6 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.settings.sections
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Contrast
+import androidx.compose.material.icons.filled.Gesture
+import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.SortByAlpha
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Waves
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,45 +54,45 @@ internal fun stripEntries(env: SettingsEnv): List<SettingsEntry> {
 
     val isRipple = style == ScrubStyle.RIPPLE
     return listOf(
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_az_visibility)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_az_visibility), icon = Icons.Filled.SortByAlpha) {
             ChoiceChips(AzStripVisibility.entries, visibility, { stringResource(it.labelRes()) }, { env.write { strip.setAzStripVisibility(it) } })
         }, "alphabet strip a-z"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_show_alphabet), showAlphabet) { env.write { strip.setShowAlphabet(it) } }, "letters a-z strip"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_edge_side)) {
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_show_alphabet), showAlphabet, icon = Icons.Filled.SortByAlpha) { env.write { strip.setShowAlphabet(it) } }, "letters a-z strip"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_edge_side), icon = Icons.Filled.Tune) {
             ChoiceChips(EdgeSide.entries, side, { stringResource(it.labelRes()) }, {
                 env.previews.showEdge()
                 env.write { strip.setEdgeSide(it) }
             })
         }, "a-z strip left right"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_scrub_style)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_scrub_style), icon = Icons.Filled.Gesture) {
             ChoiceChips(ScrubStyle.entries, style, { stringResource(it.labelRes()) }, { env.write { strip.setScrubStyle(it) } })
         }, "a-z strip animation ripple wave bell"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_scrub_bubble)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_scrub_bubble), icon = Icons.Filled.Gesture) {
             ChoiceChips(ScrubBubbleShape.entries, bubble, { stringResource(it.labelRes()) }, { env.write { strip.setScrubBubbleShape(it) } })
         }, "a-z strip letter bubble shape circle square hide"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_ripple_speed), value = stringResource(R.string.settings_ripple_speed_value, ripple.speed)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_ripple_speed), value = stringResource(R.string.settings_ripple_speed_value, ripple.speed), icon = Icons.Filled.Waves) {
             SettingsSlider(ripple.speed, RippleParams.SPEED_RANGE, { env.write { strip.setRippleParams(ripple.copy(speed = it)) } })
         }, "a-z strip ripple wave speed", visible = isRipple),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_ripple_damping), value = "%.1f".format(ripple.damping)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_ripple_damping), value = "%.1f".format(ripple.damping), icon = Icons.Filled.Waves) {
             SettingsSlider(ripple.damping, RippleParams.DAMPING_RANGE, { env.write { strip.setRippleParams(ripple.copy(damping = it)) } }, step = 0.5f)
         }, "a-z strip ripple wave damping decay", visible = isRipple),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_ripple_stiffness), value = "%.0f".format(ripple.stiffness)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_ripple_stiffness), value = "%.0f".format(ripple.stiffness), icon = Icons.Filled.Waves) {
             SettingsSlider(ripple.stiffness, RippleParams.STIFFNESS_RANGE, { env.write { strip.setRippleParams(ripple.copy(stiffness = it)) } }, step = 10f)
         }, "a-z strip ripple wave stiffness follow spring", visible = isRipple),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_ripple_reset)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_ripple_reset), icon = Icons.Filled.RestartAlt) {
             TextButton(onClick = { env.write { strip.setRippleParams(RippleParams()) } }) { Text(stringResource(R.string.settings_ripple_reset)) }
         }, "a-z strip ripple defaults", visible = isRipple && ripple != RippleParams()),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_dim_others), dimOthers, { env.write { strip.setDimOthersScrubbing(it) } }, value = stringResource(R.string.settings_dim_others_detail)), "dim fade a-z scrub"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_hold_scroll), holdScroll, { env.write { strip.setHoldScroll(it) } }, value = stringResource(R.string.settings_hold_scroll_detail)), "a-z hold scroll"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_hold_scroll_speed), value = holdSpeed.toString()) {
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_dim_others), dimOthers, { env.write { strip.setDimOthersScrubbing(it) } }, value = stringResource(R.string.settings_dim_others_detail), icon = Icons.Filled.Contrast), "dim fade a-z scrub"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_hold_scroll), holdScroll, { env.write { strip.setHoldScroll(it) } }, value = stringResource(R.string.settings_hold_scroll_detail), icon = Icons.Filled.Speed), "a-z hold scroll"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_hold_scroll_speed), value = holdSpeed.toString(), icon = Icons.Filled.Speed) {
             SettingsSlider(holdSpeed.toFloat(), HOLD_SCROLL_RANGE.first.toFloat()..HOLD_SCROLL_RANGE.last.toFloat(), { env.write { strip.setHoldScrollSpeed(it.toInt()) } })
         }, "a-z hold scroll", visible = holdScroll),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_edge_band_only), bandOnly, { env.write { strip.setEdgeZoneBandOnly(it) } }, value = stringResource(R.string.settings_edge_band_only_detail)), "a-z strip height touch"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_edge_inset_auto), insetAuto, { env.write { strip.setEdgeZoneInsetAuto(it) } }, value = stringResource(R.string.settings_edge_inset_auto_detail)), "back gesture edge conflict automatic"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_edge_inset), value = inset.toString()) {
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_edge_band_only), bandOnly, { env.write { strip.setEdgeZoneBandOnly(it) } }, value = stringResource(R.string.settings_edge_band_only_detail), icon = Icons.Filled.Tune), "a-z strip height touch"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_edge_inset_auto), insetAuto, { env.write { strip.setEdgeZoneInsetAuto(it) } }, value = stringResource(R.string.settings_edge_inset_auto_detail), icon = Icons.Filled.Tune), "back gesture edge conflict automatic"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_edge_inset), value = inset.toString(), icon = Icons.Filled.Tune) {
             SettingsSlider(inset.toFloat(), EDGE_ZONE_INSET_RANGE.first.toFloat()..EDGE_ZONE_INSET_RANGE.last.toFloat(), { env.write { strip.setEdgeZoneInsetDp(it.toInt()) } })
         }, "back gesture edge conflict", visible = !insetAuto),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_edge_zone_width), value = "${width}dp") {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_edge_zone_width), value = "${width}dp", icon = Icons.Filled.Tune) {
             SettingsSlider(width.toFloat(), 32f..96f, {
                 env.previews.showEdge()
                 env.write { strip.setEdgeZoneWidthDp(it.roundToInt()) }

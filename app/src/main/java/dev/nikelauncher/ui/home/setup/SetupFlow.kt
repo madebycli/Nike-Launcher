@@ -63,6 +63,10 @@ internal fun SetupFlow(
     iconSizeDp: Int,
     onDone: () -> Unit,
 ) {
+    val favoriteApps = remember(apps.apps, library.favoriteKeys) {
+        val byKey = apps.apps.associateBy { it.key }
+        library.favoriteKeys.mapNotNull { byKey[it] }
+    }
     val backup = rememberBackupActions(app, apps.privateSpace)
     var step by rememberSaveable { mutableIntStateOf(0) }
     // Every access below is granted on a system screen, so the answer only arrives on resume.
@@ -100,7 +104,7 @@ internal fun SetupFlow(
                 when (page) {
                     0 -> WelcomeStep(onRestore = backup.import)
                     1 -> AccessStep(resumed)
-                    2 -> StyleStep(app)
+                    2 -> StyleStep(app, apps.apps, favoriteApps)
                     3 -> FavoritesStep(app, apps, library, iconSizeDp)
                     else -> DoneStep()
                 }

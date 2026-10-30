@@ -1,6 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.settings.sections
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.AspectRatio
+import androidx.compose.material.icons.filled.Gesture
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.SwipeUp
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
@@ -40,29 +49,29 @@ internal fun gesturesEntries(env: SettingsEnv): List<SettingsEntry> {
     val regionBottomTitle = stringResource(R.string.quick_zone_bottom)
     val none = stringResource(R.string.settings_quick_launch_none)
     return listOf(
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_haptics), haptics, { env.write { env.prefs.strip.setHapticsEnabled(it) } }, value = stringResource(R.string.settings_haptics_detail)), "vibrate"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_swipe_up_list), swipeUp, { env.write { home.setSwipeUpOpensList(it) } }, value = stringResource(R.string.settings_swipe_up_list_detail)), "swipe up"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_swipe_shortcuts), value = stringResource(R.string.settings_swipe_shortcuts_detail)) {
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_haptics), haptics, { env.write { env.prefs.strip.setHapticsEnabled(it) } }, value = stringResource(R.string.settings_haptics_detail), icon = Icons.Filled.Vibration), "vibrate"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_swipe_up_list), swipeUp, { env.write { home.setSwipeUpOpensList(it) } }, value = stringResource(R.string.settings_swipe_up_list_detail), icon = Icons.Filled.SwipeUp), "swipe up"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_swipe_shortcuts), value = stringResource(R.string.settings_swipe_shortcuts_detail), icon = Icons.Filled.Gesture) {
             ChoiceChips(ShortcutSwipe.entries, shortcutSwipe, { stringResource(it.labelRes()) }, { env.write { home.setShortcutSwipe(it) } })
         }, "swipe shortcuts"),
-        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_quick_launch_left), { env.nav.onQuickLaunchPicker(QuickLaunchSlot.LEFT) }, value = env.quickLaunchLeftLabel ?: none), "swipe launch"),
-        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_quick_launch_right), { env.nav.onQuickLaunchPicker(QuickLaunchSlot.RIGHT) }, value = env.quickLaunchRightLabel ?: none), "swipe launch"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_quick_launch_left), { env.nav.onQuickLaunchPicker(QuickLaunchSlot.LEFT) }, value = env.quickLaunchLeftLabel ?: none, icon = Icons.Filled.RocketLaunch), "swipe launch"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_quick_launch_right), { env.nav.onQuickLaunchPicker(QuickLaunchSlot.RIGHT) }, value = env.quickLaunchRightLabel ?: none, icon = Icons.Filled.RocketLaunch), "swipe launch"),
         // Only while something is bound to the swipe, since the band has no other use.
-        SettingsEntry(SECTION, settingsBlock(regionHeightTitle, value = "${region.height}%") {
+        SettingsEntry(SECTION, settingsBlock(regionHeightTitle, value = "${region.height}%", icon = Icons.Filled.AspectRatio) {
             SettingsSlider(region.height.toFloat(), QuickLaunchRegion.HEIGHT_RANGE.first.toFloat()..QuickLaunchRegion.HEIGHT_RANGE.last.toFloat(), { v -> env.write { home.setQuickLaunchRegion(region.copy(heightPercent = v.toInt())) } })
         }, "swipe launch band area", visible = env.quickLaunchLeftLabel != null || env.quickLaunchRightLabel != null),
-        SettingsEntry(SECTION, settingsBlock(regionBottomTitle, value = "${region.bottom}%") {
+        SettingsEntry(SECTION, settingsBlock(regionBottomTitle, value = "${region.bottom}%", icon = Icons.Filled.AspectRatio) {
             SettingsSlider(region.bottom.toFloat(), QuickLaunchRegion.BOTTOM_RANGE.first.toFloat()..QuickLaunchRegion.BOTTOM_RANGE.last.toFloat(), { v -> env.write { home.setQuickLaunchRegion(region.copy(bottomPercent = v.toInt())) } })
         }, "swipe launch band area", visible = env.quickLaunchLeftLabel != null || env.quickLaunchRightLabel != null),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_double_tap_lock), doubleTap, { env.write { home.setDoubleTapToLock(it) } }, value = stringResource(R.string.settings_double_tap_lock_detail)), "lock screen"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_double_tap_lock), doubleTap, { env.write { home.setDoubleTapToLock(it) } }, value = stringResource(R.string.settings_double_tap_lock_detail), icon = Icons.Filled.TouchApp), "lock screen"),
         // Switching it on does nothing at all without the permission, so the way to grant it
         // belongs right here rather than in a toast later.
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_lock_needs_accessibility)) { AccessibilityButtons(env) }, "lock accessibility", visible = doubleTap && !env.lockGestureReady),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_lock_needs_accessibility), icon = Icons.Filled.Accessibility) { AccessibilityButtons(env) }, "lock accessibility", visible = doubleTap && !env.lockGestureReady),
         SettingsEntry(
             SECTION,
             settingsBlock(
                 stringResource(R.string.settings_shade_gesture),
-                value = stringResource(if (env.shadeGestureReady) R.string.settings_shade_ready else R.string.settings_shade_not_ready),
+                value = stringResource(if (env.shadeGestureReady) R.string.settings_shade_ready else R.string.settings_shade_not_ready), icon = Icons.Filled.Notifications,
             ) { if (!env.shadeGestureReady) AccessibilityButtons(env) },
             "notification shade pull",
         ),

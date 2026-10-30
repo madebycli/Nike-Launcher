@@ -270,6 +270,8 @@
 
     <!-- Favorites / hidden / folder pickers -->
     <string name="favorites_title">Favoriter</string>
+    <string name="favorites_remove">Ta bort från favoriter</string>
+    <string name="favorites_add">Lägg till i favoriter</string>
     <string name="favorites_count">%1$d på din startskärm</string>
     <string name="folder_title_fallback">Mapp</string>
     <string name="folder_gone">Den här mappen finns inte längre.</string>
@@ -618,6 +620,7 @@
     <string name="widget_pages_done">Klart</string>
     <string name="widget_pages_edit">Redigera widgets</string>
     <string name="widget_pages_height">Höjd</string>
+    <string name="settings_section_widgets">Widgets</string>
     <string name="widget_pages_left">Widgetsida till vänster</string>
     <string name="widget_pages_move_after">Flytta senare</string>
     <string name="widget_pages_move_before">Flytta tidigare</string>

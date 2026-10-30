@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.settings.sections
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.Widgets
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,12 +26,12 @@ internal fun backupEntries(env: SettingsEnv): List<SettingsEntry> {
     val pending by env.prefs.pendingWidgetRestores.collectAsState(emptyList())
     val widgetsLeft = stringResource(R.string.backup_widgets_remaining, pending.size)
     return listOfNotNull(
-        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_export), env.actions.onExport, value = stringResource(R.string.settings_export_detail)), "backup save"),
-        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_import), env.actions.onImport, value = stringResource(R.string.settings_import_detail)), "backup restore"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_export), env.actions.onExport, value = stringResource(R.string.settings_export_detail), icon = Icons.Filled.Upload), "backup save"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_import), env.actions.onImport, value = stringResource(R.string.settings_import_detail), icon = Icons.Filled.Download), "backup restore"),
         // Only while a restore has widgets it could not bind by itself.
         if (pending.isEmpty()) null else SettingsEntry(
             SECTION,
-            settingsItem(stringResource(R.string.backup_widgets_title), { context.startActivity(Intent(context, WidgetRestoreActivity::class.java)) }, value = widgetsLeft),
+            settingsItem(stringResource(R.string.backup_widgets_title), { context.startActivity(Intent(context, WidgetRestoreActivity::class.java)) }, value = widgetsLeft, icon = Icons.Filled.Widgets),
             "backup widgets restore",
         ),
     )

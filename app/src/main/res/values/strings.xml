@@ -278,6 +278,8 @@
 
     <!-- Favorites / hidden / folder pickers -->
     <string name="favorites_title">Favorites</string>
+    <string name="favorites_remove">Remove from favorites</string>
+    <string name="favorites_add">Add to favorites</string>
     <string name="favorites_count">%1$d on your home screen</string>
     <string name="folder_title_fallback">Folder</string>
     <string name="folder_gone">This folder no longer exists.</string>
@@ -621,6 +623,7 @@
     <string name="widget_pages_done">Done</string>
     <string name="widget_pages_edit">Edit widgets</string>
     <string name="widget_pages_height">Height</string>
+    <string name="settings_section_widgets">Widgets</string>
     <string name="widget_pages_left">Left widget page</string>
     <string name="widget_pages_move_after">Move later</string>
     <string name="widget_pages_move_before">Move earlier</string>

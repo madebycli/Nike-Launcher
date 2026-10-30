@@ -144,6 +144,12 @@ internal fun WidgetHomePages(
 
     val notificationPriority = remember { NotificationGesturePriority() }
     val originalDirection = LocalLayoutDirection.current
+    // With no widget page there is nothing to swipe to, so the home screen is not put behind a
+    // pager at all: its own vertical drag and spring are then the only gesture on it.
+    if (pages.size == 1) {
+        Box(Modifier.fillMaxSize()) { home(false) }
+        return
+    }
     Box(Modifier.fillMaxSize()) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr,
             LocalNotificationGesturePriority provides notificationPriority) {

@@ -147,6 +147,8 @@
 
     <!-- Favorites / hidden / folder pickers -->
     <string name="favorites_title">Favoriten</string>
+    <string name="favorites_remove">Aus Favoriten entfernen</string>
+    <string name="favorites_add">Zu Favoriten hinzufügen</string>
     <string name="favorites_count">%1$d auf deinem Startbildschirm</string>
     <string name="folder_title_fallback">Ordner</string>
     <string name="folder_gone">Dieser Ordner existiert nicht mehr.</string>
@@ -413,6 +415,7 @@
     <string name="widget_pages_done">Fertig</string>
     <string name="widget_pages_edit">Widgets bearbeiten</string>
     <string name="widget_pages_height">Höhe</string>
+    <string name="settings_section_widgets">Widgets</string>
     <string name="widget_pages_left">Linke Widget-Seite</string>
     <string name="widget_pages_move_after">Nach hinten verschieben</string>
     <string name="widget_pages_move_before">Nach vorne verschieben</string>

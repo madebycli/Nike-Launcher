@@ -1,6 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.settings.sections
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Contrast
+import androidx.compose.material.icons.filled.FormatAlignLeft
+import androidx.compose.material.icons.filled.FormatColorText
+import androidx.compose.material.icons.filled.FormatSize
+import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.PhotoSizeSelectLarge
+import androidx.compose.material.icons.filled.SpaceBar
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -103,10 +118,10 @@ internal fun appearanceEntries(env: SettingsEnv): List<SettingsEntry> {
     }
 
     return listOf(
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_preview)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_preview), icon = Icons.Filled.Visibility) {
             RowPreview(env, iconSize, labelSize, spacing, font, fontFile)
         }),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_icon_pack)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_icon_pack), icon = Icons.Filled.Palette) {
             val packs = env.iconPacks
             val options = buildList {
                 add(IconChoice.DEFAULT)
@@ -146,18 +161,18 @@ internal fun appearanceEntries(env: SettingsEnv): List<SettingsEntry> {
                 },
             )
         }, keywords = "icons themed pack"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_icons_favorites), showFavoriteIcons) { env.write { a.setShowFavoriteIcons(it) } }, "icons"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_icons_app_list), showAppIcons) { env.write { a.setShowAppIcons(it) } }, "icons"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_icon_size), value = "${iconSize}dp") {
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_icons_favorites), showFavoriteIcons, icon = Icons.Filled.Apps) { env.write { a.setShowFavoriteIcons(it) } }, "icons"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_icons_app_list), showAppIcons, icon = Icons.Filled.Apps) { env.write { a.setShowAppIcons(it) } }, "icons"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_icon_size), value = "${iconSize}dp", icon = Icons.Filled.PhotoSizeSelectLarge) {
             SettingsSlider(iconSize.toFloat(), 12f..96f, { env.write { a.setIconSizeDp(it.toInt()) } })
         }, "size"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_text_size), value = "${labelSize}sp") {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_text_size), value = "${labelSize}sp", icon = Icons.Filled.FormatSize) {
             SettingsSlider(labelSize.toFloat(), 10f..28f, { env.write { a.setLabelSizeSp(it.toInt()) } })
         }, "font label size"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_favorite_spacing), value = "${spacing}dp") {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_favorite_spacing), value = "${spacing}dp", icon = Icons.Filled.SpaceBar) {
             SettingsSlider(spacing.toFloat(), 0f..40f, { env.write { a.setItemSpacingDp(it.toInt()) } })
         }, "gap spacing"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_font)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_font), icon = Icons.Filled.TextFields) {
             ChoiceChips(
                 options = AppFont.entries,
                 selected = font,
@@ -173,7 +188,7 @@ internal fun appearanceEntries(env: SettingsEnv): List<SettingsEntry> {
                 TextButton(onClick = { picker.launch(arrayOf("*/*")) }) { Text(stringResource(R.string.font_custom_pick)) }
             }
         }, "typeface"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_text_color)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_text_color), icon = Icons.Filled.FormatColorText) {
             ChoiceChips(
                 options = TextColorMode.entries,
                 selected = textColorMode,
@@ -187,7 +202,7 @@ internal fun appearanceEntries(env: SettingsEnv): List<SettingsEntry> {
                 TextButton(onClick = { pickingText = true }) { Text(stringResource(R.string.text_color_pick)) }
             }
         }, "colour"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.icon_shape)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.icon_shape), icon = Icons.Filled.Category) {
             ChoiceChips(
                 options = IconShape.entries,
                 selected = iconShape,
@@ -195,30 +210,30 @@ internal fun appearanceEntries(env: SettingsEnv): List<SettingsEntry> {
                 onSelect = { env.write { a.setIconShape(it); clearIconCache() } },
             )
         }, "shape"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_alignment_favorites)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_alignment_favorites), icon = Icons.Filled.FormatAlignLeft) {
             ChoiceChips(HomeAlignment.entries, alignment, { stringResource(it.labelRes()) }, { env.write { a.setAlignment(it) } })
         }, "align left right center"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_alignment_applist)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_alignment_applist), icon = Icons.Filled.FormatAlignLeft) {
             ChoiceChips(HomeAlignment.entries, listAlignment, { stringResource(it.labelRes()) }, { env.write { a.setAppListAlignment(it) } })
         }, "align left right center"),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_icon_side)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_icon_side), icon = Icons.Filled.SwapHoriz) {
             ChoiceChips(IconSide.entries, iconSide, { stringResource(it.labelRes()) }, { env.write { a.setIconSide(it) } })
         }, "left right"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_show_names), showLabels) { env.write { a.setShowFavoriteLabels(it) } }, "labels"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_show_names), showLabels, icon = Icons.Filled.Label) { env.write { a.setShowFavoriteLabels(it) } }, "labels"),
         SettingsEntry(
             SECTION,
             settingsItem(
                 stringResource(R.string.settings_dim_color),
                 onClick = { pickingDim = true },
-                value = stringResource(R.string.settings_dim_color_detail),
+                value = stringResource(R.string.settings_dim_color_detail), icon = Icons.Filled.Contrast,
             ),
             keywords = "colour wallpaper",
             visible = dimHome > 0f || dimList > 0f,
         ),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_text_shadow), textShadow, { env.write { a.setTextShadow(it) } }, value = stringResource(R.string.settings_text_shadow_detail)), "contrast readability wallpaper"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_text_shadow), textShadow, { env.write { a.setTextShadow(it) } }, value = stringResource(R.string.settings_text_shadow_detail), icon = Icons.Filled.Layers), "contrast readability wallpaper"),
         SettingsEntry(
             SECTION,
-            settingsBlock(stringResource(R.string.settings_text_shadow_strength), value = shadowStrength.toString()) {
+            settingsBlock(stringResource(R.string.settings_text_shadow_strength), value = shadowStrength.toString(), icon = Icons.Filled.Layers) {
                 SettingsSlider(
                     shadowStrength.toFloat(),
                     SHADOW_STRENGTH_RANGE.first.toFloat()..SHADOW_STRENGTH_RANGE.last.toFloat(),

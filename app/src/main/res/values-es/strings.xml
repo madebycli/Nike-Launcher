@@ -169,6 +169,8 @@
 
     <!-- Favorites / hidden / folder pickers -->
     <string name="favorites_title">Favoritos</string>
+    <string name="favorites_remove">Quitar de favoritos</string>
+    <string name="favorites_add">Añadir a favoritos</string>
     <string name="favorites_count">%1$d en tu pantalla de inicio</string>
     <string name="folder_title_fallback">Carpeta</string>
     <string name="folder_gone">Esta carpeta ya no existe.</string>
@@ -618,6 +620,7 @@
     <string name="widget_pages_done">Hecho</string>
     <string name="widget_pages_edit">Editar widgets</string>
     <string name="widget_pages_height">Altura</string>
+    <string name="settings_section_widgets">Widgets</string>
     <string name="widget_pages_left">Página de widgets a la izquierda</string>
     <string name="widget_pages_move_after">Mover después</string>
     <string name="widget_pages_move_before">Mover antes</string>

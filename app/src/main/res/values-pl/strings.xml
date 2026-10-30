@@ -242,6 +242,8 @@
 
     <!-- Favorites / hidden / folder pickers -->
     <string name="favorites_title">Ulubione</string>
+    <string name="favorites_remove">Usuń z ulubionych</string>
+    <string name="favorites_add">Dodaj do ulubionych</string>
     <string name="favorites_count">%1$d na ekranie startowym</string>
     <string name="folder_title_fallback">Folder</string>
     <string name="folder_gone">Ten folder już nie istnieje.</string>
@@ -641,6 +643,7 @@
     <string name="widget_pages_done">Gotowe</string>
     <string name="widget_pages_edit">Edytuj widżety</string>
     <string name="widget_pages_height">Wysokość</string>
+    <string name="settings_section_widgets">Widżety</string>
     <string name="widget_pages_left">Strona widżetów po lewej</string>
     <string name="widget_pages_move_after">Przesuń później</string>
     <string name="widget_pages_move_before">Przesuń wcześniej</string>

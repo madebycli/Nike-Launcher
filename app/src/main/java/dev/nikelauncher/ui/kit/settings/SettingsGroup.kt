@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.Icon
+import dev.nikelauncher.ui.kit.onboarding.IconBlob
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SegmentedListItem
@@ -54,7 +54,7 @@ private fun SettingsRowContent(row: SettingsRow, index: Int, count: Int) {
             shapes = shapes,
             colors = colors,
             enabled = row.enabled,
-            leadingContent = row.icon?.let { icon -> { Icon(icon, contentDescription = null) } },
+            leadingContent = row.icon?.let { icon -> { IconBlob(icon) } },
             supportingContent = row.value?.let { value -> { Text(value) } },
             trailingContent = row.trailing,
             content = { Text(row.title) },
@@ -66,7 +66,7 @@ private fun SettingsRowContent(row: SettingsRow, index: Int, count: Int) {
             shapes = shapes,
             colors = colors,
             enabled = row.enabled,
-            leadingContent = row.icon?.let { icon -> { Icon(icon, contentDescription = null) } },
+            leadingContent = row.icon?.let { icon -> { IconBlob(icon) } },
             supportingContent = row.value?.let { value -> { Text(value) } },
             trailingContent = {
                 Switch(checked = row.checked, onCheckedChange = null, enabled = row.enabled)
@@ -87,7 +87,7 @@ private fun SettingsRowContent(row: SettingsRow, index: Int, count: Int) {
         is SettingsRow.Block -> SegmentedListItem(
             shapes = shapes,
             colors = colors,
-            leadingContent = row.icon?.let { icon -> { Icon(icon, contentDescription = null) } },
+            leadingContent = row.icon?.let { icon -> { IconBlob(icon) } },
             supportingContent = {
                 Column {
                     row.value?.let { Text(it) }

@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.settings.sections
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,13 +27,13 @@ internal fun appsEntries(env: SettingsEnv): List<SettingsEntry> {
     val excluded by library.frequentExcluded.collectAsState(emptySet())
 
     return listOf(
-        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_favorites), env.nav.onFavorites, value = stringResource(R.string.settings_favorites_detail)), "manage"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_favorites), env.nav.onFavorites, value = stringResource(R.string.settings_favorites_detail), icon = Icons.Filled.Star), "manage"),
         SettingsEntry(
             SECTION,
             settingsItem(
                 stringResource(R.string.settings_default_launcher),
                 env.actions.onOpenHomeSettings,
-                value = stringResource(if (env.isDefaultLauncher) R.string.settings_default_launcher_yes else R.string.settings_default_launcher_no),
+                value = stringResource(if (env.isDefaultLauncher) R.string.settings_default_launcher_yes else R.string.settings_default_launcher_no), icon = Icons.Filled.Home,
             ),
             "home default launcher set",
         ),
@@ -41,7 +46,7 @@ internal fun appsEntries(env: SettingsEnv): List<SettingsEntry> {
                     stringResource(R.string.settings_frequent_excluded_none)
                 } else {
                     pluralStringResource(R.plurals.settings_frequent_excluded_count, excluded.size, excluded.size)
-                },
+                }, icon = Icons.Filled.Whatshot,
             ),
             "most used favorites exclude block",
             visible = source == FavoritesSource.FREQUENT,
@@ -52,7 +57,7 @@ internal fun appsEntries(env: SettingsEnv): List<SettingsEntry> {
                 stringResource(R.string.settings_hidden_apps),
                 env.nav.onHiddenApps,
                 value = if (env.hiddenCount == 0) stringResource(R.string.settings_hidden_none)
-                else stringResource(R.string.settings_hidden_count, env.hiddenCount),
+                else stringResource(R.string.settings_hidden_count, env.hiddenCount), icon = Icons.Filled.VisibilityOff,
             ),
             "hide",
         ),

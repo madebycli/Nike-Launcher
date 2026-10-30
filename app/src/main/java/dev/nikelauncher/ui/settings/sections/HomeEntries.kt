@@ -1,6 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.settings.sections
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Compress
+import androidx.compose.material.icons.filled.Contrast
+import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.ScreenRotation
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.ViewAgenda
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,7 +50,7 @@ internal fun homeEntries(env: SettingsEnv): List<SettingsEntry> {
     val compactTap by appearance.compactTapArea.collectAsState(false)
 
     return listOf(
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_favorites_source)) {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_favorites_source), icon = Icons.Filled.Star) {
             Column {
                 ChoiceChips(FavoritesSource.entries, source, { stringResource(it.labelRes()) }, { env.write { library.setFavoritesSource(it) } })
                 if (source == FavoritesSource.FREQUENT) {
@@ -52,18 +62,18 @@ internal fun homeEntries(env: SettingsEnv): List<SettingsEntry> {
                 }
             }
         }, "frequent most used manual"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_close_folder), closeFolder, { env.write { home.setCloseFolderOnLaunch(it) } }, value = stringResource(R.string.settings_close_folder_detail)), "folder"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_widgets_stacked), stacked, { env.write { home.setWidgetsStacked(it) } }, value = stringResource(R.string.settings_widgets_stacked_detail)), "widgets stack below carousel"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_hide_status_bar), hideStatusBar) { env.write { appearance.setHideStatusBar(it) } }, "status bar"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_close_folder), closeFolder, { env.write { home.setCloseFolderOnLaunch(it) } }, value = stringResource(R.string.settings_close_folder_detail), icon = Icons.Filled.FolderOpen), "folder"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_widgets_stacked), stacked, { env.write { home.setWidgetsStacked(it) } }, value = stringResource(R.string.settings_widgets_stacked_detail), icon = Icons.Filled.ViewAgenda), "widgets stack below carousel"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_hide_status_bar), hideStatusBar, icon = Icons.Filled.VisibilityOff) { env.write { appearance.setHideStatusBar(it) } }, "status bar"),
         SettingsEntry(
             SECTION,
-            settingsBlock(stringResource(R.string.settings_status_bar_timeout), value = "${peekSeconds}s") {
+            settingsBlock(stringResource(R.string.settings_status_bar_timeout), value = "${peekSeconds}s", icon = Icons.Filled.Timer) {
                 SettingsSlider(peekSeconds.toFloat(), 0f..30f, { env.write { appearance.setStatusBarPeekSeconds(it.roundToInt()) } })
             },
             "status bar peek",
             visible = hideStatusBar,
         ),
-        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_dim_home), value = "${(dimHome * 100).roundToInt()}%") {
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_dim_home), value = "${(dimHome * 100).roundToInt()}%", icon = Icons.Filled.Contrast) {
             SettingsSlider(
                 value = dimHome,
                 range = 0f..0.85f,
@@ -76,8 +86,8 @@ internal fun homeEntries(env: SettingsEnv): List<SettingsEntry> {
                 },
             )
         }, "dim wallpaper"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_allow_rotation), rotation, { env.write { home.setAllowRotation(it) } }, value = stringResource(R.string.settings_allow_rotation_detail)), "landscape rotate"),
-        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_corner_button), env.nav.onCornerPicker, value = env.cornerButtonLabel ?: stringResource(R.string.settings_quick_launch_none)), "button shortcut corner"),
-        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_compact_tap), compactTap, { env.write { appearance.setCompactTapArea(it) } }, value = stringResource(R.string.settings_compact_tap_detail)), "tap area accidental launch empty"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_allow_rotation), rotation, { env.write { home.setAllowRotation(it) } }, value = stringResource(R.string.settings_allow_rotation_detail), icon = Icons.Filled.ScreenRotation), "landscape rotate"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_corner_button), env.nav.onCornerPicker, value = env.cornerButtonLabel ?: stringResource(R.string.settings_quick_launch_none), icon = Icons.Filled.TouchApp), "button shortcut corner"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_compact_tap), compactTap, { env.write { appearance.setCompactTapArea(it) } }, value = stringResource(R.string.settings_compact_tap_detail), icon = Icons.Filled.Compress), "tap area accidental launch empty"),
     )
 }
