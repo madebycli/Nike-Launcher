@@ -102,4 +102,7 @@ class CornerActions(
     val onOpenSearch: () -> Unit,
     /** Where the corner button is in the window, or null when there is none to keep clear. */
     val onBounds: (Rect?) -> Unit,
+    val onOpenSettings: () -> Unit,
+    /** Opens the screen where the app the button launches is chosen. */
+    val onPickApp: () -> Unit,
 )

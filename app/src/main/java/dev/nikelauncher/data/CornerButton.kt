@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+package dev.nikelauncher.data
+
+/** What a press, or a swipe up, on the corner button does. */
+enum class CornerAction {
+    MENU,
+    SEARCH,
+    APP,
+    SHORTCUTS,
+    CALENDAR,
+    WEATHER,
+    NOTIFICATIONS,
+    SETTINGS,
+    ASSISTANT,
+    SHADE,
+    LOCK,
+}
+
+enum class CornerShape { CIRCLE, SQUIRCLE, OUTLINE, MINIMAL }
+
+enum class CornerColorMode { CLASSIC, MATERIAL, CUSTOM }
+
+data class CornerAppearance(
+    val colorMode: CornerColorMode = CornerColorMode.CLASSIC,
+    val background: Int = 0xFFFFFFFF.toInt(),
+    val foreground: Int = 0xFF153E49.toInt(),
+    val automaticForeground: Boolean = true,
+    val backgroundOpacity: Int = 100,
+)
+
+/** Everything the corner button is set to, read as one so it never draws half of a change. */
+data class CornerSettings(
+    val enabled: Boolean,
+    val tap: CornerAction,
+    val swipe: CornerAction,
+    val shape: CornerShape,
+    val sizeDp: Int,
+    val appearance: CornerAppearance,
+)
+
+val CORNER_SIZE_RANGE = 48..72

@@ -40,6 +40,7 @@ class Prefs(private val context: Context) {
     val home = HomePrefs(store)
     val appList = AppListPrefs(store)
     val strip = StripPrefs(store)
+    val corner = CornerPrefs(store)
 
 
 

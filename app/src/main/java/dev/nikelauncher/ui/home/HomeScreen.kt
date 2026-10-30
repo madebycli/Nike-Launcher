@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import dev.nikelauncher.R
 import dev.nikelauncher.data.HomeBlock
 import dev.nikelauncher.service.HapticUtil
-import dev.nikelauncher.ui.home.blocks.CornerButton
+import dev.nikelauncher.ui.home.corner.CornerButton
 import dev.nikelauncher.ui.home.blocks.FavoritesBlock
 import dev.nikelauncher.ui.home.blocks.NowPlayingBlock
 import dev.nikelauncher.ui.home.blocks.WidgetBlock

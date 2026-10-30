@@ -147,6 +147,8 @@ internal fun rememberHomeActions(
                 onOpenApp = { hooks.launchEntry(it) },
                 onOpenSearch = { hooks.controller.openFully(focusSearch = true) },
                 onBounds = hooks.setCornerBounds,
+                onOpenSettings = { hooks.onNavigate("settings") },
+                onPickApp = { hooks.onNavigate("cornerpicker") },
             ),
         )
     }
