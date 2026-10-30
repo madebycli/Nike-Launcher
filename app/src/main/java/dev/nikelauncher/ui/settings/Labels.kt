@@ -24,7 +24,9 @@ import dev.nikelauncher.data.TextColorMode
  */
 @StringRes
 fun AppFont.labelRes(): Int = when (this) {
+    AppFont.GOOGLE_SANS_FLEX -> R.string.font_google_sans_flex
     AppFont.SYSTEM -> R.string.font_system
+    AppFont.NIAGARA -> R.string.font_niagara
     AppFont.SANS_SERIF -> R.string.font_sans_serif
     AppFont.SERIF -> R.string.font_serif
     AppFont.MONOSPACE -> R.string.font_monospace

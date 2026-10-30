@@ -650,4 +650,8 @@
     <string name="widget_settings_system_app">Systemstandard</string>
     <string name="widget_settings_weather">Väder</string>
     <string name="widget_text_width">Textbredd</string>
+    <string name="app_edit_title">Redigera app</string>
+    <string name="app_edit_reset_name">Återställ visningsnamn</string>
+    <string name="font_google_sans_flex">Google Sans Flex</string>
+    <string name="font_niagara">Niagara / Nunito Sans</string>
 </resources>

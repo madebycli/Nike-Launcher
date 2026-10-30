@@ -646,4 +646,8 @@
         <item quantity="other">%1$d frühere Nachrichten</item>
     </plurals>
     <string name="settings_app_list_text_cloud">Kontrastwolke hinter Text</string>
+    <string name="app_edit_reset_name">Anzeigenamen zurücksetzen</string>
+    <string name="app_edit_title">App anpassen</string>
+    <string name="font_niagara">Niagara / Nunito Sans</string>
+    <string name="font_google_sans_flex">Google Sans Flex</string>
 </resources>

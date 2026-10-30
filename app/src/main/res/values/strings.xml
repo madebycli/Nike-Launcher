@@ -650,4 +650,8 @@
         <item quantity="other">%1$d earlier messages</item>
     </plurals>
     <string name="settings_app_list_text_cloud">Text contrast cloud</string>
+    <string name="app_edit_reset_name">Reset display name</string>
+    <string name="app_edit_title">Edit app</string>
+    <string name="font_google_sans_flex">Google Sans Flex</string>
+    <string name="font_niagara">Niagara / Nunito Sans</string>
 </resources>

@@ -70,7 +70,7 @@ internal fun appearanceEntries(env: SettingsEnv): List<SettingsEntry> {
     val iconSize by a.iconSizeDp.collectAsState(56)
     val labelSize by a.labelSizeSp.collectAsState(16)
     val spacing by a.itemSpacingDp.collectAsState(10)
-    val font by a.font.collectAsState(AppFont.SYSTEM)
+    val font by a.font.collectAsState(AppFont.GOOGLE_SANS_FLEX)
     val fontFile by a.fontFile.collectAsState(null)
     val textColorMode by a.textColorMode.collectAsState(TextColorMode.AUTO)
     val textColorCustom by a.textColorCustom.collectAsState(0xFFFFFFFF.toInt())

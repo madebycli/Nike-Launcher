@@ -279,6 +279,7 @@ internal fun FavoritesBlock(
                 renameFor = null
             },
             onDismiss = { renameFor = null },
+            app = app,
         )
     }
 }

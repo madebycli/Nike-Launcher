@@ -44,7 +44,7 @@ internal fun StylePreview(app: NikeApp, apps: List<AppInfo>, favorites: List<App
     val showLabels by a.showFavoriteLabels.collectAsState(true)
     val alignment by a.alignment.collectAsState(HomeAlignment.LEFT)
     val iconSide by a.iconSide.collectAsState(IconSide.LEFT)
-    val font by a.font.collectAsState(AppFont.SYSTEM)
+    val font by a.font.collectAsState(AppFont.GOOGLE_SANS_FLEX)
     val fontFile by a.fontFile.collectAsState(null)
     val family = fontFamilyOf(font, fontFile)
 

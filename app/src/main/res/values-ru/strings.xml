@@ -670,5 +670,9 @@
     <string name="widget_settings_system_app">Системное по умолчанию</string>
     <string name="widget_settings_weather">Погода</string>
     <string name="widget_text_width">Ширина текста</string>
+    <string name="app_edit_reset_name">Сбросить название</string>
+    <string name="app_edit_title">Настроить приложение</string>
+    <string name="font_google_sans_flex">Google Sans Flex</string>
+    <string name="font_niagara">Niagara / Nunito Sans</string>
 </resources>
 

@@ -16,7 +16,7 @@ enum class HomeAlignment { LEFT, CENTER, RIGHT }
 /** Which side of an app's name its icon sits on. */
 enum class IconSide { LEFT, RIGHT }
 
-enum class AppFont { SYSTEM, SANS_SERIF, SERIF, MONOSPACE, CUSTOM }
+enum class AppFont { GOOGLE_SANS_FLEX, SYSTEM, NIAGARA, SANS_SERIF, SERIF, MONOSPACE, CUSTOM }
 
 /** AUTO picks light or dark text from the wallpaper's own colors. */
 enum class TextColorMode { AUTO, LIGHT, DARK, MATERIAL, CUSTOM }
@@ -70,7 +70,7 @@ class AppearancePrefs internal constructor(private val store: DataStore<Preferen
     }.distinctUntilChanged()
 
     val font: Flow<AppFont> = data.map {
-        runCatching { AppFont.valueOf(it[PrefKeys.FONT] ?: AppFont.SYSTEM.name) }.getOrDefault(AppFont.SYSTEM)
+        runCatching { AppFont.valueOf(it[PrefKeys.FONT] ?: AppFont.GOOGLE_SANS_FLEX.name) }.getOrDefault(AppFont.SYSTEM)
     }.distinctUntilChanged()
 
     val hideStatusBar: Flow<Boolean> = data.map { it[PrefKeys.HIDE_STATUS_BAR] ?: false }.distinctUntilChanged()

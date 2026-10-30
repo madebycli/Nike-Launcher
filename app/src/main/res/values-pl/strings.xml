@@ -675,4 +675,8 @@
     <string name="widget_settings_system_app">Domyślna systemowa</string>
     <string name="widget_settings_weather">Pogoda</string>
     <string name="widget_text_width">Szerokość tekstu</string>
+    <string name="app_edit_title">Edytuj aplikację</string>
+    <string name="app_edit_reset_name">Zresetuj nazwę wyświetlaną</string>
+    <string name="font_google_sans_flex">Google Sans Flex</string>
+    <string name="font_niagara">Niagara / Nunito Sans</string>
 </resources>

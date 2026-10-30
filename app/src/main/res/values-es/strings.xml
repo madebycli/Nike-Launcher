@@ -650,4 +650,8 @@
     <string name="widget_settings_system_app">Predeterminada del sistema</string>
     <string name="widget_settings_weather">Tiempo</string>
     <string name="widget_text_width">Ancho del texto</string>
+    <string name="app_edit_reset_name">Restablecer nombre</string>
+    <string name="app_edit_title">Editar aplicación</string>
+    <string name="font_google_sans_flex">Google Sans Flex</string>
+    <string name="font_niagara">Niagara / Nunito Sans</string>
 </resources>

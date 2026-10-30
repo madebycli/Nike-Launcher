@@ -102,9 +102,9 @@ class MainActivity : ComponentActivity() {
                 StatusBarFader.setVisible(window, visible = statusBarVisible, instant = hideStatusBarInstantly)
             }
 
-            val font by app.prefs.appearance.font.collectAsState(initial = AppFont.SYSTEM)
+            val font by app.prefs.appearance.font.collectAsState(initial = AppFont.GOOGLE_SANS_FLEX)
             val fontFile by app.prefs.appearance.fontFile.collectAsState(initial = null)
-            LaunchedEffect(font, fontFile) { app.widgetHost.typeface = widgetTypeface(font, fontFile) }
+            LaunchedEffect(font, fontFile) { app.widgetHost.typeface = widgetTypeface(font, fontFile, this@MainActivity) }
             val allowRotation by app.prefs.home.allowRotation.collectAsState(initial = null)
             LaunchedEffect(allowRotation, rotatesByDefault) {
                 requestedOrientation = if (allowRotation ?: rotatesByDefault) {

@@ -101,6 +101,8 @@ fun ClockOverviewSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
+        sheetMaxWidth = 640.dp,
+        dragHandle = null,
         contentWindowInsets = {
             WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
         },
@@ -118,8 +120,12 @@ fun ClockOverviewSheet(
             val panelHeight = (maxHeight - safeTop).coerceAtLeast(0.dp)
             Column(Modifier.fillMaxWidth().height(panelHeight).testTag("clock-overview-panel")
                 .semantics { testTagsAsResourceId = true }) {
+                // The stock handle brings 22dp of air on either side; the header carries its own padding.
+                Box(Modifier.fillMaxWidth().height(24.dp), contentAlignment = Alignment.Center) {
+                    BottomSheetDefaults.DragHandle(Modifier.wrapContentHeight(unbounded = true))
+                }
                 Row(
-                    Modifier.fillMaxWidth().padding(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 12.dp),
+                    Modifier.fillMaxWidth().padding(start = 12.dp, end = 8.dp, top = 0.dp, bottom = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Spacer(Modifier.width(8.dp))

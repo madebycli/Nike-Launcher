@@ -37,7 +37,7 @@ private val LightColors = lightColorScheme(
  */
 @Composable
 fun NikeTheme(
-    font: AppFont = AppFont.SYSTEM,
+    font: AppFont = AppFont.GOOGLE_SANS_FLEX,
     fontFile: String? = null,
     content: @Composable () -> Unit,
 ) {

@@ -1398,6 +1398,7 @@ fun AppListScreen(
                     editDialogFor = null
                 },
                 onDismiss = { editDialogFor = null },
+                app = target,
             )
         }
 
