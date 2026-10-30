@@ -10,6 +10,7 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.Rocket
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,7 +62,14 @@ import dev.nikelauncher.ui.state.LibraryState
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun WelcomeStep() = Hero(Icons.Filled.Rocket, R.string.app_name, headlineSize = true)
+internal fun WelcomeStep(onRestore: () -> Unit) {
+    Box(Modifier.fillMaxSize()) {
+        Hero(Icons.Filled.Rocket, R.string.app_name, headlineSize = true)
+        TextButton(onClick = onRestore, modifier = Modifier.align(Alignment.BottomCenter)) {
+            Text(stringResource(R.string.setup_restore))
+        }
+    }
+}
 
 @Composable
 internal fun DoneStep() = Hero(Icons.Filled.CheckCircle, R.string.setup_ready, headlineSize = false)

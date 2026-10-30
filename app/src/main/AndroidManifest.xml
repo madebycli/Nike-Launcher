@@ -56,6 +56,13 @@
         </activity>
 
         <activity
+            android:name=".widget.WidgetRestoreActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.NikeLauncher.PinShortcut" />
+
+        <activity
             android:name=".widget.WidgetPickerActivity"
             android:exported="false"
             android:excludeFromRecents="true"

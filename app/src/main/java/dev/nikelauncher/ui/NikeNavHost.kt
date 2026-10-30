@@ -30,6 +30,7 @@ import dev.nikelauncher.ui.settings.SettingsRoute
 import dev.nikelauncher.ui.state.buildFavoriteEntries
 import dev.nikelauncher.ui.state.rememberHomeSettings
 import dev.nikelauncher.ui.state.rememberLibraryState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /** The navigation graph. What the destinations share is read here, once, and handed down. */
@@ -147,7 +148,8 @@ fun NikeNavHost(
     if (library.layoutDefaultsVersion == 1 && !library.welcomeSeen) {
         SetupFlow(app, apps, library, settings.iconSizeDp) {
             scope.launch {
-                app.prefs.home.applyNewInstallDefaults()
+                // A restored backup already holds the choices a new install would be given.
+                if (!app.prefs.backupRestored.first()) app.prefs.home.applyNewInstallDefaults()
                 app.prefs.home.setWelcomeSeen(true)
             }
         }

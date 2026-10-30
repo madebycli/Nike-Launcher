@@ -3,6 +3,7 @@ package dev.nikelauncher.ui.settings
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -11,6 +12,7 @@ import dev.nikelauncher.R
 import dev.nikelauncher.data.PrivateSpace
 import dev.nikelauncher.data.stripsOtherProfiles
 import dev.nikelauncher.ui.common.toast
+import dev.nikelauncher.widget.WidgetRestoreActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,8 +62,9 @@ fun rememberBackupActions(app: NikeApp, privateSpace: PrivateSpace): BackupActio
                     context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
                 }.getOrNull()
             }
-            val ok = text != null && app.prefs.importJson(text)
-            context.toast(if (ok) R.string.settings_import_done else R.string.settings_backup_failed)
+            val report = text?.let { app.prefs.importJson(it) }
+            context.toast(if (report != null) R.string.settings_import_done else R.string.settings_backup_failed)
+            if (report != null && report.widgetsToConfirm > 0) context.startActivity(Intent(context, WidgetRestoreActivity::class.java))
         }
     }
     return BackupActions(

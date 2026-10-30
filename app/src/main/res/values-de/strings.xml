@@ -192,4 +192,14 @@
     <string name="setup_style">Stil</string>
     <string name="setup_ready">Fertig</string>
     <string name="setup_calendar">Kalender</string>
+    <string name="action_close">Schließen</string>
+    <string name="backup_widgets_title">Widgets</string>
+    <string name="backup_widgets_remaining">%1$d übrig</string>
+    <string name="backup_widgets_later">Später</string>
+    <string name="backup_widget_choose">Widget wählen</string>
+    <string name="backup_widget_choose_other">Anderes wählen</string>
+    <string name="backup_widget_setup">Einrichten</string>
+    <string name="backup_widget_retry">Das hat nicht geklappt</string>
+    <string name="backup_widget_missing">Die App ist nicht installiert</string>
+    <string name="setup_restore">Backup wiederherstellen</string>
 </resources>

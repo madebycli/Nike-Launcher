@@ -43,6 +43,7 @@ import dev.nikelauncher.ui.apps.AppsState
 import dev.nikelauncher.ui.kit.motion.AppMotion
 import dev.nikelauncher.ui.kit.onboarding.SetupPrimaryButton
 import dev.nikelauncher.ui.kit.onboarding.SetupStepHeader
+import dev.nikelauncher.ui.settings.rememberBackupActions
 import dev.nikelauncher.ui.state.LibraryState
 
 private const val STEPS = 5
@@ -62,6 +63,7 @@ internal fun SetupFlow(
     iconSizeDp: Int,
     onDone: () -> Unit,
 ) {
+    val backup = rememberBackupActions(app, apps.privateSpace)
     var step by rememberSaveable { mutableIntStateOf(0) }
     // Every access below is granted on a system screen, so the answer only arrives on resume.
     var resumed by remember { mutableIntStateOf(0) }
@@ -96,7 +98,7 @@ internal fun SetupFlow(
                 label = "setupStep",
             ) { page ->
                 when (page) {
-                    0 -> WelcomeStep()
+                    0 -> WelcomeStep(onRestore = backup.import)
                     1 -> AccessStep(resumed)
                     2 -> StyleStep(app)
                     3 -> FavoritesStep(app, apps, library, iconSizeDp)
