@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.widget
+package dev.nikelauncher.widget
 
 import android.Manifest
 import android.app.AlarmManager
@@ -8,7 +8,7 @@ import android.content.pm.PackageManager
 import android.provider.CalendarContract
 import android.text.format.DateFormat
 import androidx.core.content.ContextCompat
-import dev.victorialauncher.R
+import dev.nikelauncher.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

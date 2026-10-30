@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.widget
+package dev.nikelauncher.widget
 
 import android.content.Context
 import android.view.GestureDetector

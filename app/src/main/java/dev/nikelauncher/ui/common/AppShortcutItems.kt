@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.common
+package dev.nikelauncher.ui.common
 
 import android.content.pm.ShortcutInfo
 import androidx.compose.foundation.Image
@@ -23,9 +23,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
-import dev.victorialauncher.VictoriaApp
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.ShortcutSwipe
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.ShortcutSwipe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -48,14 +48,14 @@ fun AppShortcutItems(
     onStarted: () -> Unit,
 ) {
     val context = LocalContext.current
-    val victoriaApp = context.applicationContext as VictoriaApp
+    val nikeApp = context.applicationContext as NikeApp
     val density = LocalConfiguration.current.densityDpi
     var shortcuts by remember(app.key) { mutableStateOf<List<ShortcutInfo>>(emptyList()) }
 
     LaunchedEffect(app.key, expanded) {
         if (!expanded) return@LaunchedEffect
         shortcuts = withContext(Dispatchers.IO) {
-            victoriaApp.appRepository.appShortcuts(app).take(MAX_SHORTCUTS)
+            nikeApp.appRepository.appShortcuts(app).take(MAX_SHORTCUTS)
         }
     }
 
@@ -67,7 +67,7 @@ fun AppShortcutItems(
         val iconDp = iconSizeFor(labelSizeSp)
         val icon = remember(shortcut.id, density) {
             runCatching {
-                victoriaApp.appRepository.shortcutIcon(shortcut, density)
+                nikeApp.appRepository.shortcutIcon(shortcut, density)
                     ?.toBitmap(ICON_PX, ICON_PX)
                     ?.asImageBitmap()
             }.getOrNull()
@@ -78,7 +78,7 @@ fun AppShortcutItems(
                 { Image(bitmap = it, contentDescription = null, modifier = Modifier.size(iconDp)) }
             },
             onClick = {
-                victoriaApp.appRepository.startAppShortcut(shortcut)
+                nikeApp.appRepository.startAppShortcut(shortcut)
                 onStarted()
             },
         )

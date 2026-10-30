@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.data
+package dev.nikelauncher.data
 
 import android.content.Context
 import android.os.Build
-import dev.victorialauncher.BuildConfig
+import dev.nikelauncher.BuildConfig
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -46,7 +46,7 @@ object CrashLog {
         val when_ = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())
         file(context).writeText(
             buildString {
-                appendLine("Victoria Launcher ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+                appendLine("Nike Launcher ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
                 appendLine("Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
                 appendLine("${Build.MANUFACTURER} ${Build.MODEL}")
                 appendLine(when_)

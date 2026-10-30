@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.common
+package dev.nikelauncher.ui.common
 
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
@@ -41,8 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import dev.victorialauncher.VictoriaApp
-import dev.victorialauncher.R
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.R
 import androidx.compose.ui.res.stringResource
 
 /** Most a single pack contributes to a search, so one huge pack cannot bury the others. */
@@ -58,7 +58,7 @@ fun IconPickerScreen(
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
-    val app = context.applicationContext as VictoriaApp
+    val app = context.applicationContext as NikeApp
     val packs = remember { app.iconPackRepository.getInstalledIconPacks() }
     // Null means All: browse or search every pack at once. Picking a pack narrows both.
     var selectedPack by remember { mutableStateOf<String?>(null) }
@@ -184,7 +184,7 @@ fun IconPickerScreen(
 @Composable
 private fun PackIconCell(packPackage: String, drawableName: String, onClick: () -> Unit) {
     val context = LocalContext.current
-    val app = context.applicationContext as VictoriaApp
+    val app = context.applicationContext as NikeApp
     val drawable: Drawable? = remember(packPackage, drawableName) {
         app.iconPackRepository.loadPackDrawable(packPackage, drawableName)
     }

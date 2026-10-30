@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.applist
+package dev.nikelauncher.ui.applist
 
 /**
  * One source of truth for where the A-Z strip sits, so the letter your finger is on is the

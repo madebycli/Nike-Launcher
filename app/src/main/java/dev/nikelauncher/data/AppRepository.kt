@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.data
+package dev.nikelauncher.data
 
 import android.content.ComponentName
 import android.content.Context
@@ -19,7 +19,7 @@ import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import dev.victorialauncher.R
+import dev.nikelauncher.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

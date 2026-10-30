@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.common
+package dev.nikelauncher.ui.common
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,11 +31,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import dev.victorialauncher.media.NotificationCountBus
-import dev.victorialauncher.VictoriaApp
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.EntryKind
-import dev.victorialauncher.data.IconShape
+import dev.nikelauncher.media.NotificationCountBus
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.EntryKind
+import dev.nikelauncher.data.IconShape
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.Dispatchers
@@ -135,7 +135,7 @@ suspend fun warmIconCache(
     priorityKeys: Set<String> = emptySet(),
 ) {
     if (px <= 0 || apps.isEmpty()) return
-    val victoriaApp = context.applicationContext as VictoriaApp
+    val nikeApp = context.applicationContext as NikeApp
 
     fun warm(app: AppInfo) {
         val override = overrides[app.key]
@@ -144,7 +144,7 @@ suspend fun warmIconCache(
         val key = iconCacheKey(app, iconPack, override, px, own)
         if (IconCache.get(key) != null) return
         runCatching {
-            val drawable = resolveDrawable(context, victoriaApp, app, iconPack, override)
+            val drawable = resolveDrawable(context, nikeApp, app, iconPack, override)
             val bitmap = renderIcon(drawable, px, own.shape, own.themed, own.background, own.foreground)
             IconCache.put(key, bitmap.asImageBitmap())
         }
@@ -204,7 +204,7 @@ val LocalIconConfig = staticCompositionLocalOf {
 @Composable
 fun AppIcon(app: AppInfo, sizeDp: Int, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val victoriaApp = context.applicationContext as VictoriaApp
+    val nikeApp = context.applicationContext as NikeApp
     val config = LocalIconConfig.current
     // Nothing drawn and no space taken, so rows close up rather than leaving a hole. Except
     // for a dot beside the name while the app has notifications, or a list with no icons
@@ -239,7 +239,7 @@ fun AppIcon(app: AppInfo, sizeDp: Int, modifier: Modifier = Modifier) {
     val cacheKey = iconCacheKey(app, iconPackPackage, overrideValue, px, style)
     val bitmap: ImageBitmap? = remember(cacheKey) {
         IconCache.get(cacheKey) ?: runCatching {
-            val drawable = resolveDrawable(context, victoriaApp, app, iconPackPackage, overrideValue)
+            val drawable = resolveDrawable(context, nikeApp, app, iconPackPackage, overrideValue)
             renderIcon(drawable, px, style.shape, style.themed, style.background, style.foreground)
                 .asImageBitmap()
                 .also { IconCache.put(cacheKey, it) }
@@ -307,7 +307,7 @@ private fun NotificationBadge(count: Int, iconSizeDp: Int, modifier: Modifier = 
  */
 internal fun decodeIconOverride(
     context: Context,
-    victoriaApp: VictoriaApp,
+    nikeApp: NikeApp,
     override: String?,
 ): Drawable? = when {
     override == null -> null
@@ -318,7 +318,7 @@ internal fun decodeIconOverride(
         if (split <= 0) {
             null
         } else {
-            victoriaApp.iconPackRepository.loadPackDrawable(
+            nikeApp.iconPackRepository.loadPackDrawable(
                 body.substring(0, split),
                 body.substring(split + 1),
             )
@@ -335,19 +335,19 @@ internal fun decodeIconOverride(
 
 private fun resolveDrawable(
     context: Context,
-    victoriaApp: VictoriaApp,
+    nikeApp: NikeApp,
     app: AppInfo,
     iconPackPackage: String?,
     overrideValue: String?,
 ): Drawable =
-    decodeIconOverride(context, victoriaApp, overrideValue)
+    decodeIconOverride(context, nikeApp, overrideValue)
         ?: if (app.kind != EntryKind.APP) {
             // An icon pack is matched by component, and a shortcut carries its publisher's:
             // every bookmark would come back wearing the browser's icon instead of its own,
             // which is the one thing that tells two of them apart.
-            victoriaApp.appRepository.loadIcon(app)
+            nikeApp.appRepository.loadIcon(app)
         } else {
-            victoriaApp.iconPackRepository.getIcon(iconPackPackage, app.componentName) {
-                victoriaApp.appRepository.loadIcon(app)
+            nikeApp.iconPackRepository.getIcon(iconPackPackage, app.componentName) {
+                nikeApp.appRepository.loadIcon(app)
             }
         }

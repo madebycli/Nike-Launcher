@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Victoria Launcher</string>
-    <string name="accessibility_description">Pozwala gestem przesunięcia w dół otwierać obszar powiadomień. Victoria Launcher nie odczytuje zawartości ekranu ani nie wchodzi z nią w interakcje.</string>
+    <string name="app_name">Nike Launcher</string>
+    <string name="accessibility_description">Pozwala gestem przesunięcia w dół otwierać obszar powiadomień. Nike Launcher nie odczytuje zawartości ekranu ani nie wchodzi z nią w interakcje.</string>
 
     <!-- Shared actions -->
     <string name="action_back">Wstecz</string>
@@ -15,7 +15,7 @@
     <string name="action_edit_icon_and_name">Edytuj ikonę i nazwę</string>
     <string name="action_move_to_folder">Przenieś do folderu…</string>
     <string name="action_change_icon">Zmień ikonę…</string>
-    <string name="action_open_settings">Ustawienia Victoria Launcher</string>
+    <string name="action_open_settings">Ustawienia Nike Launcher</string>
     <string name="action_remove_shortcut">Usuń skrót</string>
 
     <!-- Home screen -->
@@ -59,11 +59,11 @@
     <string name="applist_search">Szukaj aplikacji</string>
 
     <!-- Toasts -->
-    <string name="toast_enable_accessibility_shade">Włącz Victoria Launcher w Ustawieniach → Ułatwienia dostępu, aby otwierać powiadomienia</string>
-    <string name="toast_enable_accessibility_lock">Włącz Victoria Launcher w Ustawieniach → Ułatwienia dostępu, aby zablokować ekran</string>
+    <string name="toast_enable_accessibility_shade">Włącz Nike Launcher w Ustawieniach → Ułatwienia dostępu, aby otwierać powiadomienia</string>
+    <string name="toast_enable_accessibility_lock">Włącz Nike Launcher w Ustawieniach → Ułatwienia dostępu, aby zablokować ekran</string>
 
     <!-- Settings -->
-    <string name="settings_title">Ustawienia Victoria</string>
+    <string name="settings_title">Ustawienia Nike</string>
     <string name="settings_section_home">Ekran Główny</string>
     <string name="settings_section_app_list">Lista aplikacji</string>
     <string name="settings_section_gestures">Gesty</string>
@@ -117,7 +117,7 @@
     <string name="settings_edge_side">Krawędź otwieranego menu aplikacji</string>
     <string name="settings_double_tap_lock">Stuknij dwukrotnie, aby zablokować ekran</string>
     <string name="settings_double_tap_lock_detail">Stuknij dwukrotnie w pasek A–Z</string>
-    <string name="settings_lock_needs_accessibility">Wymaga włączenia Victoria Launcher w Ułatwieniach dostępu. Jeśli przełącznik jest nieaktywny (szary), otwórz Informacje o aplikacji i zezwól najpierw na ustawienia ograniczone z menu ⋮.</string>
+    <string name="settings_lock_needs_accessibility">Wymaga włączenia Nike Launcher w Ułatwieniach dostępu. Jeśli przełącznik jest nieaktywny (szary), otwórz Informacje o aplikacji i zezwól najpierw na ustawienia ograniczone z menu ⋮.</string>
     <string name="settings_az_visibility">Pokaż A–Z na ekranie startowym</string>
     <string name="az_visibility_never">Nigdy</string>
     <string name="az_visibility_landscape">W poziomie</string>
@@ -160,7 +160,7 @@
     <string name="settings_icon_side">Strona ikony</string>
     <string name="settings_shade_gesture">Przesuń w dół, aby pokazać powiadomienia</string>
     <string name="settings_shade_ready">Gotowe — pociągnij w dół na ekranie startowym</string>
-    <string name="settings_shade_not_ready">Pociągnij w dół na ekranie startowym. Jeśli nic się nie dzieje, włącz Victoria Launcher w Ułatwieniach dostępu — a jeśli przełącznik jest nieaktywny, zezwól najpierw na ustawienia ograniczone w Informacjach o aplikacji.</string>
+    <string name="settings_shade_not_ready">Pociągnij w dół na ekranie startowym. Jeśli nic się nie dzieje, włącz Nike Launcher w Ułatwieniach dostępu — a jeśli przełącznik jest nieaktywny, zezwól najpierw na ustawienia ograniczone w Informacjach o aplikacji.</string>
     <string name="settings_enable">Włącz</string>
     <string name="settings_app_info">Informacje o aplikacji</string>
     <string name="settings_now_playing_show">Pokaż widżet „Teraz odtwarzane”</string>
@@ -185,7 +185,7 @@
     <string name="settings_text_shadow">Cień pod tekstem</string>
     <string name="settings_text_shadow_detail">Pomaga nazwam aplikacji wyróżnić się na tle zajętej tapety. Stosowany tylko za jasnym tekstem, gdzie zwiększa kontrast zamiast go pogarszać</string>
     <string name="settings_default_launcher">Domyślny launcher</string>
-    <string name="settings_default_launcher_yes">Victoria Launcher</string>
+    <string name="settings_default_launcher_yes">Nike Launcher</string>
     <string name="settings_default_launcher_no">Nie ustawiono — stuknij, aby wybrać</string>
     <string name="settings_frequent_excluded">Wykluczone z najczęściej używanych</string>
     <string name="settings_frequent_excluded_none">Brak wykluczonych aplikacji</string>
@@ -342,10 +342,10 @@
     <string name="widget_clock_alarm_hide">Brak alarmu</string>
     <string name="widget_clock_agenda_permission">Zezwól na dostęp do kalendarza</string>
     <string name="widget_clock_agenda_empty">Brak nadchodzących wydarzeń</string>
-    <string name="widget_clock_agenda_hint">Odczytywanie kalendarza wymaga uprawnień. Nic nie opuszcza telefonu: Victoria nie ma dostępu do sieci.</string>
+    <string name="widget_clock_agenda_hint">Odczytywanie kalendarza wymaga uprawnień. Nic nie opuszcza telefonu: Nike nie ma dostępu do sieci.</string>
     <string name="widget_clock_weather_opens">Działanie po stuknięciu w pogodę</string>
     <string name="widget_clock_weather_waiting">Oczekiwanie na aplikację pogodową</string>
-    <string name="widget_clock_weather_hint">Dane o pogodzie pochodzą z aplikacji pogodowej, która już je posiada, więc Victoria nie potrzebuje dostępu do sieci ani lokalizacji. W Breezy Weather włącz Ustawienia → Widżety i żywa tapeta → Udostępnianie danych.</string>
+    <string name="widget_clock_weather_hint">Dane o pogodzie pochodzą z aplikacji pogodowej, która już je posiada, więc Nike nie potrzebuje dostępu do sieci ani lokalizacji. W Breezy Weather włącz Ustawienia → Widżety i żywa tapeta → Udostępnianie danych.</string>
     <string name="widget_clock_notifications_show">Liczba powiadomień</string>
     <string name="widget_clock_notifications_hide">Brak licznika</string>
     <string name="widget_clock_notifications_size">Rozmiar licznika</string>

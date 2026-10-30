@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.settings
+package dev.nikelauncher.ui.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,8 +56,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
-import dev.victorialauncher.ui.theme.fontFamilyOf
-import dev.victorialauncher.ui.theme.rememberWallpaperPalette
+import dev.nikelauncher.ui.theme.fontFamilyOf
+import dev.nikelauncher.ui.theme.rememberWallpaperPalette
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -69,7 +69,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
-import dev.victorialauncher.data.CrashLog
+import dev.nikelauncher.data.CrashLog
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -80,33 +80,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
-import dev.victorialauncher.BuildConfig
-import dev.victorialauncher.data.AppFont
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.AzStripVisibility
-import dev.victorialauncher.data.IconShape
-import dev.victorialauncher.data.EdgeSide
-import dev.victorialauncher.data.RippleParams
-import dev.victorialauncher.data.ScrubStyle
-import dev.victorialauncher.data.ScrubBubbleShape
-import dev.victorialauncher.data.EDGE_ZONE_INSET_RANGE
-import dev.victorialauncher.data.HOLD_SCROLL_RANGE
-import dev.victorialauncher.data.RECENT_SECTION_RANGE
-import dev.victorialauncher.data.SECTION_TOP_RANGE
-import dev.victorialauncher.data.FREQUENT_RANGE
-import dev.victorialauncher.data.FavoritesSource
-import dev.victorialauncher.data.ShortcutSwipe
-import dev.victorialauncher.data.HomeAlignment
-import dev.victorialauncher.data.IconSide
-import dev.victorialauncher.data.QuickLaunchSlot
-import dev.victorialauncher.data.IconPackRepository
-import dev.victorialauncher.data.TextColorMode
-import dev.victorialauncher.ui.common.AppIcon
-import dev.victorialauncher.ui.theme.toFontFamily
-import dev.victorialauncher.R
+import dev.nikelauncher.BuildConfig
+import dev.nikelauncher.data.AppFont
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.AzStripVisibility
+import dev.nikelauncher.data.IconShape
+import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.data.RippleParams
+import dev.nikelauncher.data.ScrubStyle
+import dev.nikelauncher.data.ScrubBubbleShape
+import dev.nikelauncher.data.EDGE_ZONE_INSET_RANGE
+import dev.nikelauncher.data.HOLD_SCROLL_RANGE
+import dev.nikelauncher.data.RECENT_SECTION_RANGE
+import dev.nikelauncher.data.SECTION_TOP_RANGE
+import dev.nikelauncher.data.FREQUENT_RANGE
+import dev.nikelauncher.data.FavoritesSource
+import dev.nikelauncher.data.ShortcutSwipe
+import dev.nikelauncher.data.HomeAlignment
+import dev.nikelauncher.data.IconSide
+import dev.nikelauncher.data.QuickLaunchSlot
+import dev.nikelauncher.data.IconPackRepository
+import dev.nikelauncher.data.TextColorMode
+import dev.nikelauncher.ui.common.AppIcon
+import dev.nikelauncher.ui.theme.toFontFamily
+import dev.nikelauncher.R
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import dev.victorialauncher.ui.theme.SHADOW_STRENGTH_RANGE
+import dev.nikelauncher.ui.theme.SHADOW_STRENGTH_RANGE
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -1138,7 +1138,7 @@ fun SettingsScreen(
                             label = stringResource(R.string.settings_crash_copy),
                             detail = stringResource(R.string.settings_crash_detail),
                             onClick = {
-                                clipboard.setPrimaryClip(ClipData.newPlainText("Victoria crash", crash))
+                                clipboard.setPrimaryClip(ClipData.newPlainText("Nike crash", crash))
                                 Toast.makeText(context, R.string.settings_crash_copied, Toast.LENGTH_SHORT).show()
                                 CrashLog.clear(context)
                                 crashCleared = true

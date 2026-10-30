@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.widget
+package dev.nikelauncher.widget
 
 import android.content.ComponentName
 import android.content.Context
@@ -9,7 +9,7 @@ import java.util.Locale
 /**
  * The last weather another app sent us, and whether it is still worth drawing.
  *
- * Victoria has no network permission and is not getting one, so there is no fetching here: a
+ * Nike has no network permission and is not getting one, so there is no fetching here: a
  * weather app that already has the forecast broadcasts it, and this is where what arrived is
  * kept. Nothing asks for a location either — the sender says where it is.
  *

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.shortcut
+package dev.nikelauncher.shortcut
 
 import android.content.pm.LauncherApps
 import android.content.pm.ShortcutInfo
@@ -21,10 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import dev.victorialauncher.R
-import dev.victorialauncher.VictoriaApp
-import dev.victorialauncher.data.EntryKeys
-import dev.victorialauncher.ui.theme.VictoriaTheme
+import dev.nikelauncher.R
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.data.EntryKeys
+import dev.nikelauncher.ui.theme.NikeTheme
 
 private const val STATE_ACCEPTED = "accepted"
 
@@ -44,7 +44,7 @@ private const val STATE_ACCEPTED = "accepted"
  * forged request and a planted favorite is that win or lose, a favorite is only ever added once
  * the system *separately* reports the shortcut pinned, never on `accept()`'s own say-so — and
  * that check, along with the write it guards, lives in
- * [dev.victorialauncher.data.AppRepository.confirmPinnedShortcut] rather than here, so that
+ * [dev.nikelauncher.data.AppRepository.confirmPinnedShortcut] rather than here, so that
  * this screen finishing the instant it calls it can never cancel it.
  *
  * What it must not do is accept twice. A second accept would pin a second copy of the same
@@ -100,7 +100,7 @@ class PinShortcutActivity : ComponentActivity() {
         }.getOrNull() ?: shortcut.`package`
 
         setContent {
-            VictoriaTheme {
+            NikeTheme {
                 AlertDialog(
                     // Tapping away is a decision too, and the same one Cancel is.
                     onDismissRequest = { finish() },
@@ -143,7 +143,7 @@ class PinShortcutActivity : ComponentActivity() {
      * request, a publisher that has since been uninstalled — and then there is nothing to put
      * on the home screen. A true answer is not trusted on its own either: it only means the
      * system accepted the *request*, and the favorite is added only once
-     * [dev.victorialauncher.data.AppRepository.confirmPinnedShortcut] finds that shortcut in
+     * [dev.nikelauncher.data.AppRepository.confirmPinnedShortcut] finds that shortcut in
      * the system's own pinned set. finish() happens right after handing off to it rather than
      * waiting on that check, because this screen is `noHistory` and declares no
      * `configChanges` — Cancel, a tap outside, rotation, or the screen merely stopping would
@@ -169,7 +169,7 @@ class PinShortcutActivity : ComponentActivity() {
             finish()
             return
         }
-        (application as VictoriaApp).appRepository.confirmPinnedShortcut(pkg, id, user, serial)
+        (application as NikeApp).appRepository.confirmPinnedShortcut(pkg, id, user, serial)
         finish()
     }
 }

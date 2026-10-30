@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.widget
+package dev.nikelauncher.widget
 
 import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
@@ -51,10 +51,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import dev.victorialauncher.VictoriaApp
-import dev.victorialauncher.ui.common.TouchAnchoredMenu
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.ui.common.TouchAnchoredMenu
 import kotlinx.coroutines.delay
-import dev.victorialauncher.R
+import dev.nikelauncher.R
 import androidx.compose.ui.res.stringResource
 
 /** How long the page dots stay up after a swipe settles. */
@@ -252,7 +252,7 @@ fun WidgetSlot(
 @Composable
 internal fun WidgetPage(widgetId: Int, onPressAndHold: (x: Float, y: Float) -> Unit) {
     val context = LocalContext.current
-    val app = context.applicationContext as VictoriaApp
+    val app = context.applicationContext as NikeApp
     val appWidgetManager = remember { AppWidgetManager.getInstance(context) }
     val providerInfo: AppWidgetProviderInfo? = remember(widgetId) {
         if (widgetId > 0) appWidgetManager.getAppWidgetInfo(widgetId) else null

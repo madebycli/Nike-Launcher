@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher
+package dev.nikelauncher
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -19,16 +19,16 @@ import androidx.compose.runtime.setValue
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowCompat
-import dev.victorialauncher.data.AppFont
-import dev.victorialauncher.data.IconShape
-import dev.victorialauncher.media.NowPlayingListenerService
-import dev.victorialauncher.service.StatusBarFader
-import dev.victorialauncher.widget.ClockWidgetProvider
-import dev.victorialauncher.ui.VictoriaNavHost
-import dev.victorialauncher.ui.common.IconConfig
-import dev.victorialauncher.ui.common.LocalIconConfig
-import dev.victorialauncher.ui.theme.VictoriaTheme
-import dev.victorialauncher.ui.theme.widgetTypeface
+import dev.nikelauncher.data.AppFont
+import dev.nikelauncher.data.IconShape
+import dev.nikelauncher.media.NowPlayingListenerService
+import dev.nikelauncher.service.StatusBarFader
+import dev.nikelauncher.widget.ClockWidgetProvider
+import dev.nikelauncher.ui.NikeNavHost
+import dev.nikelauncher.ui.common.IconConfig
+import dev.nikelauncher.ui.common.LocalIconConfig
+import dev.nikelauncher.ui.theme.NikeTheme
+import dev.nikelauncher.ui.theme.widgetTypeface
 import kotlinx.coroutines.delay
 
 /** One keystroke taken on the home screen; a null character is a backspace. */
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
         // The setting exists because that is a judgement about a screen rather than about a
         // person — a phone in a car mount wants it anyway.
         val rotatesByDefault = resources.configuration.smallestScreenWidthDp >= TABLET_WIDTH_DP
-        val app = application as VictoriaApp
+        val app = application as NikeApp
 
         setContent {
             val hideStatusBar by app.prefs.hideStatusBar.collectAsState(initial = false)
@@ -143,9 +143,9 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            VictoriaTheme(font = font, fontFile = fontFile) {
+            NikeTheme(font = font, fontFile = fontFile) {
                 CompositionLocalProvider(LocalIconConfig provides iconConfig) {
-                    VictoriaNavHost(
+                    NikeNavHost(
                         app = app,
                         homeIntentTick = homeIntentTick,
                         typedToSearch = typedToSearch,
@@ -242,7 +242,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        (application as VictoriaApp).widgetHost.startListening()
+        (application as NikeApp).widgetHost.startListening()
         NowPlayingListenerService.rebindIfPermitted(this)
         // The clock widget's own rows go stale on their own — an event passes, an alarm is
         // set, "in 20 minutes" stops being true. Half an hour is the shortest the system will
@@ -253,7 +253,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
-        (application as VictoriaApp).widgetHost.stopListening()
+        (application as NikeApp).widgetHost.stopListening()
         // The fader holds a static controller for this window; don't outlive the Activity.
         StatusBarFader.release()
         super.onStop()

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui
+package dev.nikelauncher.ui
 
 import android.app.Activity.RESULT_OK
 import android.appwidget.AppWidgetManager
@@ -39,53 +39,53 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import dev.victorialauncher.TypedKey
-import dev.victorialauncher.VictoriaApp
+import dev.nikelauncher.TypedKey
+import dev.nikelauncher.NikeApp
 import android.widget.Toast
-import dev.victorialauncher.data.IconShape
-import dev.victorialauncher.data.AppFont
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.EntryKind
-import dev.victorialauncher.data.PrivateSpace
-import dev.victorialauncher.data.AzStripVisibility
-import dev.victorialauncher.data.EdgeSide
-import dev.victorialauncher.data.RippleParams
-import dev.victorialauncher.data.ScrubStyle
-import dev.victorialauncher.data.ScrubBubbleShape
-import dev.victorialauncher.data.EntryKeys
-import dev.victorialauncher.data.FavoritesSource
-import dev.victorialauncher.data.ShortcutSwipe
-import dev.victorialauncher.data.HomeAlignment
-import dev.victorialauncher.data.IconSide
-import dev.victorialauncher.data.HomePaddings
-import dev.victorialauncher.data.QuickLaunchSlot
-import dev.victorialauncher.data.TextColorMode
+import dev.nikelauncher.data.IconShape
+import dev.nikelauncher.data.AppFont
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.EntryKind
+import dev.nikelauncher.data.PrivateSpace
+import dev.nikelauncher.data.AzStripVisibility
+import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.data.RippleParams
+import dev.nikelauncher.data.ScrubStyle
+import dev.nikelauncher.data.ScrubBubbleShape
+import dev.nikelauncher.data.EntryKeys
+import dev.nikelauncher.data.FavoritesSource
+import dev.nikelauncher.data.ShortcutSwipe
+import dev.nikelauncher.data.HomeAlignment
+import dev.nikelauncher.data.IconSide
+import dev.nikelauncher.data.HomePaddings
+import dev.nikelauncher.data.QuickLaunchSlot
+import dev.nikelauncher.data.TextColorMode
 import androidx.compose.ui.res.stringResource
-import dev.victorialauncher.R
-import dev.victorialauncher.data.folderIdFromToken
-import dev.victorialauncher.data.stripsOtherProfiles
-import dev.victorialauncher.media.isListenerEnabled
-import dev.victorialauncher.service.SystemUi
-import dev.victorialauncher.ui.common.IconPickerScreen
-import dev.victorialauncher.ui.common.IconStyle
-import dev.victorialauncher.ui.common.LocalIconConfig
-import dev.victorialauncher.ui.common.clearIconCache
-import dev.victorialauncher.ui.common.encodePackOverride
-import dev.victorialauncher.ui.common.warmIconCache
-import dev.victorialauncher.ui.common.iconCacheGeneration
-import dev.victorialauncher.ui.home.FavoriteEntry
-import dev.victorialauncher.ui.home.HomeRoute
-import dev.victorialauncher.ui.home.HomeSettings
-import dev.victorialauncher.ui.settings.AppPickerScreen
-import dev.victorialauncher.ui.settings.FolderAppsScreen
-import dev.victorialauncher.ui.settings.HiddenAppsScreen
-import dev.victorialauncher.ui.theme.DEFAULT_SHADOW_STRENGTH
-import dev.victorialauncher.ui.settings.ManageFavoritesScreen
-import dev.victorialauncher.ui.settings.SettingsScreen
-import dev.victorialauncher.ui.theme.rememberContentColor
-import dev.victorialauncher.widget.ClockWidgetProvider
-import dev.victorialauncher.widget.WidgetPickerActivity
-import dev.victorialauncher.widget.WidgetSlotActions
+import dev.nikelauncher.R
+import dev.nikelauncher.data.folderIdFromToken
+import dev.nikelauncher.data.stripsOtherProfiles
+import dev.nikelauncher.media.isListenerEnabled
+import dev.nikelauncher.service.SystemUi
+import dev.nikelauncher.ui.common.IconPickerScreen
+import dev.nikelauncher.ui.common.IconStyle
+import dev.nikelauncher.ui.common.LocalIconConfig
+import dev.nikelauncher.ui.common.clearIconCache
+import dev.nikelauncher.ui.common.encodePackOverride
+import dev.nikelauncher.ui.common.warmIconCache
+import dev.nikelauncher.ui.common.iconCacheGeneration
+import dev.nikelauncher.ui.home.FavoriteEntry
+import dev.nikelauncher.ui.home.HomeRoute
+import dev.nikelauncher.ui.home.HomeSettings
+import dev.nikelauncher.ui.settings.AppPickerScreen
+import dev.nikelauncher.ui.settings.FolderAppsScreen
+import dev.nikelauncher.ui.settings.HiddenAppsScreen
+import dev.nikelauncher.ui.theme.DEFAULT_SHADOW_STRENGTH
+import dev.nikelauncher.ui.settings.ManageFavoritesScreen
+import dev.nikelauncher.ui.settings.SettingsScreen
+import dev.nikelauncher.ui.theme.rememberContentColor
+import dev.nikelauncher.widget.ClockWidgetProvider
+import dev.nikelauncher.widget.WidgetPickerActivity
+import dev.nikelauncher.widget.WidgetSlotActions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -97,8 +97,8 @@ import kotlinx.coroutines.withContext
  * is collected once per key instead of once per consumer.
  */
 @Composable
-fun VictoriaNavHost(
-    app: VictoriaApp,
+fun NikeNavHost(
+    app: NikeApp,
     homeIntentTick: Int,
     typedToSearch: List<TypedKey>,
     onTypedToSearchHandled: (List<TypedKey>) -> Unit,
@@ -872,7 +872,7 @@ fun VictoriaNavHost(
                 onSetDimColor = { scope.launch { app.prefs.setDimColor(it) } },
                 onSetAllowRotation = { scope.launch { app.prefs.setAllowRotation(it) } },
                 onSetShortcutSwipe = { scope.launch { app.prefs.setShortcutSwipe(it) } },
-                        onExportSettings = { exportLauncher.launch("victoria-launcher-settings.json") },
+                        onExportSettings = { exportLauncher.launch("nike-launcher-settings.json") },
                 onImportSettings = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
                 onSetIconShape = { scope.launch { app.prefs.setIconShape(it); clearIconCache() } },
                 onSetThemedIcons = { scope.launch { app.prefs.setThemedIcons(it); clearIconCache() } },

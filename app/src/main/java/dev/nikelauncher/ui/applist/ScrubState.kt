@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.applist
+package dev.nikelauncher.ui.applist
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import dev.victorialauncher.data.EdgeSide
+import dev.nikelauncher.data.EdgeSide
 
 /**
  * Everything that changes while a finger is on the A-Z strip, in one stable holder.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.settings
+package dev.nikelauncher.ui.settings
 
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Column
@@ -30,8 +30,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import dev.victorialauncher.R
-import dev.victorialauncher.service.HapticUtil
+import dev.nikelauncher.R
+import dev.nikelauncher.service.HapticUtil
 import kotlin.math.roundToInt
 
 /** Every reorderable row is this tall, so a drag works out where it landed by division. */

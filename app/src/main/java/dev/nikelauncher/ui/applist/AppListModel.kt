@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.applist
+package dev.nikelauncher.ui.applist
 
 import androidx.compose.runtime.Immutable
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.EntryKind
-import dev.victorialauncher.data.Folder
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.EntryKind
+import dev.nikelauncher.data.Folder
 import android.icu.text.Transliterator
 import android.os.Build
 import androidx.annotation.RequiresApi

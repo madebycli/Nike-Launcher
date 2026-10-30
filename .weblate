@@ -1,7 +1,7 @@
 [weblate]
 url = https://hosted.weblate.org/api/
 
-[component "victoria-launcher/strings"]
+[component "nike-launcher/strings"]
 slug = strings
 name = Strings
 filemask = app/src/main/res/values-*/strings.xml

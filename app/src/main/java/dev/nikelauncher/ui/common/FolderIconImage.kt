@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.common
+package dev.nikelauncher.ui.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import dev.victorialauncher.VictoriaApp
+import dev.nikelauncher.NikeApp
 
 /**
  * Renders a folder's custom icon, using the same override encoding apps use so a folder can
@@ -24,12 +24,12 @@ import dev.victorialauncher.VictoriaApp
 @Composable
 fun FolderIconImage(override: String, sizeDp: Int, modifier: Modifier = Modifier): Boolean {
     val context = LocalContext.current
-    val victoriaApp = context.applicationContext as VictoriaApp
+    val nikeApp = context.applicationContext as NikeApp
     val px = with(LocalDensity.current) { sizeDp.dp.roundToPx() }.coerceAtLeast(1)
 
     val bitmap: ImageBitmap? = remember(override, px) {
         runCatching {
-            decodeIconOverride(context, victoriaApp, override)?.toBitmap(px, px)?.asImageBitmap()
+            decodeIconOverride(context, nikeApp, override)?.toBitmap(px, px)?.asImageBitmap()
         }.getOrNull()
     }
 

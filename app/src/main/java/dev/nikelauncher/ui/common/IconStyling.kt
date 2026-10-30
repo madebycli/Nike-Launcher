@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.common
+package dev.nikelauncher.ui.common
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -11,7 +11,7 @@ import android.graphics.RectF
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
-import dev.victorialauncher.data.IconShape
+import dev.nikelauncher.data.IconShape
 
 /**
  * How much larger an adaptive icon's layers are than the part of them that shows.

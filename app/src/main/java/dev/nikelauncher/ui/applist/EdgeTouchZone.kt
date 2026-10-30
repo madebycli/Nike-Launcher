@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.applist
+package dev.nikelauncher.ui.applist
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -21,8 +21,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
-import dev.victorialauncher.data.EdgeSide
-import dev.victorialauncher.service.HapticUtil
+import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.service.HapticUtil
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

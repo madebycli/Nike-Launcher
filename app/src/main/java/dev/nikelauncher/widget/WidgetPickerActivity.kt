@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.widget
+package dev.nikelauncher.widget
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
@@ -30,9 +30,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import dev.victorialauncher.VictoriaApp
-import dev.victorialauncher.ui.theme.VictoriaTheme
-import dev.victorialauncher.R
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.ui.theme.NikeTheme
+import dev.nikelauncher.R
 import androidx.compose.ui.res.stringResource
 
 private const val REQUEST_CONFIGURE = 1
@@ -40,7 +40,7 @@ private const val REQUEST_CONFIGURE = 1
 class WidgetPickerActivity : ComponentActivity() {
 
     private lateinit var appWidgetManager: AppWidgetManager
-    private lateinit var widgetHost: VictoriaAppWidgetHost
+    private lateinit var widgetHost: NikeAppWidgetHost
     private var pendingWidgetId: Int = -1
 
     private val bindLauncher =
@@ -57,10 +57,10 @@ class WidgetPickerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appWidgetManager = AppWidgetManager.getInstance(this)
-        widgetHost = (application as VictoriaApp).widgetHost
+        widgetHost = (application as NikeApp).widgetHost
 
         setContent {
-            VictoriaTheme {
+            NikeTheme {
                 val providers = remember { appWidgetManager.installedProviders }
                 val groups = remember(providers) {
                     providers.groupBy { it.provider.packageName }

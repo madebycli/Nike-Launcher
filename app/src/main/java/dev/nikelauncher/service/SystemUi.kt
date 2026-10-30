@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.service
+package dev.nikelauncher.service
 
 import android.content.Context
 
@@ -22,7 +22,7 @@ object SystemUi {
      * @return true if the shade was actually opened.
      */
     fun expandNotificationShade(context: Context): Boolean {
-        if (VictoriaAccessibilityService.openNotificationShade()) return true
+        if (NikeAccessibilityService.openNotificationShade()) return true
 
         return runCatching {
             val service = context.getSystemService("statusbar")
@@ -39,10 +39,10 @@ object SystemUi {
      * once it has been seen to work, so a device where the pull-down already opens the shade
      * stops being told to turn on an accessibility service it does not need.
      */
-    fun canExpandShade(): Boolean = VictoriaAccessibilityService.isConnected || reflectionWorked
+    fun canExpandShade(): Boolean = NikeAccessibilityService.isConnected || reflectionWorked
 
     /** Locking has no fallback: the accessibility action is the only way to do it at all. */
-    fun canLockScreen(): Boolean = VictoriaAccessibilityService.isConnected
+    fun canLockScreen(): Boolean = NikeAccessibilityService.isConnected
 
-    fun lockScreen(): Boolean = VictoriaAccessibilityService.lockScreen()
+    fun lockScreen(): Boolean = NikeAccessibilityService.lockScreen()
 }

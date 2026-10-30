@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.service
+package dev.nikelauncher.service
 
 import android.accessibilityservice.AccessibilityService
 import android.os.Build
@@ -11,7 +11,7 @@ import android.view.accessibility.AccessibilityEvent
  * `performGlobalAction` is the sanctioned route. The service reads nothing: it ignores every
  * event it receives.
  */
-class VictoriaAccessibilityService : AccessibilityService() {
+class NikeAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -29,7 +29,7 @@ class VictoriaAccessibilityService : AccessibilityService() {
 
     companion object {
         @Volatile
-        private var instance: VictoriaAccessibilityService? = null
+        private var instance: NikeAccessibilityService? = null
 
         val isConnected: Boolean get() = instance != null
 

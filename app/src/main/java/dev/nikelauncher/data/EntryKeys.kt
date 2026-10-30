@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.data
+package dev.nikelauncher.data
 
 /**
  * The strings that identify a row everywhere it is stored: favorites, folders, renames, icon
@@ -33,7 +33,7 @@ object EntryKeys {
      * Favorites are stored as one newline-joined string ([Prefs.readFavorites]), so an id
      * carrying `\n` — or any other ISO control character, which is never meaningful in an id —
      * would corrupt that list for every favorite after it, not just itself. A shortcut whose id
-     * fails this is refused rather than stored: [dev.victorialauncher.data.AppRepository]
+     * fails this is refused rather than stored: [dev.nikelauncher.data.AppRepository]
      * filters it out of the pinned list, and the pin confirmation refuses to accept it.
      */
     fun isStorableShortcutId(id: String): Boolean =

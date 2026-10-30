@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.media
+package dev.nikelauncher.media
 
 import android.content.Context
 import android.content.Intent
@@ -66,8 +66,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-import dev.victorialauncher.data.HomeAlignment
-import dev.victorialauncher.R
+import dev.nikelauncher.data.HomeAlignment
+import dev.nikelauncher.R
 import androidx.compose.ui.res.stringResource
 
 fun isListenerEnabled(context: Context) =

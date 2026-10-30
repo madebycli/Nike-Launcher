@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.media
+package dev.nikelauncher.media
 
 import android.app.Notification
 import android.content.ComponentName
@@ -11,7 +11,7 @@ import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import dev.victorialauncher.widget.ClockWidgetProvider
+import dev.nikelauncher.widget.ClockWidgetProvider
 
 class NowPlayingListenerService : NotificationListenerService() {
 

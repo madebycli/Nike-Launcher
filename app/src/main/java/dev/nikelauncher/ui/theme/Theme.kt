@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.theme
+package dev.nikelauncher.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import android.graphics.Typeface
 import androidx.compose.ui.text.font.FontFamily
 import java.io.File
-import dev.victorialauncher.data.AppFont
+import dev.nikelauncher.data.AppFont
 
 fun AppFont.toFontFamily(): FontFamily = when (this) {
     AppFont.SYSTEM -> FontFamily.Default
@@ -85,14 +85,14 @@ private val LightColors = lightColorScheme(
  * at 18 to 22dp it read as a different app's menu. Everything the app draws by hand sits in
  * that range, so the scale is set to meet it rather than each menu being told separately.
  */
-private val VictoriaShapes = Shapes(
+private val NikeShapes = Shapes(
     extraSmall = RoundedCornerShape(16.dp),
     small = RoundedCornerShape(18.dp),
     medium = RoundedCornerShape(20.dp),
 )
 
 @Composable
-fun VictoriaTheme(
+fun NikeTheme(
     font: AppFont = AppFont.SYSTEM,
     fontFile: String? = null,
     content: @Composable () -> Unit,
@@ -123,7 +123,7 @@ fun VictoriaTheme(
     MaterialTheme(
         colorScheme = colors,
         typography = typography,
-        shapes = VictoriaShapes,
+        shapes = NikeShapes,
         content = content,
     )
 }

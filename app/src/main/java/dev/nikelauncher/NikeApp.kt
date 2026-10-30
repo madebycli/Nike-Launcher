@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher
+package dev.nikelauncher
 
 import android.app.Application
-import dev.victorialauncher.data.AppRepository
-import dev.victorialauncher.data.IconPackRepository
-import dev.victorialauncher.data.CrashLog
-import dev.victorialauncher.data.Prefs
-import dev.victorialauncher.widget.ClockWidgetBattery
-import dev.victorialauncher.widget.VictoriaAppWidgetHost
+import dev.nikelauncher.data.AppRepository
+import dev.nikelauncher.data.IconPackRepository
+import dev.nikelauncher.data.CrashLog
+import dev.nikelauncher.data.Prefs
+import dev.nikelauncher.widget.ClockWidgetBattery
+import dev.nikelauncher.widget.NikeAppWidgetHost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-class VictoriaApp : Application() {
+class NikeApp : Application() {
 
     lateinit var prefs: Prefs
         private set
@@ -20,7 +20,7 @@ class VictoriaApp : Application() {
         private set
     lateinit var iconPackRepository: IconPackRepository
         private set
-    lateinit var widgetHost: VictoriaAppWidgetHost
+    lateinit var widgetHost: NikeAppWidgetHost
         private set
 
     /** Outlives any screen, for work that must finish even as the launcher is left behind. */
@@ -33,7 +33,7 @@ class VictoriaApp : Application() {
         prefs = Prefs(this)
         appRepository = AppRepository(this, prefs, appScope)
         iconPackRepository = IconPackRepository(this)
-        widgetHost = VictoriaAppWidgetHost(this, HOST_ID)
+        widgetHost = NikeAppWidgetHost(this, HOST_ID)
         // Nothing else keeps the clock widget's battery line current; see the object.
         ClockWidgetBattery.watch(this)
     }

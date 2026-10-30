@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.service
+package dev.nikelauncher.service
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter

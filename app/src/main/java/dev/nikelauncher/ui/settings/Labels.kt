@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.settings
+package dev.nikelauncher.ui.settings
 
 import androidx.annotation.StringRes
-import dev.victorialauncher.R
-import dev.victorialauncher.data.AppFont
-import dev.victorialauncher.data.AzStripVisibility
-import dev.victorialauncher.data.EdgeSide
-import dev.victorialauncher.data.ScrubStyle
-import dev.victorialauncher.data.ScrubBubbleShape
-import dev.victorialauncher.data.FavoritesSource
-import dev.victorialauncher.data.ShortcutSwipe
-import dev.victorialauncher.data.HomeAlignment
-import dev.victorialauncher.data.IconShape
-import dev.victorialauncher.data.IconSide
-import dev.victorialauncher.data.TextColorMode
+import dev.nikelauncher.R
+import dev.nikelauncher.data.AppFont
+import dev.nikelauncher.data.AzStripVisibility
+import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.data.ScrubStyle
+import dev.nikelauncher.data.ScrubBubbleShape
+import dev.nikelauncher.data.FavoritesSource
+import dev.nikelauncher.data.ShortcutSwipe
+import dev.nikelauncher.data.HomeAlignment
+import dev.nikelauncher.data.IconShape
+import dev.nikelauncher.data.IconSide
+import dev.nikelauncher.data.TextColorMode
 
 /**
  * Display labels for the settings chips.

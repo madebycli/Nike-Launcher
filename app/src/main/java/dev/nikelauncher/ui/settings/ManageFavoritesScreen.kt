@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.settings
+package dev.nikelauncher.ui.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -28,14 +28,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.Folder
-import dev.victorialauncher.data.PrivateSpace
-import dev.victorialauncher.data.concealsStored
-import dev.victorialauncher.data.folderIdFromToken
-import dev.victorialauncher.data.restoreConcealed
-import dev.victorialauncher.ui.common.AppIcon
-import dev.victorialauncher.R
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.Folder
+import dev.nikelauncher.data.PrivateSpace
+import dev.nikelauncher.data.concealsStored
+import dev.nikelauncher.data.folderIdFromToken
+import dev.nikelauncher.data.restoreConcealed
+import dev.nikelauncher.ui.common.AppIcon
+import dev.nikelauncher.R
 import androidx.compose.ui.res.stringResource
 
 /**

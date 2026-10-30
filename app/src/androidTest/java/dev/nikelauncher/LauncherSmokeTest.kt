@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher
+package dev.nikelauncher
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.UiDevice

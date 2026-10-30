@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.widget
+package dev.nikelauncher.widget
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
@@ -41,10 +41,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
-import dev.victorialauncher.R
+import dev.nikelauncher.R
 import androidx.compose.foundation.shape.CircleShape
-import dev.victorialauncher.ui.settings.ColorPickerDialog
-import dev.victorialauncher.ui.settings.FilledChip
+import dev.nikelauncher.ui.settings.ColorPickerDialog
+import dev.nikelauncher.ui.settings.FilledChip
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -57,11 +57,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.RadioButton
 import androidx.compose.foundation.layout.Row as LayoutRow
-import dev.victorialauncher.VictoriaApp
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.EntryKind
-import dev.victorialauncher.ui.settings.SliderRow
-import dev.victorialauncher.ui.theme.VictoriaTheme
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.EntryKind
+import dev.nikelauncher.ui.settings.SliderRow
+import dev.nikelauncher.ui.theme.NikeTheme
 import java.util.Date
 
 /**
@@ -89,7 +89,7 @@ class ClockWidgetConfigActivity : ComponentActivity() {
         setResult(Activity.RESULT_CANCELED, resultIntent())
 
         setContent {
-            VictoriaTheme {
+            NikeTheme {
                 var config by remember { mutableStateOf(ClockWidgetConfig.read(this, widgetId)) }
                 var pickingWeatherApp by remember { mutableStateOf(false) }
                 var editingDateFormat by remember { mutableStateOf(false) }
@@ -291,7 +291,7 @@ class ClockWidgetConfigActivity : ComponentActivity() {
      * dismissed, and an app installed while it is up is not worth a subscription.
      */
     private fun launchableApps(): List<AppInfo> = runCatching {
-        (application as VictoriaApp).appRepository.queryAllApps()
+        (application as NikeApp).appRepository.queryAllApps()
             .filter { it.kind == EntryKind.APP }
             .sortedBy { it.label.lowercase() }
     }.getOrDefault(emptyList())

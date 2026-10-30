@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.widget
+package dev.nikelauncher.widget
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -13,8 +13,8 @@ import android.provider.Settings
 import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
-import dev.victorialauncher.R
-import dev.victorialauncher.media.NotificationCountBus
+import dev.nikelauncher.R
+import dev.nikelauncher.media.NotificationCountBus
 
 /**
  * A clock and date, so a fresh launcher has something on it without hunting for a widget that

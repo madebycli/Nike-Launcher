@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.data
+package dev.nikelauncher.data
 
 import org.json.JSONArray
 import org.json.JSONObject

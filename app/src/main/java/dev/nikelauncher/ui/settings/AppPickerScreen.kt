@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.settings
+package dev.nikelauncher.ui.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -27,9 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import dev.victorialauncher.R
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.ui.common.AppIcon
+import dev.nikelauncher.R
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.ui.common.AppIcon
 
 /**
  * Pick one app, or none. Same shape as the favorites picker, with radio buttons because these

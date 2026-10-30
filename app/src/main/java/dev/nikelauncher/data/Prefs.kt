@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.data
+package dev.nikelauncher.data
 
 import android.content.Context
 import androidx.datastore.preferences.core.MutablePreferences
@@ -11,8 +11,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import dev.victorialauncher.ui.theme.DEFAULT_SHADOW_STRENGTH
-import dev.victorialauncher.ui.theme.SHADOW_STRENGTH_RANGE
+import dev.nikelauncher.ui.theme.DEFAULT_SHADOW_STRENGTH
+import dev.nikelauncher.ui.theme.SHADOW_STRENGTH_RANGE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -113,7 +113,7 @@ enum class IconShape { SYSTEM, CIRCLE, ROUNDED, SQUARE }
 /** When the A-Z strip shows on the home screen itself. */
 enum class AzStripVisibility { NEVER, LANDSCAPE, ALWAYS }
 
-private val Context.dataStore by preferencesDataStore(name = "victoria_prefs")
+private val Context.dataStore by preferencesDataStore(name = "nike_prefs")
 
 /** Bumped only if the shape of an exported file changes, so an old one can be refused. */
 private const val EXPORT_FORMAT = 1
@@ -286,7 +286,7 @@ class Prefs(private val context: Context) {
         }
         val json = JSONObject()
             .put("format", EXPORT_FORMAT)
-            .put("app", "Victoria Launcher")
+            .put("app", "Nike Launcher")
             .put("values", values)
             .toString(2)
         return ExportResult(json, omittedPrivateSpace)

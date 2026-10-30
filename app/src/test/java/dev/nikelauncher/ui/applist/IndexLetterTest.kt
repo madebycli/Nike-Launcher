@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.applist
+package dev.nikelauncher.ui.applist
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -43,7 +43,7 @@ class IndexLetterTest {
 
     @Test
     fun `alphabets that romanize land on their own letter`() {
-        // The examples from the report, checked against where Niagara files them.
+        // The examples from the report, checked against the filing rules.
         assertEquals('K', indexLetter("Калькулятор"))
         assertEquals('K', indexLetter("Календарь"))
         assertEquals('G', indexLetter("Галерея"))

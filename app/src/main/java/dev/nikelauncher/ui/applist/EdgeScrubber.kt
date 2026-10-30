@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.applist
+package dev.nikelauncher.ui.applist
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -24,9 +24,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.victorialauncher.data.EdgeSide
-import dev.victorialauncher.data.RippleParams
-import dev.victorialauncher.data.ScrubStyle
+import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.data.RippleParams
+import dev.nikelauncher.data.ScrubStyle
 import kotlinx.coroutines.flow.first
 import kotlin.math.abs
 import kotlin.math.exp

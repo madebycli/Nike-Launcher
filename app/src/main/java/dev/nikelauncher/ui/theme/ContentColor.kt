@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.theme
+package dev.nikelauncher.ui.theme
 
 import android.app.WallpaperManager
 import android.os.Build
@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import dev.victorialauncher.data.TextColorMode
+import dev.nikelauncher.data.TextColorMode
 
 private val LightText = Color(0xFFFFFFFF)
 private val DarkText = Color(0xFF10161C)

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher
+package dev.nikelauncher
 
 import android.content.Context
 import android.content.pm.LauncherApps
@@ -13,9 +13,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import dev.victorialauncher.data.Folder
-import dev.victorialauncher.data.Prefs
-import dev.victorialauncher.data.USER_TYPE_PROFILE_PRIVATE
+import dev.nikelauncher.data.Folder
+import dev.nikelauncher.data.Prefs
+import dev.nikelauncher.data.USER_TYPE_PROFILE_PRIVATE
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After

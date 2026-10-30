@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.applist
+package dev.nikelauncher.ui.applist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -38,8 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.victorialauncher.R
-import dev.victorialauncher.data.EdgeSide
+import dev.nikelauncher.R
+import dev.nikelauncher.data.EdgeSide
 import kotlin.math.roundToInt
 
 /**

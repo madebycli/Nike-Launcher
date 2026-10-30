@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.applist
+package dev.nikelauncher.ui.applist
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -73,7 +73,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.LocalTextStyle
-import dev.victorialauncher.ui.theme.launcherTextShadow
+import dev.nikelauncher.ui.theme.launcherTextShadow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -116,37 +116,37 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.EdgeSide
-import dev.victorialauncher.data.RippleParams
-import dev.victorialauncher.data.ScrubStyle
-import dev.victorialauncher.data.ScrubBubbleShape
-import dev.victorialauncher.data.EntryKind
-import dev.victorialauncher.data.Folder
-import dev.victorialauncher.data.folderToken
-import dev.victorialauncher.ui.home.FolderIcon
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.data.RippleParams
+import dev.nikelauncher.data.ScrubStyle
+import dev.nikelauncher.data.ScrubBubbleShape
+import dev.nikelauncher.data.EntryKind
+import dev.nikelauncher.data.Folder
+import dev.nikelauncher.data.folderToken
+import dev.nikelauncher.ui.home.FolderIcon
 import androidx.compose.material.icons.filled.Delete
-import dev.victorialauncher.data.PRIVATE_SPACE_UNLOCKED_CLASS
-import dev.victorialauncher.VictoriaApp
+import dev.nikelauncher.data.PRIVATE_SPACE_UNLOCKED_CLASS
+import dev.nikelauncher.NikeApp
 import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
 import androidx.compose.material.icons.filled.Add
-import dev.victorialauncher.data.HomeAlignment
-import dev.victorialauncher.data.IconSide
-import dev.victorialauncher.data.ShortcutSwipe
-import dev.victorialauncher.ui.common.AppIcon
-import dev.victorialauncher.ui.common.AppShortcutMenu
-import dev.victorialauncher.ui.common.swipeForShortcuts
-import dev.victorialauncher.ui.common.LocalIconConfig
-import dev.victorialauncher.ui.common.recordTouchPosition
-import dev.victorialauncher.ui.common.EditAppDialog
+import dev.nikelauncher.data.HomeAlignment
+import dev.nikelauncher.data.IconSide
+import dev.nikelauncher.data.ShortcutSwipe
+import dev.nikelauncher.ui.common.AppIcon
+import dev.nikelauncher.ui.common.AppShortcutMenu
+import dev.nikelauncher.ui.common.swipeForShortcuts
+import dev.nikelauncher.ui.common.LocalIconConfig
+import dev.nikelauncher.ui.common.recordTouchPosition
+import dev.nikelauncher.ui.common.EditAppDialog
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.first
 import kotlin.math.abs
 import kotlin.math.roundToInt
-import dev.victorialauncher.R
+import dev.nikelauncher.R
 import androidx.compose.ui.res.stringResource
 
 /**
@@ -1614,7 +1614,7 @@ private fun AppRow(
                     leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
                     onClick = {
                         onDismissMenu()
-                        val repo = (context.applicationContext as VictoriaApp).appRepository
+                        val repo = (context.applicationContext as NikeApp).appRepository
                         if (!repo.openPrivateSpaceStore(context)) {
                             Toast.makeText(context, R.string.private_space_install_failed, Toast.LENGTH_SHORT).show()
                         }
@@ -1628,7 +1628,7 @@ private fun AppRow(
                     leadingIcon = { Icon(Icons.Filled.Settings, contentDescription = null) },
                     onClick = {
                         onDismissMenu()
-                        val repo = (context.applicationContext as VictoriaApp).appRepository
+                        val repo = (context.applicationContext as NikeApp).appRepository
                         if (!repo.openPrivateSpaceSettings(context)) {
                             Toast.makeText(context, R.string.private_space_settings_failed, Toast.LENGTH_SHORT).show()
                         }

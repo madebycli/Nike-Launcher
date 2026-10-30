@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.widget
+package dev.nikelauncher.widget
 
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetHostView
@@ -13,7 +13,7 @@ import android.widget.TextView
 import java.util.Collections
 import java.util.WeakHashMap
 
-class VictoriaAppWidgetHost(context: Context, hostId: Int) : AppWidgetHost(context, hostId) {
+class NikeAppWidgetHost(context: Context, hostId: Int) : AppWidgetHost(context, hostId) {
 
     /**
      * The launcher's font, for our own clock (#123).

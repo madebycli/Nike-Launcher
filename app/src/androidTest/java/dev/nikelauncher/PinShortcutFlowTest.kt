@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher
+package dev.nikelauncher
 
 import android.app.ActivityManager
 import android.content.Intent
@@ -13,9 +13,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import dev.victorialauncher.data.EntryKeys
-import dev.victorialauncher.data.Prefs
-import dev.victorialauncher.shortcut.PinShortcutActivity
+import dev.nikelauncher.data.EntryKeys
+import dev.nikelauncher.data.Prefs
+import dev.nikelauncher.shortcut.PinShortcutActivity
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -61,7 +61,7 @@ class PinShortcutFlowTest {
     /**
      * Leaves the shared emulator the way this test class found it: pinShortcuts with every id
      * this class pinned removed unpins them all in one call (the same replace-the-whole-set
-     * shape [dev.victorialauncher.data.PinnedShortcuts] exists to get right elsewhere), and
+     * shape [dev.nikelauncher.data.PinnedShortcuts] exists to get right elsewhere), and
      * forgetEntry drops whatever favorites/name/icon/launch-count rows they left behind. The
      * orientation lock is undone unconditionally, even for a test that never touched it, since
      * it is shared state on this emulator and would otherwise leave every test after it running

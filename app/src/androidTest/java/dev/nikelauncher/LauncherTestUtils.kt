@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher
+package dev.nikelauncher
 
 import android.content.ComponentName
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import dev.victorialauncher.data.Prefs
+import dev.nikelauncher.data.Prefs
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
  *
  * Lives in the same package as [MainActivity] and resolves everything off the running
  * instrumentation (the target package name, the [MainActivity] class itself) rather than a
- * literal "dev.victorialauncher" string, so these keep working if the applicationId is ever
+ * literal "dev.nikelauncher" string, so these keep working if the applicationId is ever
  * renamed for a fork or a rebrand.
  */
 object LauncherTestUtils {
@@ -48,7 +48,7 @@ object LauncherTestUtils {
     }
 
     /**
-     * [dev.victorialauncher.ui.home.WelcomeDialog] covers the whole screen once, on a fresh
+     * [dev.nikelauncher.ui.home.WelcomeDialog] covers the whole screen once, on a fresh
      * install, and would otherwise eat the edge-swipe meant for the app list. A short wait
      * that finds nothing is the normal case on every run after the first.
      */

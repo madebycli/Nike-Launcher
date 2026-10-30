@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.media
+package dev.nikelauncher.media
 
 import android.app.ActivityOptions
 import android.app.PendingIntent

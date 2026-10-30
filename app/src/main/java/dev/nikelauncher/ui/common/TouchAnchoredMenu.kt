@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.common
+package dev.nikelauncher.ui.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope

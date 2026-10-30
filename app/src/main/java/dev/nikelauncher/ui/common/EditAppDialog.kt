@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.common
+package dev.nikelauncher.ui.common
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.victorialauncher.R
+import dev.nikelauncher.R
 import androidx.compose.ui.res.stringResource
 
 /** Rename an app or swap its icon. Shared by the home screen and the A-Z list. */
