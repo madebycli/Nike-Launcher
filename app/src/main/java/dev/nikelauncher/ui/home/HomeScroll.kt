@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.home
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.core.exponentialDecay
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.draggable
@@ -15,6 +14,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import kotlinx.coroutines.Job
+import dev.nikelauncher.ui.kit.motion.AppMotion
+import dev.nikelauncher.ui.home.scroll.draggedOffset
+import dev.nikelauncher.ui.home.scroll.settleTarget
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -48,11 +51,15 @@ internal class HomeScroll(
     private val peekPullPx: Float,
     private val deepPullPx: Float,
     private val quickLaunchPx: Float,
+    var motion: FiniteAnimationSpec<Float>,
 ) {
     /** Replaced on every composition, so the scroll itself outlives changes to what the gestures do. */
     var actions: GestureActions = actions
     var swipeUpOpensAppList: Boolean = swipeUpOpensAppList
-    val offsetY = Animatable(0f)
+    var offsetY by mutableFloatStateOf(0f)
+        private set
+    private var settling: Job? = null
+    private var dragging = false
     var viewportHeight by mutableIntStateOf(0)
     var contentHeight by mutableIntStateOf(0)
 
@@ -68,58 +75,68 @@ internal class HomeScroll(
     fun dragModifier(enabled: Boolean): Modifier = Modifier.draggable(
         orientation = Orientation.Vertical,
         enabled = enabled,
-        onDragStarted = {
-            rawPullDown = 0f
-            rawPullUp = 0f
-            pullActionFired = false
-            peekFired = false
-        },
+        onDragStarted = { beginDrag() },
         state = rememberDraggableState { delta -> onDrag(delta) },
-        onDragStopped = { velocity -> onDragStopped(velocity) },
+        onDragStopped = { velocity -> finishDrag(velocity) },
     )
 
-    private fun onDrag(delta: Float) {
-        // Undamped downward travel once already at the top drives the status-bar gestures; the
-        // damped offset would need more than a screen of dragging.
-        if (delta > 0f && offsetY.value >= -2f) {
-            rawPullDown += delta
-            if (!pullActionFired && rawPullDown > deepPullPx) {
-                pullActionFired = true
-                actions.onExpandShade()
-            } else if (!peekFired && rawPullDown > peekPullPx) {
-                peekFired = true
-                actions.onPeekStatusBar()
-            }
-        }
-        // The mirror of the pull-down, measured from the bottom of the stack. Reported as it
-        // happens rather than fired once, so the list can come in under the finger.
-        if (swipeUpOpensAppList && delta < 0f && offsetY.value <= minOffset + 2f) {
-            rawPullUp -= delta
-            actions.onSwipeUpDrag(rawPullUp, -delta)
-        }
-        scope.launch {
-            val next = offsetY.value + delta
-            val outOfBounds = next > 0f || next < minOffset
-            offsetY.snapTo(if (outOfBounds) offsetY.value + delta * 0.4f else next)
-        }
-    }
-
-    private suspend fun onDragStopped(velocity: Float) {
-        if (!pullActionFired && rawPullDown > peekPullPx && velocity > 2200f) actions.onExpandShade()
-        if (swipeUpOpensAppList && rawPullUp > 0f) actions.onSwipeUpEnd(velocity)
+    internal fun beginDrag() {
+        settling?.cancel()
+        dragging = true
         rawPullDown = 0f
         rawPullUp = 0f
         pullActionFired = false
         peekFired = false
+    }
 
-        val target = exponentialDecay<Float>(frictionMultiplier = 1.6f)
-            .calculateTargetValue(offsetY.value, velocity)
-            .coerceIn(minOffset, 0f)
-        offsetY.animateTo(
-            targetValue = target,
-            initialVelocity = velocity,
-            animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow),
-        )
+    internal fun onDrag(delta: Float) {
+        val before = offsetY
+        if (rawPullDown > 0f || before >= 0f) {
+            rawPullDown = (rawPullDown + delta).coerceAtLeast(0f)
+            if (!pullActionFired && rawPullDown >= deepPullPx) {
+                pullActionFired = true
+                actions.onExpandShade()
+            } else if (!pullActionFired && !peekFired && rawPullDown >= peekPullPx) {
+                peekFired = true
+                actions.onPeekStatusBar()
+            }
+        }
+        if (swipeUpOpensAppList && (rawPullUp > 0f || before <= minOffset)) {
+            rawPullUp = (rawPullUp - delta).coerceAtLeast(0f)
+            if (rawPullUp > 0f) actions.onSwipeUpDrag(rawPullUp, -delta)
+        }
+        // Apply the delta synchronously: one launched snapTo per event could cancel the rebound.
+        offsetY = draggedOffset(before, delta, minOffset, maxOf(peekPullPx, viewportHeight * .18f))
+    }
+
+    internal fun finishDrag(velocity: Float) {
+        dragging = false
+        if (!pullActionFired && rawPullDown >= peekPullPx && velocity > 2200f) actions.onExpandShade()
+        if (swipeUpOpensAppList && rawPullUp > 0f) actions.onSwipeUpEnd(velocity)
+        rawPullDown = 0f
+        rawPullUp = 0f
+        val target = settleTarget(offsetY, minOffset,
+            exponentialDecay<Float>(frictionMultiplier = 1.6f).calculateTargetValue(offsetY, velocity))
+        settleAt(target, velocity)
+    }
+
+    private fun settleAt(target: Float, velocity: Float = 0f) {
+        settling?.cancel()
+        settling = scope.launch {
+            animate(offsetY, target, initialVelocity = velocity, animationSpec = motion) { value, _ -> offsetY = value }
+            offsetY = target.coerceIn(minOffset, 0f)
+        }
+    }
+
+    fun boundsChanged() {
+        if (!dragging && (offsetY < minOffset || offsetY > 0f)) settleAt(offsetY.coerceIn(minOffset, 0f))
+    }
+
+    fun reset() {
+        dragging = false
+        rawPullUp = 0f
+        rawPullDown = 0f
+        settleAt(0f)
     }
 
     /** Sideways swipes in the empty space under the stack, when anything is bound to them. */
@@ -152,27 +169,24 @@ internal class HomeScroll(
     /** The stack, unbounded in height so it can be taller than the screen, and shifted by the drag. */
     fun contentModifier(): Modifier = Modifier
         .wrapContentHeight(align = Alignment.Top, unbounded = true)
-        .offset { IntOffset(0, offsetY.value.roundToInt()) }
+        .offset { IntOffset(0, offsetY.roundToInt()) }
 
     /** Back to the top, for when HOME is pressed on a home screen already showing. */
-    suspend fun scrollToTop() {
-        if (offsetY.value != 0f) {
-            offsetY.animateTo(0f, spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMedium))
-        }
+    fun scrollToTop() = reset()
+
+    /** Reveal real overflow; short stacks always have a single resting position. */
+    fun revealBelow(overflow: Float, topInView: Float) {
+        if (overflow <= 0f) return
+        settleAt((offsetY - minOf(overflow, topInView)).coerceIn(minOffset, 0f))
     }
 
-    /** Moves up by what is hidden below the screen, but never so far that [topInView] leaves the top. */
-    suspend fun revealBelow(overflow: Float, topInView: Float) {
-        if (overflow <= 0f) return
-        val target = (offsetY.value - minOf(overflow, topInView)).coerceIn(minOf(0f, (viewportHeight - contentHeight).toFloat()), 0f)
-        offsetY.animateTo(target, spring(stiffness = Spring.StiffnessMediumLow))
-    }
 }
 
 @Composable
 internal fun rememberHomeScroll(actions: GestureActions, swipeUpOpensAppList: Boolean, homeIntentTick: Int): HomeScroll {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
+    val motion = AppMotion.spatial<Float>()
     // Never keyed. A scroll made anew keeps the root's size only if the root is resized afterwards,
     // so one recreated on a settings change or on entering edit mode had a viewport of zero and put
     // every block at the top until something resized the screen. Whatever can change is copied in.
@@ -182,20 +196,19 @@ internal fun rememberHomeScroll(actions: GestureActions, swipeUpOpensAppList: Bo
             actions = actions,
             swipeUpOpensAppList = swipeUpOpensAppList,
             peekPullPx = with(density) { 30.dp.toPx() },
-            deepPullPx = with(density) { 200.dp.toPx() },
+            deepPullPx = with(density) { 120.dp.toPx() },
             quickLaunchPx = with(density) { 80.dp.toPx() },
+            motion = motion,
         )
     }
     SideEffect {
+        scroll.motion = motion
         scroll.actions = actions
         scroll.swipeUpOpensAppList = swipeUpOpensAppList
     }
     LaunchedEffect(homeIntentTick) { if (homeIntentTick > 0) scroll.scrollToTop() }
     // Turning the phone changes how much there is to scroll through: a stack dragged up in
     // landscape kept that offset when the screen went tall again, which left it above the top.
-    LaunchedEffect(scroll.minOffset) {
-        val settled = scroll.offsetY.value.coerceIn(scroll.minOffset, 0f)
-        if (settled != scroll.offsetY.value) scroll.offsetY.snapTo(settled)
-    }
+    LaunchedEffect(scroll.minOffset) { scroll.boundsChanged() }
     return scroll
 }

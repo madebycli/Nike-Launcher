@@ -158,3 +158,12 @@ whichever app is the current Home.
 - No generated Baseline Profile. Recording and validating one still needs a device.
 - Robolectric verifies real Compose layouts and simulated interactions. Device gesture velocity,
   notification-provider delivery, system-role dialogs, wallpaper and frame timing need phone checks.
+
+## Elastic home input
+
+HomeScroll applies pointer deltas synchronously and owns one cancelling/settling animation using
+the Material motion scheme. HomeStack reports actual content height rather than the constrained
+outer box. Short content rebounds to its boundary, including cancelled/interrupted gestures;
+real overflow still scrolls. Deep pull uses undamped travel and requests the existing shade action
+once. HomeScrollInteractionTest drives the real draggable/clock and records the accessibility
+global-action request through SystemUi with a Robolectric service; DragMathTest covers boundaries.

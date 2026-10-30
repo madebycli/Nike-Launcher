@@ -177,11 +177,11 @@ fun HomeScreen(
                     .widthIn(max = MAX_CONTENT_WIDTH)
                     .align(settings.alignment.wideScreenAlignment())
                     .fillMaxWidth()
-                    .then(if (editMode) Modifier.verticalScroll(editScroll) else scroll.contentModifier())
-                    .onSizeChanged { scroll.contentHeight = it.height },
+                    .then(if (editMode) Modifier.verticalScroll(editScroll) else scroll.contentModifier()),
             ) {
                 HomeStack(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = if (editMode) EDIT_BOTTOM_ROOM else 0.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = if (editMode) EDIT_BOTTOM_ROOM else 0.dp)
+                        .onSizeChanged { scroll.contentHeight = it.height },
                     viewportHeightPx = { scroll.viewportHeight },
                     bottomInsetPx = { bottomInsetPx },
                     pins = { editor.pins },
