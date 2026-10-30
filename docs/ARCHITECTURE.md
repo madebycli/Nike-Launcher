@@ -139,3 +139,13 @@ HomeGestureZones draws Canvas rectangles and stock Material badges without point
 below the nudge panel and toolbar. Pure GestureZoneGeometry follows edge insets, band confinement,
 corner keep-out and quick-launch region. Direction labels use resources in all six locales.
 HomeScreensTest exercises controls through the overlay; frame chips use filled Material colours.
+
+## Notification presentation
+
+NotificationSheet owns live state; NotificationSheetContent is the real presentation with an
+injectable controller. NotificationChat keeps provider order while grouping authors and pauses.
+MessageBubble and NotificationDismissBox use Material swipe dismissal; stable message keys keep
+hiding local to the chosen bubble. NotificationHistory follows newest messages until scrolled away.
+NotificationReply keeps action/result-key identity through updates and requires explicit retargeting.
+Provider metadata supplies action icons, and large pictures decode off-thread up to 1024px.
+NotificationScreensTest covers overview, conversation, replies and invented image attachments.

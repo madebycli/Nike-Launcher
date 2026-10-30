@@ -33,7 +33,7 @@ import dev.nikelauncher.media.NotificationPreview
 internal fun NotificationOverview(
     notifications: List<NotificationPreview>,
     onSelect: (NotificationPreview) -> Unit,
-    onDismiss: (NotificationPreview) -> Unit,
+    onDismiss: (NotificationPreview) -> Boolean,
     onClearAll: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -56,6 +56,7 @@ internal fun NotificationOverview(
         val now = remember(notifications) { System.currentTimeMillis() }
         LazyColumn(Modifier.fillMaxWidth()) {
             items(notifications, key = { it.key }) { preview ->
+                NotificationDismissBox(preview, onDismiss) {
                 Row(
                     Modifier.fillMaxWidth().clickable { onSelect(preview) }.padding(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -90,6 +91,7 @@ internal fun NotificationOverview(
                     IconButton(onClick = { onDismiss(preview) }) {
                         Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.notification_dismiss), modifier = Modifier.size(20.dp))
                     }
+                }
                 }
             }
         }

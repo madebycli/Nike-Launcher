@@ -1,96 +1,49 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.notifications
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.R
 import dev.nikelauncher.media.NotificationPreview
 import kotlinx.coroutines.delay
 
-/** One notification in full: its picture, the conversation, its own actions, and a way to answer. */
-@OptIn(ExperimentalLayoutApi::class)
+/** The header and fixed composer surround a scrollable notification or conversation. */
 @Composable
-internal fun NotificationDetail(
-    preview: NotificationPreview,
-    controller: NotificationController,
-    onBack: () -> Unit,
-    onClose: () -> Unit,
-) {
+internal fun NotificationDetail(preview: NotificationPreview, controller: NotificationController, onBack: () -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
     var failed by remember { mutableStateOf(false) }
-    // The failure line is a moment's feedback, not a state to keep.
     LaunchedEffect(failed) { if (failed) { delay(4000); failed = false } }
     val report: (Boolean) -> Unit = { ok -> if (!ok) failed = true }
     val title = preview.title.ifBlank { appLabel(context, preview.packageName) }
-    val picture = notificationBitmap(preview.picture)
-    // Actions that are only a button; the ones that take text are the reply field below.
-    val buttons = preview.actions.filter { it.inputs.isEmpty() && it.title.isNotBlank() }
-
+    val open = {
+        val destination = preview.contentIntent
+        val opened = if (destination != null) controller.open(preview, destination) else controller.launchApp(preview.packageName)
+        if (opened) onClose() else failed = true
+    }
     Column(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back)) }
             SenderAvatar(title, preview.conversationIcon ?: preview.smallIcon, 32.dp)
-            Text(title, Modifier.weight(1f).padding(horizontal = 12.dp), style = MaterialTheme.typography.titleMedium, maxLines = 1)
+            Text(title, Modifier.weight(1f).padding(horizontal = 12.dp), style = MaterialTheme.typography.titleMedium,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
             IconButton(onClick = { if (controller.dismiss(preview)) onBack() else failed = true }) {
                 Icon(Icons.Outlined.Close, stringResource(R.string.notification_dismiss))
             }
         }
-        Column(
-            Modifier.weight(1f, fill = false).heightIn(min = 120.dp).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            picture?.let {
-                Image(it, null, Modifier.fillMaxWidth().heightIn(max = 240.dp), contentScale = ContentScale.Fit)
-            }
-            if (preview.messages.isNotEmpty()) NotificationMessages(preview.key, preview.messages) else if (preview.text.isNotBlank()) {
-                Text(preview.text, style = MaterialTheme.typography.bodyLarge)
-            }
-            if (failed) {
-                Text(stringResource(R.string.notification_failed), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-            }
-        }
-        NotificationReply(preview, controller, report, Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
-        FlowRow(
-            Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            buttons.forEach { action ->
-                OutlinedButton(onClick = { report(controller.run(preview, action.intent)) }) { Text(action.title) }
-            }
-            val destination = preview.contentIntent
-            Button(onClick = { if (destination != null) { report(controller.open(preview, destination)); onClose() } else report(controller.launchApp(preview.packageName)) }) {
-                Text(stringResource(R.string.notification_open))
-            }
-        }
+        NotificationHistory(preview, Modifier.weight(1f, fill = false), open)
+        if (failed) Text(stringResource(R.string.notification_failed), Modifier.padding(horizontal = 16.dp),
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+        NotificationActions(preview, controller, open, report)
+        NotificationReply(preview, controller, report, Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
     }
 }

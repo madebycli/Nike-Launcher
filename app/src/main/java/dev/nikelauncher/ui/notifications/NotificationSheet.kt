@@ -3,13 +3,6 @@ package dev.nikelauncher.ui.notifications
 
 import android.content.Intent
 import android.provider.Settings
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,12 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -45,7 +36,6 @@ import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.media.NotificationPreviewBus
 import dev.nikelauncher.media.NowPlayingListenerService
 import dev.nikelauncher.media.isListenerEnabled
-import dev.nikelauncher.ui.kit.motion.AppMotion
 import kotlinx.coroutines.launch
 
 /** Whether notification access is granted, read again every time the app comes back to the front. */
@@ -90,17 +80,8 @@ internal fun NotificationSheet(
     val shown = remember(notifications, app) { notifications.filter { app == null || it.packageName == app.packageName } }
     val controller = remember(context) { BusNotificationController(context) }
     val scope = rememberCoroutineScope()
-    var selected by rememberSaveable { mutableStateOf(initialKey) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val available = enabled && access
-    val current = shown.firstOrNull { it.key == selected }
-
-    // A page whose notification has gone, or access that has been taken away, goes back to the list.
-    LaunchedEffect(current == null) { if (current == null) selected = null }
-    BackHandler(enabled = selected != null) { selected = null }
-
-    val effects = AppMotion.effects<Float>()
-    val offset = AppMotion.offset()
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(Modifier.fillMaxWidth().heightIn(max = (LocalConfiguration.current.screenHeightDp * .83f).dp)) {
             if (!available) {
@@ -111,31 +92,7 @@ internal fun NotificationSheet(
                     }) { Text(stringResource(R.string.notification_allow_access)) }
                 }
             } else {
-                AnimatedContent(
-                    targetState = current,
-                    transitionSpec = {
-                        val forward = targetState != null
-                        (slideInHorizontally(offset) { if (forward) it / 4 else -it / 4 } + fadeIn(effects)) togetherWith
-                            (slideOutHorizontally(offset) { if (forward) -it / 4 else it / 4 } + fadeOut(effects))
-                    },
-                    label = "notificationPage",
-                ) { preview ->
-                    if (preview == null) {
-                        NotificationOverview(
-                            notifications = shown,
-                            onSelect = { selected = it.key },
-                            onDismiss = { controller.dismiss(it) },
-                            onClearAll = { shown.forEach { controller.dismiss(it) } },
-                        )
-                    } else {
-                        NotificationDetail(
-                            preview = preview,
-                            controller = controller,
-                            onBack = { selected = null },
-                            onClose = onDismiss,
-                        )
-                    }
-                }
+                NotificationSheetContent(shown, initialKey, controller, onDismiss)
             }
         }
     }

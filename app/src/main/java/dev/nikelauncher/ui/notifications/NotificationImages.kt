@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,17 +41,17 @@ private const val ICON_PX = 128
 
 /** An icon from a notification, loaded off the main thread: photos can mean Binder or disk work. */
 @Composable
-internal fun notificationBitmap(icon: Icon?): ImageBitmap? {
+internal fun notificationBitmap(icon: Icon?, maxSizePx: Int = ICON_PX): ImageBitmap? {
     val context = LocalContext.current.applicationContext
     // Keyed as well as the loader, so a replaced photo never draws its predecessor.
-    val bitmap by key(context, icon) {
+    val bitmap by key(context, icon, maxSizePx) {
         produceState<ImageBitmap?>(null) {
             value = withContext(Dispatchers.IO) {
                 runCatching {
                     val drawable = icon?.loadDrawable(context) ?: return@runCatching null
                     val width = drawable.intrinsicWidth.coerceAtLeast(1)
                     val height = drawable.intrinsicHeight.coerceAtLeast(1)
-                    val scale = ICON_PX.toFloat() / maxOf(width, height)
+                    val scale = minOf(1f, maxSizePx.toFloat() / maxOf(width, height))
                     drawable.toBitmap((width * scale).toInt().coerceAtLeast(1), (height * scale).toInt().coerceAtLeast(1)).asImageBitmap()
                 }.getOrNull()
             }
