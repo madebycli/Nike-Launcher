@@ -1,7 +1,7 @@
 # Architecture
 
 Nike Launcher is a single-module Android home-screen launcher: Kotlin, Jetpack
-Compose, `minSdk 26`, `compileSdk`/`targetSdk 35`. No network permission, no
+Compose, `minSdk 26`, `compileSdk`/`targetSdk 37`. No network permission, no
 analytics, no ads, no accounts.
 
 ## Package layout (`dev.nikelauncher`)
@@ -29,7 +29,8 @@ ui/
   common/AppIcon.kt             icon rasterisation and the bounded bitmap cache
   common/…                      shared dialogs, icon picker, touch-position modifier
   settings/…                    settings screen and the three picker screens
-  theme/                        Material theme, font mapping, wallpaper-aware text color
+  theme/                        Material 3 Expressive theme, fonts, wallpaper-aware text color
+  kit/                          shared building blocks: motion, menu, settings rows (see docs/COMPONENTS.md)
 media/                          notification-listener service + Now Playing card
 service/                        haptics, status-bar fader, accessibility service, system UI
 widget/                         AppWidgetHost, widget slot, widget picker

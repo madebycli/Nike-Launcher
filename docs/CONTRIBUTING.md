@@ -2,7 +2,7 @@
 
 ## Building
 
-You need JDK 17 and an Android SDK with platform 35.
+You need JDK 17 and an Android SDK with platform 37.
 
 ```sh
 export ANDROID_HOME=/path/to/android-sdk   # or create local.properties with sdk.dir=...

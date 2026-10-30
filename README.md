@@ -63,7 +63,7 @@ shape of the answer.
 
 ## Build
 
-You need JDK 17 and an Android SDK with platform 35.
+You need JDK 17 and an Android SDK with platform 37.
 
 ```sh
 ./gradlew assembleDebug
