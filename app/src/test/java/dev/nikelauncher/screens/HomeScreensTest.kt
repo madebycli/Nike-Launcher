@@ -45,6 +45,14 @@ class HomeScreensTest {
         rule.onNodeWithText("Done").performClick()
         rule.waitUntil(15_000) { rule.onAllNodesWithText("All set").fetchSemanticsNodes().isEmpty() }
         rule.shoot("h1-home")
+        rule.onAllNodesWithText("Calendar").onFirst().performTouchInput { longClick() }
+        rule.waitForIdle()
+        rule.shoot("h1b-app-menu")
+        rule.onAllNodesWithText("Edit icon & name").onFirst().performClick()
+        rule.waitForIdle()
+        rule.shoot("h1c-edit-app")
+        rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        rule.waitForIdle()
         rule.onRoot().performTouchInput { longClick(Offset(width / 2f, height * 0.85f)) }
         rule.onAllNodesWithText("Edit layout").onFirst().performClick()
         rule.waitForIdle()

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LinkOff
+import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.MaterialTheme
@@ -170,7 +171,7 @@ internal fun FavoriteRow(
             if (app.kind == EntryKind.SHORTCUT) {
                 item(stringResource(R.string.action_remove_shortcut), menu.onUnpin, leadingIcon = Icons.Filled.LinkOff)
             }
-            item(stringResource(R.string.action_remove), menu.onRemove, leadingIcon = Icons.Filled.Delete, destructive = true)
+            item(stringResource(R.string.action_remove), menu.onRemove, leadingIcon = Icons.Filled.RemoveCircleOutline)
             gap()
             item(stringResource(R.string.action_edit_icon_and_name), menu.onEditIconName, leadingIcon = Icons.Filled.Tune)
             item(stringResource(R.string.action_open_settings), menu.onOpenSettings, leadingIcon = Icons.Filled.Settings)
