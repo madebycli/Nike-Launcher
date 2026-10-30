@@ -105,6 +105,8 @@ fun HomeRoute(
     /** Locks an open private space or asks for a locked one to be opened, off this thread. */
     onTogglePrivateSpace: () -> Unit,
     onNavigate: (String) -> Unit,
+    cornerPlacement: Boolean = false,
+    onCornerPlacementClose: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -194,7 +196,7 @@ fun HomeRoute(
         if (typedToSearch.isEmpty()) return@LaunchedEffect
         val taken = typedToSearch
         onTypedToSearchHandled(taken)
-        if (!settings.appListSearch || homeEditMode || bands.editing) return@LaunchedEffect
+        if (settings.searchDisplayMode == dev.nikelauncher.data.prefs.SearchDisplayMode.NONE || homeEditMode || bands.editing) return@LaunchedEffect
         if (!controller.visible) controller.openFully()
         controller.query = taken.fold(controller.query) { text, key -> if (key.char == null) text.dropLast(1) else text + key.char }
     }
@@ -278,6 +280,7 @@ fun HomeRoute(
             ) {
                 HomeScreen(
                     settings = settings,
+                    showCornerButton = !cornerPlacement,
                     data = data.copy(nowPlayingHasContent = settings.nowPlayingEnabled && (!listenerGranted || nowPlaying != null)),
                     actions = actions,
                     homeIntentTick = homeIntentTick,
@@ -353,5 +356,14 @@ fun HomeRoute(
                 } else null,
             )
         }
+        if (cornerPlacement) {
+            val cornerSettings by app.prefs.corner.settings.collectAsState(null)
+            cornerSettings?.let { current ->
+                dev.nikelauncher.ui.home.corner.CornerPlacement(current, cornerApp, settings.alignment, settings.contentColor,
+                    onSave = { position -> scope.launch { app.prefs.corner.setPosition(position); kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main.immediate) { onCornerPlacementClose() } } },
+                    onCancel = onCornerPlacementClose)
+            }
+        }
+
     }
 }

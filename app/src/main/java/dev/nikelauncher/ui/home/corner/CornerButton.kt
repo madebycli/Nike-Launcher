@@ -8,6 +8,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import dev.nikelauncher.data.CornerPosition
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -93,7 +101,12 @@ internal fun BoxScope.CornerButton(
     val configureLabel = stringResource(R.string.corner_configure)
     val swipeLabel = stringResource(R.string.corner_swipe_up)
 
-    if (settings.enabled) {
+    if (settings.enabled) BoxWithConstraints(Modifier.fillMaxSize()) {
+        val density = LocalDensity.current
+        val insets = WindowInsets.safeDrawing
+        val travel = cornerTravel(constraints.maxWidth, constraints.maxHeight, with(density) { settings.sizeDp.dp.roundToPx() },
+            with(density) { 20.dp.roundToPx() }, insets.getTop(density), insets.getBottom(density) + with(density) { 24.dp.roundToPx() })
+        val location = settings.position?.let(travel::location)
         CornerButtonFace(
             shape = settings.shape,
             sizeDp = settings.sizeDp,
@@ -101,13 +114,11 @@ internal fun BoxScope.CornerButton(
             app = cornerApp,
             overWallpaper = contentColor,
             appearance = settings.appearance,
-            modifier = Modifier
-                .align(if (alignment == HomeAlignment.RIGHT) Alignment.BottomStart else Alignment.BottomEnd)
-                .navigationBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 24.dp)
+            modifier = (if (location != null) Modifier.offset { IntOffset(location.first, location.second) }
+                else Modifier.align(if (alignment == HomeAlignment.RIGHT) Alignment.BottomStart else Alignment.BottomEnd)
+                    .navigationBarsPadding().padding(horizontal = 20.dp, vertical = 24.dp))
                 // Reported so the swipe edge can stop short of it, or a tap on it opens the list instead.
                 .onGloballyPositioned { corner.onBounds(it.boundsInWindow()) }
-                .clip(CircleShape)
                 .semantics {
                     customActions = listOf(
                         CustomAccessibilityAction(configureLabel) { configure = true; true },
@@ -135,7 +146,7 @@ internal fun BoxScope.CornerButton(
     }
 
     if (configure) {
-        CornerSettingsSheet(cornerApp?.label, contentColor, onPickApp = { configure = false; corner.onPickApp() }, onDismiss = { configure = false })
+        CornerSettingsSheet(cornerApp?.label, contentColor, onPickApp = { configure = false; corner.onPickApp() }, onPlace = { configure = false; corner.onPlace() }, onDismiss = { configure = false })
     }
     if (menu) {
         CornerActionSheet(cornerApp?.label, onDismiss = { menu = false }, onAction = ::perform, onConfigure = { configure = true })

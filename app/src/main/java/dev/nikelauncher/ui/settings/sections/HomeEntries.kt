@@ -18,6 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import dev.nikelauncher.R
+import dev.nikelauncher.ui.home.corner.label
+import dev.nikelauncher.data.CornerAction
 import dev.nikelauncher.data.FREQUENT_RANGE
 import dev.nikelauncher.data.FavoritesSource
 import dev.nikelauncher.ui.kit.settings.ChoiceChips
@@ -48,6 +50,14 @@ internal fun homeEntries(env: SettingsEnv): List<SettingsEntry> {
     val rotationPref by home.allowRotation.collectAsState(null)
     val rotation = rotationPref ?: (LocalConfiguration.current.smallestScreenWidthDp >= 600)
     val compactTap by appearance.compactTapArea.collectAsState(false)
+    val cornerState by env.prefs.corner.settings.collectAsState(null)
+    val corner = cornerState
+    val cornerValue = when {
+        corner == null -> stringResource(R.string.corner_action_menu)
+        !corner.enabled -> stringResource(R.string.search_mode_none)
+        corner.tap == CornerAction.APP -> env.cornerButtonLabel ?: stringResource(R.string.widget_settings_choose_app)
+        else -> stringResource(corner.tap.label)
+    }
 
     return listOf(
         SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_favorites_source), icon = Icons.Filled.Star) {
@@ -87,7 +97,7 @@ internal fun homeEntries(env: SettingsEnv): List<SettingsEntry> {
             )
         }, "dim wallpaper"),
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_allow_rotation), rotation, { env.write { home.setAllowRotation(it) } }, value = stringResource(R.string.settings_allow_rotation_detail), icon = Icons.Filled.ScreenRotation), "landscape rotate"),
-        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_corner_button), env.nav.onCornerPicker, value = env.cornerButtonLabel ?: stringResource(R.string.settings_quick_launch_none), icon = Icons.Filled.TouchApp), "button shortcut corner"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_corner_button), env.nav.onCornerSettings, value = cornerValue, icon = Icons.Filled.TouchApp), "button shortcut corner"),
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_compact_tap), compactTap, { env.write { appearance.setCompactTapArea(it) } }, value = stringResource(R.string.settings_compact_tap_detail), icon = Icons.Filled.Compress), "tap area accidental launch empty"),
     )
 }

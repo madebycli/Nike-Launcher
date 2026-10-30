@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,8 @@ import kotlinx.coroutines.flow.map
 class CornerPrefs internal constructor(private val store: DataStore<Preferences>) {
 
     private object Keys {
+        val POSITION_X = floatPreferencesKey("corner_position_x")
+        val POSITION_Y = floatPreferencesKey("corner_position_y")
         val ENABLED = booleanPreferencesKey("corner_enabled")
         val TAP = stringPreferencesKey("corner_tap")
         val SWIPE = stringPreferencesKey("corner_swipe")
@@ -42,6 +45,7 @@ class CornerPrefs internal constructor(private val store: DataStore<Preferences>
     val settings: Flow<CornerSettings> = store.data.map { pref ->
         CornerSettings(
             enabled = pref[Keys.ENABLED] ?: true,
+            position = cornerPosition(pref[Keys.POSITION_X], pref[Keys.POSITION_Y]),
             // A phone that already had an app or the search chosen keeps doing exactly that.
             tap = pref[Keys.TAP]?.let { runCatching { CornerAction.valueOf(it) }.getOrNull() }
                 ?: when (pref[Keys.BUTTON_KEY]) {
@@ -62,6 +66,14 @@ class CornerPrefs internal constructor(private val store: DataStore<Preferences>
             ),
         )
     }.distinctUntilChanged()
+
+    suspend fun setPosition(position: CornerPosition?) {
+        store.edit {
+            val value = position?.let { p -> cornerPosition(p.x, p.y) }
+            if (value == null) { it.remove(Keys.POSITION_X); it.remove(Keys.POSITION_Y) }
+            else { it[Keys.POSITION_X] = value.x; it[Keys.POSITION_Y] = value.y }
+        }
+    }
 
     suspend fun setEnabled(v: Boolean) = store.edit { it[Keys.ENABLED] = v }.let { }
     suspend fun setTap(v: CornerAction) = store.edit { it[Keys.TAP] = v.name }.let { }

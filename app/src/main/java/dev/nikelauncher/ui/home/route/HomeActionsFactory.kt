@@ -167,6 +167,7 @@ internal fun rememberHomeActions(
                 onBounds = hooks.setCornerBounds,
                 onOpenSettings = { hooks.onNavigate("settings") },
                 onPickApp = { hooks.onNavigate("cornerpicker") },
+                onPlace = { hooks.onNavigate("corner/place") },
             ),
         )
     }

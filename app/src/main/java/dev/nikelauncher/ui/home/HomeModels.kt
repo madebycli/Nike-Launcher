@@ -118,4 +118,5 @@ class CornerActions(
     val onOpenSettings: () -> Unit,
     /** Opens the screen where the app the button launches is chosen. */
     val onPickApp: () -> Unit,
+    val onPlace: () -> Unit = {},
 )

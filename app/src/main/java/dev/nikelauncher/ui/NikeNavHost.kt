@@ -8,6 +8,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
+import dev.nikelauncher.ui.kit.motion.AppMotion
+import dev.nikelauncher.ui.kit.motion.sharedAxisEnter
+import dev.nikelauncher.ui.kit.motion.sharedAxisExit
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -88,11 +91,12 @@ fun NikeNavHost(
         if (homeIntentTick > 0 && nav.currentDestination?.route != "home") nav.popBackStack("home", inclusive = false)
     }
 
-    NavHost(navController = nav, startDestination = "home") {
-        composable("home") {
+    @Composable fun HomeDestination(placing: Boolean = false) {
             HomeRoute(
                 app = app,
                 homeIntentTick = homeIntentTick,
+                cornerPlacement = placing,
+                onCornerPlacementClose = { nav.popBackStack() },
                 settings = settings,
                 data = HomeData(
                     favorites = favorites,
@@ -121,8 +125,27 @@ fun NikeNavHost(
                 onTogglePrivateSpace = apps::togglePrivateSpace,
                 onNavigate = { route -> nav.navigate(route) },
             )
-        }
+    }
 
+    val spatial = AppMotion.offset()
+    val effects = AppMotion.effects<Float>()
+    NavHost(navController = nav, startDestination = "home",
+        enterTransition = { sharedAxisEnter(true, spatial, effects) },
+        exitTransition = { sharedAxisExit(true, spatial, effects) },
+        popEnterTransition = { sharedAxisEnter(false, spatial, effects) },
+        popExitTransition = { sharedAxisExit(false, spatial, effects) },
+    ) {
+        composable("home") { HomeDestination() }
+        composable("corner/place") { HomeDestination(placing = true) }
+        composable("corner/settings") {
+            dev.nikelauncher.ui.home.corner.CornerSettingsSheet(
+                appLabel = library.cornerButtonKey?.let { appsByKey[it]?.label },
+                overWallpaper = settings.contentColor,
+                onPickApp = { nav.navigate("cornerpicker") },
+                onPlace = { nav.navigate("corner/place") },
+                onDismiss = { nav.popBackStack() },
+            )
+        }
         composable("settings") {
             SettingsRoute(
                 app = app,
@@ -135,6 +158,7 @@ fun NikeNavHost(
                     onFavorites = { nav.navigate("favorites") },
                     onQuickLaunchPicker = { slot -> nav.navigate("apppicker/" + slot.name) },
                     onCornerPicker = { nav.navigate("cornerpicker") },
+                    onCornerSettings = { nav.navigate("corner/settings") },
                 ),
                 onBack = { nav.popBackStack() },
             )

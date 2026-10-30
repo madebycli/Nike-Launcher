@@ -91,6 +91,7 @@ fun HomeScreen(
     onEditModeChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     editOverlay: @Composable () -> Unit = {},
+    showCornerButton: Boolean = true,
 ) {
     val density = LocalDensity.current
     val view = LocalView.current
@@ -289,7 +290,7 @@ fun HomeScreen(
                 }
             }
 
-            if (!editMode) {
+            if (!editMode && showCornerButton) {
                 CornerButton(
                     corner = actions.corner,
                     alignment = settings.alignment,

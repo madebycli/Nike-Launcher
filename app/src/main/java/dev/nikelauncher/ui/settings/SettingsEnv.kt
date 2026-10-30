@@ -15,6 +15,7 @@ class SettingsNav(
     val onFavorites: () -> Unit,
     val onQuickLaunchPicker: (QuickLaunchSlot) -> Unit,
     val onCornerPicker: () -> Unit,
+    val onCornerSettings: () -> Unit = onCornerPicker,
 )
 
 /** What a settings row can ask the rest of the app to do. */

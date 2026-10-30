@@ -40,6 +40,7 @@ data class CornerSettings(
     val shape: CornerShape,
     val sizeDp: Int,
     val appearance: CornerAppearance,
+    val position: CornerPosition? = null,
 )
 
 val CORNER_SIZE_RANGE = 48..72

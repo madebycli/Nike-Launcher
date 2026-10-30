@@ -211,3 +211,9 @@ segmented Material rows as candidates, with tonal remove/drag buttons and access
 SearchPrefs provides exclusive None/Button/Bar by atomically writing the existing two booleans;
 legacy conflicts prefer Bar. search_button_at_bottom is independent of the permanent bar edge.
 No persisted key was renamed or retyped; optional keys remain in typed backup format 2.
+
+Home settings always open the complete corner settings, including Enabled, and display the actual
+action rather than an absent app name. A separate home-backed placement route keeps Reset/Back in
+a draft; Done atomically saves corner_position_x/y as normalized travel fractions. Pure geometry
+keeps the whole button within insets on resize. SharedAxis adapts full-container forward/pop slide
+and fade from the attributed settings reference, using Material motion specs.

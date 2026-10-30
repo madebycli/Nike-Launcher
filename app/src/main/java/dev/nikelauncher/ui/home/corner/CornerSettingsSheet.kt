@@ -61,6 +61,7 @@ internal fun CornerSettingsSheet(
     overWallpaper: Color,
     onPickApp: () -> Unit,
     onDismiss: () -> Unit,
+    onPlace: () -> Unit = {},
 ) {
     val prefs = (LocalContext.current.applicationContext as NikeApp).prefs.corner
     val settings by prefs.settings.collectAsState(null)
@@ -83,6 +84,9 @@ internal fun CornerSettingsSheet(
     val badgeTitle = stringResource(R.string.corner_badge)
     val tapLabel = stringResource(current.tap.label)
     val swipeLabel = stringResource(current.swipe.label)
+    val placeTitle = stringResource(R.string.corner_place)
+    val sizeValue = stringResource(R.string.edit_value_dp, current.sizeDp)
+    val opacityValue = stringResource(R.string.widget_clock_battery_percent, appearance.backgroundOpacity)
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(Modifier.fillMaxWidth().heightIn(max = LocalConfiguration.current.screenHeightDp.dp * .85f)) {
@@ -94,6 +98,7 @@ internal fun CornerSettingsSheet(
             ) {
             SettingsGroup {
                 switchItem(enabledTitle, current.enabled, { v -> scope.launch { prefs.setEnabled(v) } }, icon = Icons.Outlined.TouchApp)
+                item(placeTitle, { scope.launch { sheetState.hide(); onPlace() } }, icon = Icons.Outlined.TouchApp)
                 item(tapTitle, { chooser = Chooser.TAP }, icon = current.tap.icon, value = tapLabel)
                 item(swipeTitle, { chooser = Chooser.SWIPE }, icon = current.swipe.icon, value = swipeLabel)
                 item(appTitle, { scope.launch { sheetState.hide(); onPickApp() } }, icon = Icons.Outlined.Apps, value = appLabel ?: chooseApp)
@@ -114,7 +119,7 @@ internal fun CornerSettingsSheet(
                 onSelect = { scope.launch { prefs.setShape(it) } },
             )
             SettingsGroup {
-                block(sizeTitle, value = "${current.sizeDp} dp") {
+                block(sizeTitle, value = sizeValue) {
                     SettingsSlider(current.sizeDp.toFloat(), CORNER_SIZE_RANGE.first.toFloat()..CORNER_SIZE_RANGE.last.toFloat(), { v -> scope.launch { prefs.setSize(v.toInt()) } })
                 }
             }
@@ -143,7 +148,7 @@ internal fun CornerSettingsSheet(
                         item(iconColorTitle, { chooser = Chooser.FOREGROUND }, icon = Icons.Outlined.FormatColorText, value = "#%06X".format(appearance.foreground and 0xFFFFFF))
                     }
                 }
-                block(opacityTitle, value = "${appearance.backgroundOpacity}%") {
+                block(opacityTitle, value = opacityValue) {
                     SettingsSlider(appearance.backgroundOpacity.toFloat(), 0f..100f, { v -> scope.launch { prefs.setBackgroundOpacity(v.toInt()) } }, step = 5f)
                 }
             }
