@@ -68,7 +68,6 @@ class ProjectRulesTest {
 
         val LEGACY_ROUNDED_SHAPES = setOf(
             "ui/common/IconPickerScreen.kt",
-            "ui/applist/AppListScreen.kt",
             "ui/applist/BandEditOverlay.kt",
             "media/NowPlayingWidget.kt",
             "widget/WidgetSlot.kt",
@@ -77,7 +76,7 @@ class ProjectRulesTest {
         val LEGACY_TEXT_LITERALS = emptySet<String>()
 
         val LEGACY_FILE_CAPS = mapOf(
-            "ui/applist/AppListScreen.kt" to 1866,
+            "ui/applist/AppListScreen.kt" to 540,
             "data/AppRepository.kt" to 745,
                     )
     }
