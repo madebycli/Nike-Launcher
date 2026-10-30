@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * What's currently playable, if anything. A session only counts while it is playing, paused
  * or buffering — a stopped or empty session publishes null so the home screen collapses the
- * block entirely rather than reserving space for nothing.
+ * card while its home layout field keeps its configured space.
  */
 data class NowPlaying(
     val title: String,

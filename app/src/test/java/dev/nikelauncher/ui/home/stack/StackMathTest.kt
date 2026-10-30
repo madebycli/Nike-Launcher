@@ -25,7 +25,7 @@ class StackMathTest {
         assertEquals(0, placed.tops.getValue(HomeBlock.WIDGET))
         assertEquals(360 + gap, placed.tops.getValue(HomeBlock.NOW_PLAYING))
         assertEquals(360 + gap + 128 + gap, placed.tops.getValue(HomeBlock.FAVORITES))
-        assertEquals(360 + gap + 128 + gap + 600, placed.contentHeightPx)
+        assertEquals(360 + gap + 128 + gap + 600 + inset, placed.contentHeightPx)
     }
 
     @Test fun absentBlockTakesNoSpace() {
@@ -48,17 +48,18 @@ class StackMathTest {
         assertEquals(1000, place(widget(), nowPlaying(), favorites(pin)).tops.getValue(HomeBlock.FAVORITES))
     }
 
-    @Test fun blockIsPushedDownRatherThanOverlappingTheOneAbove() {
+    @Test fun explicitPinStaysAuthoritativeEvenWhenAnotherFrameOverlaps() {
         val placed = place(widget(height = 700), favorites(BlockPin(PinEdge.TOP, 0.2f)))
-        assertEquals(700 + gap, placed.tops.getValue(HomeBlock.FAVORITES))
+        assertEquals(400, placed.tops.getValue(HomeBlock.FAVORITES))
     }
 
-    @Test fun pushesChainDownTheStack() {
+    @Test fun overlappingPinsDoNotCreateCascadingDisplacement() {
         val pin = BlockPin(PinEdge.TOP, 0.5f)
         val placed = place(widget(pin), nowPlaying(pin), favorites(pin))
         assertEquals(1000, placed.tops.getValue(HomeBlock.WIDGET))
-        assertEquals(1000 + 360 + gap, placed.tops.getValue(HomeBlock.NOW_PLAYING))
-        assertEquals(1392 + 128 + gap, placed.tops.getValue(HomeBlock.FAVORITES))
+        assertEquals(1000, placed.tops.getValue(HomeBlock.NOW_PLAYING))
+        assertEquals(1000, placed.tops.getValue(HomeBlock.FAVORITES))
+        assertEquals(1600 + inset, placed.contentHeightPx)
     }
 
     @Test fun bottomPinCountsFromTheUsableBottom() {
@@ -72,7 +73,12 @@ class StackMathTest {
     }
 
     @Test fun pinFractionOutsideTheScreenIsClamped() {
-        assertEquals(2000, place(favorites(BlockPin(PinEdge.TOP, 1f), height = 100)).tops.getValue(HomeBlock.FAVORITES))
+        assertEquals(1800, place(favorites(BlockPin(PinEdge.TOP, 1f), height = 100)).tops.getValue(HomeBlock.FAVORITES))
+    }
+
+    @Test fun shortPinnedFieldsCannotCreatePhantomOverflowButTallFavoritesCanScroll() {
+        assertEquals(viewport, place(favorites(BlockPin(PinEdge.TOP, 1f), height = 200)).contentHeightPx)
+        assertEquals(2600 + inset, place(favorites(BlockPin(PinEdge.TOP, 1f), height = 2600)).contentHeightPx)
     }
 
     @Test fun pinForTopInvertsPinnedTop() {

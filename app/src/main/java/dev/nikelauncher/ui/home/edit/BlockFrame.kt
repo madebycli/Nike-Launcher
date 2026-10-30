@@ -3,16 +3,14 @@ package dev.nikelauncher.ui.home.edit
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,10 +25,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.zIndex
+import androidx.compose.ui.platform.testTag
 import dev.nikelauncher.R
 import dev.nikelauncher.data.HomeBlock
 
-private fun HomeBlock.label(): Int = when (this) {
+internal fun HomeBlock.label(): Int = when (this) {
     HomeBlock.WIDGET -> R.string.edit_block_widget
     HomeBlock.NOW_PLAYING -> R.string.edit_block_now_playing
     HomeBlock.FAVORITES -> R.string.edit_block_favorites
@@ -42,6 +41,7 @@ internal class FrameCallbacks(
     val onDragStart: () -> Unit,
     val onDrag: (Float) -> Unit,
     val onDragEnd: () -> Unit,
+    val onDragCancel: () -> Unit,
 )
 
 /**
@@ -67,20 +67,20 @@ internal fun BlockFrame(
     content: @Composable () -> Unit,
 ) {
     if (!editing) {
-        Box(modifier.clipToBounds()) { Box(Modifier.offset(x = contentOffsetDp.dp)) { content() } }
+        Box(modifier.testTag("home-frame-${block.name}").clipToBounds()) { Box(Modifier.offset(x = contentOffsetDp.dp)) { content() } }
         return
     }
     val current by rememberUpdatedState(callbacks)
     val outline = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
 
     Box(
-        modifier
+        modifier.testTag("home-frame-${block.name}")
             .then(
                 if (takeByBody) Modifier.pointerInput(block) {
                     detectVerticalDragGestures(
                         onDragStart = { current.onDragStart() },
                         onDragEnd = { current.onDragEnd() },
-                        onDragCancel = { current.onDragEnd() },
+                        onDragCancel = { current.onDragCancel() },
                         onVerticalDrag = { change, amount -> change.consume(); current.onDrag(amount) },
                     )
                 } else Modifier,
@@ -88,27 +88,29 @@ internal fun BlockFrame(
             .border(BorderStroke(if (selected) 2.dp else 1.dp, outline), MaterialTheme.shapes.large),
     ) {
         // The chip straddles the top edge, so its lower half would sit on whatever comes first.
-        Box(Modifier.padding(top = ChipHalfHeight).clipToBounds()) { Box(Modifier.offset(x = contentOffsetDp.dp)) { content() } }
+        Box(Modifier.clipToBounds()) { Box(Modifier.offset(x = contentOffsetDp.dp)) { content() } }
         if (coverBody) {
             // Nothing inside answers a touch while editing, so the body only selects and moves.
             Box(Modifier.matchParentSize().pointerInput(block) { detectTapGestures(onTap = { current.onSelect() }) })
         }
-        AssistChip(
+        FilterChip(
+            selected = selected,
             onClick = { current.onSelect() },
-            colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+            colors = FilterChipDefaults.filterChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
             label = { Text(stringResource(block.label())) },
             leadingIcon = { Icon(Icons.Filled.DragHandle, contentDescription = null) },
             // Straddles the top edge where there is room above, and sits inside where there is not.
             modifier = Modifier
                 .align(Alignment.TopCenter)
+                .testTag("home-select-${block.name}")
                 .zIndex(2f)
                 .offset { IntOffset(0, -minOf(ChipHalfHeight.roundToPx(), topInsidePx())) }
                 .pointerInput(block) {
-                    detectDragGestures(
+                    detectVerticalDragGestures(
                         onDragStart = { current.onDragStart() },
                         onDragEnd = { current.onDragEnd() },
-                        onDragCancel = { current.onDragEnd() },
-                    ) { change, amount -> change.consume(); current.onDrag(amount.y) }
+                        onDragCancel = { current.onDragCancel() },
+                    ) { change, amount -> change.consume(); current.onDrag(amount) }
                 },
         )
     }

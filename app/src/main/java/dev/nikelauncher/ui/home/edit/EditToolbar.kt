@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Height
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material3.FloatingToolbarDefaults
@@ -32,11 +34,14 @@ internal class EditToolbarActions(
     val onSmaller: (() -> Unit)?,
     val onLarger: (() -> Unit)?,
     val onBandRange: (() -> Unit)?,
+    val onSettings: () -> Unit,
+    val onSelectAll: () -> Unit,
+    val onAddWidget: (() -> Unit)?,
 )
 
 /**
- * Edit mode's controls: a Material floating toolbar at the bottom edge, so it never covers the
- * blocks being arranged, with Done as its action button.
+ * Edit mode's controls: a Material floating toolbar docked at the bottom, with Done as its action.
+ * It overlays the canvas without changing the measured fields.
  */
 @Composable
 internal fun EditToolbar(visible: Boolean, actions: EditToolbarActions, modifier: Modifier = Modifier) {
@@ -55,6 +60,9 @@ internal fun EditToolbar(visible: Boolean, actions: EditToolbarActions, modifier
                 }
             },
         ) {
+            IconButton(onClick = actions.onSettings) { Icon(Icons.Filled.Tune, stringResource(R.string.edit_layout_settings)) }
+            IconButton(onClick = actions.onSelectAll) { Icon(Icons.Filled.SelectAll, stringResource(R.string.edit_select_all)) }
+            actions.onAddWidget?.let { add -> IconButton(onClick = add) { Icon(Icons.Filled.Add, stringResource(R.string.widget_add)) } }
             actions.onSmaller?.let {
                 IconButton(onClick = it) { Icon(Icons.Filled.Remove, contentDescription = stringResource(R.string.settings_less)) }
             }

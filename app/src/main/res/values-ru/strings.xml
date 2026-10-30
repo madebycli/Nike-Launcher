@@ -729,5 +729,10 @@
     <string name="gesture_zone_up">↑ Смахнуть вверх</string>
     <string name="gesture_zone_left">← %1$s</string>
     <string name="gesture_zone_right">%1$s →</string>
+
+    <string name="edit_layout_settings">Разметка главного экрана</string>
+    <string name="edit_block_spacing">Расстояние между блоками</string>
+    <string name="edit_select_all">Выбрать всё</string>
+    <string name="edit_mixed">Разные</string>
 </resources>
 

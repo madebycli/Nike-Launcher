@@ -94,6 +94,8 @@ data class HomeSettings(
     val stripInsetSide: EdgeSide?,
     /** How far the live edge zones reach in, beyond their own width. */
     val edgeZoneInsetLiveDp: Int,
+    val blockGapDp: Int = 12,
+    val mediaSidePaddingDp: Int = sidePaddingDp,
 ) {
     val quickLaunchEnabled: Boolean get() = quickLaunchLeft != null || quickLaunchRight != null
 

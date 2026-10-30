@@ -116,8 +116,7 @@ internal fun rememberHomeActions(
                 },
                 onNudgeEdge = { block, dp ->
                     scope.launch {
-                        if (block == HomeBlock.WIDGET) app.prefs.home.nudgeWidgetSidePadding(dp, EDGE_DISTANCE_MAX_DP)
-                        else app.prefs.appearance.nudgeSidePaddingDp(dp, EDGE_DISTANCE_MAX_DP)
+                        app.prefs.homeLayout.setEdges(setOf(block), delta = dp)
                     }
                 },
                 onResetOffset = { block -> scope.launch { app.prefs.home.setBlockOffset(block, 0) } },
@@ -135,6 +134,10 @@ internal fun rememberHomeActions(
                     )
                 },
                 onEditScrubBand = hooks.onEditModeBand,
+                onCommitPins = { pins -> scope.launch { app.prefs.homeLayout.setPins(pins) } },
+                onSetBlockGap = { dp -> scope.launch { app.prefs.homeLayout.setGap(dp) } },
+                onSetRowSpacing = { dp -> scope.launch { app.prefs.appearance.setItemSpacingDp(dp) } },
+                onSetEdges = { blocks, dp -> scope.launch { app.prefs.homeLayout.setEdges(blocks, dp) } },
             ),
             gestures = GestureActions(
                 onSwipeUpDrag = hooks.controller::onSwipeUpDrag,

@@ -734,4 +734,9 @@
     <string name="gesture_zone_up">↑ Przesuń w górę</string>
     <string name="gesture_zone_left">← %1$s</string>
     <string name="gesture_zone_right">%1$s →</string>
+
+    <string name="edit_layout_settings">Układ ekranu głównego</string>
+    <string name="edit_block_spacing">Odstęp między blokami</string>
+    <string name="edit_select_all">Zaznacz wszystko</string>
+    <string name="edit_mixed">Różne</string>
 </resources>

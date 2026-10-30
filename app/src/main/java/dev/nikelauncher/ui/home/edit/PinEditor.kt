@@ -1,117 +1,114 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.home.edit
 
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import dev.nikelauncher.data.BlockPin
-import dev.nikelauncher.data.HomeBlock
-import dev.nikelauncher.data.HomePins
-import dev.nikelauncher.data.PinEdge
-import dev.nikelauncher.ui.home.stack.SnapGuide
-import dev.nikelauncher.ui.home.stack.StackMetrics
-import dev.nikelauncher.ui.home.stack.pinForTop
-import dev.nikelauncher.ui.home.stack.pinnedTopPx
-import dev.nikelauncher.ui.home.stack.snapped
+import androidx.compose.runtime.*
+import dev.nikelauncher.data.*
+import dev.nikelauncher.ui.home.stack.*
 import kotlin.math.roundToInt
 
-/**
- * Moving the home blocks: which one is selected, which one a finger is holding, and the pins as
- * the finger has made them so far.
- *
- * What is stored only changes on release; until the stored pins catch up the live ones are kept,
- * so letting go never flashes back to the old place.
- */
+/** A layout draft stays visible until the atomic preference write has been acknowledged. */
 @Stable
 internal class PinEditor(
     private val metrics: StackMetrics,
     private val snapDistancePx: Int,
     private val stored: () -> HomePins,
-    private val commit: (HomeBlock, BlockPin?) -> Unit,
+    private val commit: (Map<HomeBlock, BlockPin?>) -> Unit,
     private val tick: () -> Unit,
 ) {
     var live by mutableStateOf<HomePins?>(null)
         private set
-    var selected by mutableStateOf<HomeBlock?>(null)
+    var selection by mutableStateOf(setOf<HomeBlock>())
         private set
+    val selected: HomeBlock? get() = selection.singleOrNull()
     var dragging by mutableStateOf<HomeBlock?>(null)
         private set
     var guide by mutableStateOf<SnapGuide?>(null)
         private set
-
-    /** [0] where the held block's top was when the finger came down, [1] how far it has travelled. */
-    private val origin = floatArrayOf(0f, 0f)
-
     val pins: HomePins get() = live ?: stored()
+    private var available = setOf<HomeBlock>()
+    private var origin = HomePins.Default
+    private var originTops = emptyMap<HomeBlock, Int>()
+    private var travelled = 0f
+    private var nudgeRemainder = 0f
+    private var beforeDrag: HomePins? = null
 
+    fun setAvailable(blocks: Set<HomeBlock>) { available = blocks; selection = selection.intersect(blocks) }
     fun select(block: HomeBlock) {
-        selected = block
+        nudgeRemainder = 0f
+        selection = if (block in selection) selection - block else selection + block
+    }
+    fun selectAll() { selection = if (selection == available) emptySet() else available }
+
+    private fun freeze(): HomePins {
+        var frozen = pins
+        available.forEach { block ->
+            if (frozen[block] == null) frozen = frozen.with(block, pinForTop(PinEdge.TOP,
+                metrics.top(block), metrics.height(block), metrics.viewportPx, metrics.bottomInsetPx))
+        }
+        return frozen
     }
 
     fun begin(block: HomeBlock) {
+        if (block !in selection) selection = setOf(block)
         dragging = block
-        selected = block
-        origin[0] = metrics.top(block).toFloat()
-        origin[1] = 0f
-        live = live ?: stored()
+        beforeDrag = live
+        origin = freeze()
+        originTops = available.associateWith { metrics.top(it) }
+        travelled = 0f
+        live = origin
         tick()
     }
-
     fun move(block: HomeBlock, deltaPx: Float) {
-        origin[1] += deltaPx
-        val (pin, snappedTo) = snapped(
-            topPx = (origin[0] + origin[1]).roundToInt(),
-            heightPx = metrics.height(block),
-            viewportPx = metrics.viewportPx,
-            bottomInsetPx = metrics.bottomInsetPx,
-            snapDistancePx = snapDistancePx,
-        )
-        live = (live ?: stored()).with(block, pin)
-        if (snappedTo != guide) {
-            guide = snappedTo
-            if (snappedTo != null) tick()
+        if (dragging != block) return
+        travelled += deltaPx
+        var delta = travelled.roundToInt()
+        guide = null
+        if (selection.size == 1) {
+            val (_, snap) = snapped(originTops.getValue(block) + delta, metrics.height(block),
+                metrics.viewportPx, metrics.bottomInsetPx, snapDistancePx)
+            if (snap != null) {
+                delta = pinnedTopPx(BlockPin(snap.edge, snap.fraction), metrics.height(block), metrics.viewportPx, metrics.bottomInsetPx) - originTops.getValue(block)
+                guide = snap
+            }
         }
+        val tops = shiftedTops(originTops, selection, delta, metrics.viewportPx)
+        live = applyTops(origin, tops.filterKeys { it in selection })
     }
-
     fun end(block: HomeBlock) {
-        live?.get(block)?.let { commit(block, it) }
+        if (dragging != block) return
+        save()
         dragging = null
         guide = null
     }
+    fun cancel() { if (dragging != null) live = beforeDrag; dragging = null; guide = null }
 
-    /**
-     * Moves a block by [deltaPx] from where it is held, keeping the edge it is held by. For a block
-     * with no pin yet that is its top edge, which is where it is now.
-     */
-    fun nudge(block: HomeBlock, deltaPx: Int) {
-        val current = pins
-        val pin = current[block]
-        val height = metrics.height(block)
-        val top = if (pin != null) pinnedTopPx(pin, height, metrics.viewportPx, metrics.bottomInsetPx) else metrics.top(block)
-        val moved = pinForTop(pin?.edge ?: PinEdge.TOP, top + deltaPx, height, metrics.viewportPx, metrics.bottomInsetPx)
-        selected = block
-        live = current.with(block, moved)
-        commit(block, moved)
+    fun nudgeSelection(deltaPx: Float) {
+        val exact = deltaPx + nudgeRemainder
+        val step = exact.roundToInt()
+        nudgeRemainder = exact - step
+        val current = freeze()
+        val tops = available.associateWith { block -> current[block]?.let { fittedTop(pinnedTopPx(it, metrics.height(block), metrics.viewportPx, metrics.bottomInsetPx), metrics.height(block), metrics.viewportPx, metrics.bottomInsetPx) } ?: metrics.top(block) }
+        live = applyTops(current, shiftedTops(tops, selection, step, metrics.viewportPx).filterKeys { it in selection })
+        save()
     }
+    fun setGap(gapPx: Int) {
+        val targets = selection.ifEmpty { available }
+        live = applyTops(freeze(), spacedTops(available.associateWith { metrics.top(it) },
+            available.associateWith { metrics.height(it) }, targets, gapPx))
+        save()
+    }
+    private fun applyTops(base: HomePins, tops: Map<HomeBlock, Int>): HomePins = tops.entries.fold(base) { pins, (block, top) ->
+        pins.with(block, pinForTop(PinEdge.TOP, top, metrics.height(block), metrics.viewportPx, metrics.bottomInsetPx))
+    }
+    private fun save() { commit(available.associateWith { pins[it] }) }
 
-    /** Puts the selected block back to its default place. */
     fun resetSelected() {
-        selected?.let { commit(it, null) }
-        live = null
+        val targets = selection.ifEmpty { available }
+        live = targets.fold(pins) { result, block -> result.with(block, HomePins.Default[block]) }
+        commit(targets.associateWith { HomePins.Default[it] })
     }
-
-    /** The stored pins moved on, so the live ones are no longer needed. */
     fun onStoredChanged() {
-        // Only once the store has caught up with the last move. Cleared on any change, a run of
-        // quick nudges would be answered by an older value from the store and lose steps.
-        if (dragging == null && (live == null || live == stored())) live = null
+        if (dragging == null && HomeBlock.entries.all { live?.get(it)?.encode() == stored()[it]?.encode() }) live = null
     }
-
-    fun clear() {
-        selected = null
-        dragging = null
-        guide = null
-        live = null
-    }
+    fun clear() { cancel(); selection = emptySet() }
 }

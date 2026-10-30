@@ -709,4 +709,9 @@
     <string name="gesture_zone_up">↑ Svep uppåt</string>
     <string name="gesture_zone_left">← %1$s</string>
     <string name="gesture_zone_right">%1$s →</string>
+
+    <string name="edit_layout_settings">Hemskärmens layout</string>
+    <string name="edit_block_spacing">Avstånd mellan block</string>
+    <string name="edit_select_all">Markera alla</string>
+    <string name="edit_mixed">Blandat</string>
 </resources>

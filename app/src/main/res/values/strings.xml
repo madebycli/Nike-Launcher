@@ -707,4 +707,9 @@
     <string name="gesture_zone_up">↑ Swipe up</string>
     <string name="gesture_zone_left">← %1$s</string>
     <string name="gesture_zone_right">%1$s →</string>
+
+    <string name="edit_layout_settings">Home layout</string>
+    <string name="edit_block_spacing">Space between blocks</string>
+    <string name="edit_select_all">Select all</string>
+    <string name="edit_mixed">Mixed</string>
 </resources>

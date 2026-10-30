@@ -167,3 +167,18 @@ outer box. Short content rebounds to its boundary, including cancelled/interrupt
 real overflow still scrolls. Deep pull uses undamped travel and requests the existing shade action
 once. HomeScrollInteractionTest drives the real draggable/clock and records the accessibility
 global-action request through SystemUi with a Robolectric service; DragMathTest covers boundaries.
+
+## Reserved home fields and grouped editing
+
+Enabled Now Playing owns a fixed-height field even during silence. MediaDismiss uses stock Material swipe state for partial/cancelled rebound and dismissal. Editing preserves the measured
+fields and does not inject an absent widget. Pins are authoritative and short pinned fields stay
+inside the usable viewport. The stack extent uses the furthest frame bottom plus navigation inset.
+PinEditor reads updated data/actions, retains drafts until encoded preference acknowledgement,
+freezes unpinned neighbours and supports grouped selection/placement without cascading movement.
+Frame chips, HomeEditControls and HomeLayoutSheet share that selection. Material settings groups
+and sliders control block gaps, favorite-row spacing and selected-field edge distances. Batch pins
+and edges are atomic in HomeLayoutPrefs; inherited values of unselected fields are preserved.
+Ordinary nudge clicks work alongside hold-repeat, with fractional pixel carry for one-dp steps.
+New keys home_block_gap_dp and home_media_side_padding_dp retain typed backup format 2 and are
+covered by the real backup round trip. HomeLayoutScreensTest asserts media transitions, swipe
+dismissal, edit-mode bounds, group moves and persisted placement in English/German large text.

@@ -117,6 +117,8 @@ fun rememberHomeSettings(prefs: Prefs, library: LibraryState, appsByKey: Map<Str
         lastLetterToLine = l.lastLetterToLine.collectAsState(false).value,
         stripInsetSide = if (stripAlwaysVisible) edgeSide else null,
         edgeZoneInsetLiveDp = liveInsetDp(insetAuto, insetDp),
+        blockGapDp = prefs.homeLayout.blockGapDp.collectAsState(12).value,
+        mediaSidePaddingDp = prefs.homeLayout.mediaSidePaddingDp.collectAsState(sidePaddingDp).value,
     )
 }
 

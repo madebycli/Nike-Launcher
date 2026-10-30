@@ -90,6 +90,11 @@ class LayoutActions(
     val onResizeNowPlaying: (Int) -> Unit,
     val onFavoritesBoundsChanged: (topPx: Float, bottomPx: Float) -> Unit,
     val onEditScrubBand: () -> Unit,
+    val onCommitPins: (Map<HomeBlock, BlockPin?>) -> Unit = { pins -> pins.forEach { (block, pin) -> onCommitPin(block, pin) } },
+    val onSetBlockGap: (Int) -> Unit = {},
+    val onSetRowSpacing: (Int) -> Unit = {},
+    val onSetEdges: (Set<HomeBlock>, Int) -> Unit = { _, _ -> },
+
 )
 
 class GestureActions(

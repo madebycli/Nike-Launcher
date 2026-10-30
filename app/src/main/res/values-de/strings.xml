@@ -703,4 +703,9 @@
     <string name="gesture_zone_up">↑ Hochwischen</string>
     <string name="gesture_zone_left">← %1$s</string>
     <string name="gesture_zone_right">%1$s →</string>
+
+    <string name="edit_layout_settings">Home-Layout</string>
+    <string name="edit_block_spacing">Abstand zwischen Bereichen</string>
+    <string name="edit_select_all">Alle auswählen</string>
+    <string name="edit_mixed">Gemischt</string>
 </resources>

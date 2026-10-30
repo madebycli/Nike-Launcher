@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -43,8 +44,8 @@ import kotlinx.coroutines.delay
 /** What the nudge panel shows and does for the selected block. */
 internal class NudgeState(
     val topDp: Int,
-    val offsetDp: Int,
-    val edgeDp: Int,
+    val offsetDp: Int?,
+    val edgeDp: Int?,
     val onMove: (dxDp: Int, dyDp: Int) -> Unit,
     val onEdge: (deltaDp: Int) -> Unit,
 )
@@ -92,7 +93,7 @@ internal fun NudgePanel(visible: Boolean, state: NudgeState?, modifier: Modifier
                     NudgeButton(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.edit_move_left)) { m -> s.onMove(-m, 0) }
                     NudgeButton(Icons.AutoMirrored.Filled.ArrowForward, stringResource(R.string.edit_move_right)) { m -> s.onMove(m, 0) }
                     Text(
-                        stringResource(R.string.edit_value_dp, s.offsetDp),
+                        s.offsetDp?.let { stringResource(R.string.edit_value_dp, it) } ?: stringResource(R.string.edit_mixed),
                         modifier = Modifier.weight(1f).padding(start = 8.dp),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -106,7 +107,7 @@ internal fun NudgePanel(visible: Boolean, state: NudgeState?, modifier: Modifier
                     )
                     RepeatingIconButton(Icons.Filled.Remove, stringResource(R.string.settings_less)) { m -> s.onEdge(-m) }
                     Text(
-                        stringResource(R.string.edit_value_dp, s.edgeDp),
+                        s.edgeDp?.let { stringResource(R.string.edit_value_dp, it) } ?: stringResource(R.string.edit_mixed),
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier.padding(horizontal = 8.dp),
                     )
@@ -120,29 +121,31 @@ internal fun NudgePanel(visible: Boolean, state: NudgeState?, modifier: Modifier
 @Composable
 private fun NudgeButton(icon: ImageVector, description: String, onStep: (Int) -> Unit) {
     val source = remember { MutableInteractionSource() }
-    RepeatWhilePressed(source, onStep)
-    FilledTonalIconButton(onClick = {}, interactionSource = source) { Icon(icon, contentDescription = description) }
+    val click = rememberRepeatClick(source, onStep)
+    FilledTonalIconButton(onClick = click, interactionSource = source) { Icon(icon, contentDescription = description) }
 }
 
 @Composable
 private fun RepeatingIconButton(icon: ImageVector, description: String, onStep: (Int) -> Unit) {
     val source = remember { MutableInteractionSource() }
-    RepeatWhilePressed(source, onStep)
-    IconButton(onClick = {}, interactionSource = source) { Icon(icon, contentDescription = description) }
+    val click = rememberRepeatClick(source, onStep)
+    IconButton(onClick = click, interactionSource = source) { Icon(icon, contentDescription = description) }
 }
 
 /**
- * One step when the press lands, then a run of them for as long as it is held, bigger the longer it
- * goes on: a dp at a time for the last bit of placing, ten at a time to cross the screen.
+ * An ordinary click makes one step; holding repeats after a short delay. Larger repeated steps
+ * cross the screen while short clicks retain one-dp precision.
  */
 @Composable
-private fun RepeatWhilePressed(source: MutableInteractionSource, onStep: (Int) -> Unit) {
+private fun rememberRepeatClick(source: MutableInteractionSource, onStep: (Int) -> Unit): () -> Unit {
+    var repeated by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     val pressed by source.collectIsPressedAsState()
     val step by rememberUpdatedState(onStep)
     LaunchedEffect(pressed) {
         if (!pressed) return@LaunchedEffect
-        step(1)
+        repeated = false
         delay(FIRST_REPEAT_MS)
+        repeated = true
         var repeats = 0
         while (true) {
             step(if (repeats < 12) 1 else if (repeats < 30) 3 else 8)
@@ -150,4 +153,5 @@ private fun RepeatWhilePressed(source: MutableInteractionSource, onStep: (Int) -
             delay(REPEAT_MS)
         }
     }
+    return { if (!repeated) step(1); repeated = false }
 }

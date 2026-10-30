@@ -3,8 +3,6 @@ package dev.nikelauncher.ui.home
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
@@ -31,10 +29,13 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.SideEffect
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.platform.testTag
+import dev.nikelauncher.ui.home.edit.HomeEditControls
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
@@ -52,11 +53,7 @@ import dev.nikelauncher.ui.home.blocks.FavoritesBlock
 import dev.nikelauncher.ui.home.blocks.NowPlayingBlock
 import dev.nikelauncher.ui.home.blocks.WidgetBlock
 import dev.nikelauncher.ui.home.edit.BlockFrame
-import dev.nikelauncher.ui.home.edit.EditToolbar
-import dev.nikelauncher.ui.home.edit.EditToolbarActions
 import dev.nikelauncher.ui.home.edit.FrameCallbacks
-import dev.nikelauncher.ui.home.edit.NudgePanel
-import dev.nikelauncher.ui.home.edit.NudgeState
 import dev.nikelauncher.ui.home.edit.PinEditor
 import dev.nikelauncher.ui.home.edit.SnapGuideOverlay
 import dev.nikelauncher.ui.home.rows.RowStyle
@@ -76,8 +73,6 @@ private val MAX_CONTENT_WIDTH = 600.dp
 /** How much room edit mode leaves under the last block for its toolbar. */
 private val EDIT_BOTTOM_ROOM = 120.dp
 
-private const val WIDGET_HEIGHT_STEP = 20
-private const val NOW_PLAYING_HEIGHT_STEP = 8
 
 /**
  * The home screen: the widget, Now Playing and the favorites, each held where it was put.
@@ -122,29 +117,41 @@ fun HomeScreen(
     val metrics = remember { StackMetrics() }
     val bottomInsetPx = WindowInsets.navigationBars.getBottom(density)
     val snapPx = with(density) { SNAP_DISTANCE_DP.dp.toPx() }.roundToInt()
+    val currentData by rememberUpdatedState(data)
+    val currentActions by rememberUpdatedState(actions)
+    val currentSettings by rememberUpdatedState(settings)
     val editor = remember(metrics, snapPx) {
         PinEditor(
             metrics = metrics,
             snapDistancePx = snapPx,
-            stored = { data.pins },
-            commit = actions.layout.onCommitPin,
-            tick = { HapticUtil.tick(view, settings.hapticsEnabled) },
+            stored = { currentData.pins },
+            commit = { currentActions.layout.onCommitPins(it) },
+            tick = { HapticUtil.tick(view, currentSettings.hapticsEnabled) },
         )
     }
     LaunchedEffect(data.pins) { editor.onStoredChanged() }
-    LaunchedEffect(editMode) { if (!editMode) editor.clear() }
 
     val scope = rememberCoroutineScope()
     val scroll = rememberHomeScroll(actions.gestures, settings.swipeUpOpensAppList, homeIntentTick)
     val editScroll = rememberScrollState()
+    LaunchedEffect(editMode) {
+        scroll.reset()
+        editScroll.scrollTo(0)
+        if (!editMode) editor.clear()
+    }
     var rootY by remember { mutableFloatStateOf(0f) }
     var backgroundMenu by remember { mutableStateOf(false) }
     var backgroundMenuOffset by remember { mutableStateOf(DpOffset.Zero) }
 
-    // Show the widget slot when a widget exists, and also in edit mode when there isn't one: the
-    // placeholder is the only way back to the picker once a widget has been removed.
-    val showWidget = data.widgetIds.isNotEmpty() || editMode
-    val showNowPlaying = data.nowPlayingHasContent || (editMode && settings.nowPlayingEnabled)
+    // Empty media reserves its field; editing does not add a widget placeholder to the layout.
+    val showWidget = data.widgetIds.isNotEmpty()
+    val showNowPlaying = settings.nowPlayingEnabled
+    val available = buildSet {
+        if (showWidget) add(HomeBlock.WIDGET)
+        if (showNowPlaying) add(HomeBlock.NOW_PLAYING)
+        add(HomeBlock.FAVORITES)
+    }
+    SideEffect { editor.setAvailable(available) }
 
     // The rows take their style from the ambient one rather than naming it, so the shadow can be
     // put behind all of them at once instead of at every call that draws a name.
@@ -186,19 +193,21 @@ fun HomeScreen(
                     bottomInsetPx = { bottomInsetPx },
                     pins = { editor.pins },
                     metrics = metrics,
+                    gapDp = settings.blockGapDp,
                 ) {
                     fun frame(block: HomeBlock) = FrameCallbacks(
                         onSelect = { editor.select(block) },
                         onDragStart = { editor.begin(block) },
                         onDrag = { editor.move(block, it) },
                         onDragEnd = { editor.end(block) },
+                        onDragCancel = editor::cancel,
                     )
                     if (showWidget) {
                         BlockFrame(
                             block = HomeBlock.WIDGET,
                             contentOffsetDp = data.blockOffsets.widget,
                             editing = editMode,
-                            selected = editor.selected == HomeBlock.WIDGET,
+                            selected = HomeBlock.WIDGET in editor.selection,
                             takeByBody = true,
                             coverBody = true,
                             topInsidePx = { metrics.top(HomeBlock.WIDGET) },
@@ -222,29 +231,31 @@ fun HomeScreen(
                             block = HomeBlock.NOW_PLAYING,
                             contentOffsetDp = data.blockOffsets.nowPlaying,
                             editing = editMode,
-                            selected = editor.selected == HomeBlock.NOW_PLAYING,
+                            selected = HomeBlock.NOW_PLAYING in editor.selection,
                             takeByBody = true,
                             coverBody = true,
                             topInsidePx = { metrics.top(HomeBlock.NOW_PLAYING) },
                             callbacks = frame(HomeBlock.NOW_PLAYING),
                             modifier = Modifier.homeBlock(HomeBlock.NOW_PLAYING),
                         ) {
-                            NowPlayingBlock(
+                            Box(Modifier.fillMaxWidth().height(settings.nowPlayingHeightDp.dp).testTag("home-media-slot")) {
+                            if (data.nowPlayingHasContent) NowPlayingBlock(
                                 heightDp = settings.nowPlayingHeightDp,
                                 contentColor = settings.contentColor,
                                 alignment = settings.alignment,
-                                sidePaddingDp = settings.sidePaddingDp,
-                                showPlaceholder = editMode,
+                                sidePaddingDp = settings.mediaSidePaddingDp,
+                                showPlaceholder = false,
                                 onEditLayout = { onEditModeChange(true) },
                                 onOpenSettings = actions.onOpenSettings,
                             )
+                            }
                         }
                     }
                     BlockFrame(
                         block = HomeBlock.FAVORITES,
                         contentOffsetDp = data.blockOffsets.favorites,
                         editing = editMode,
-                        selected = editor.selected == HomeBlock.FAVORITES,
+                        selected = HomeBlock.FAVORITES in editor.selection,
                         takeByBody = false,
                         coverBody = false,
                         topInsidePx = { metrics.top(HomeBlock.FAVORITES) },
@@ -303,60 +314,7 @@ fun HomeScreen(
                 bottomInsetPx = { bottomInsetPx },
                 modifier = Modifier.fillMaxSize(),
             )
-            val selectedBlock = editor.selected
-            Column(Modifier.align(Alignment.BottomCenter), horizontalAlignment = Alignment.CenterHorizontally) {
-                NudgePanel(
-                    visible = editMode,
-                    state = selectedBlock?.let { block ->
-                        NudgeState(
-                            topDp = with(density) { metrics.top(block).toDp().value.roundToInt() },
-                            offsetDp = data.blockOffsets[block],
-                            edgeDp = if (block == HomeBlock.WIDGET) settings.widgetSidePaddingDp else settings.sidePaddingDp,
-                            onMove = { dx, dy ->
-                                if (dx != 0) actions.layout.onNudgeX(block, dx)
-                                if (dy != 0) editor.nudge(block, with(density) { dy.dp.roundToPx() })
-                            },
-                            onEdge = { delta -> actions.layout.onNudgeEdge(block, delta) },
-                        )
-                    },
-                )
-                EditToolbar(
-                    visible = editMode,
-                    actions = editToolbarActions(selectedBlock, settings, data, actions, {
-                        editor.resetSelected()
-                        selectedBlock?.let(actions.layout.onResetOffset)
-                    }) { onEditModeChange(false) },
-                )
-            }
+            HomeEditControls(editMode, editor, metrics, settings, data, actions, available) { onEditModeChange(false) }
         }
-    }
-}
-
-/** The controls of the selected block: a size for the ones that have one, the A-Z range for the favorites. */
-private fun editToolbarActions(
-    selected: HomeBlock?,
-    settings: HomeSettings,
-    data: HomeData,
-    actions: HomeActions,
-    reset: () -> Unit,
-    done: () -> Unit,
-): EditToolbarActions {
-    return when (selected) {
-        HomeBlock.WIDGET -> EditToolbarActions(
-            onDone = done,
-            onReset = reset,
-            onSmaller = { actions.widgets.onResize((data.widgetHeightDp - WIDGET_HEIGHT_STEP).coerceAtLeast(80)) },
-            onLarger = { actions.widgets.onResize((data.widgetHeightDp + WIDGET_HEIGHT_STEP).coerceAtMost(900)) },
-            onBandRange = null,
-        )
-        HomeBlock.NOW_PLAYING -> EditToolbarActions(
-            onDone = done,
-            onReset = reset,
-            onSmaller = { actions.layout.onResizeNowPlaying((settings.nowPlayingHeightDp - NOW_PLAYING_HEIGHT_STEP).coerceAtLeast(48)) },
-            onLarger = { actions.layout.onResizeNowPlaying((settings.nowPlayingHeightDp + NOW_PLAYING_HEIGHT_STEP).coerceAtMost(220)) },
-            onBandRange = null,
-        )
-        HomeBlock.FAVORITES -> EditToolbarActions(done, reset, null, null, actions.layout.onEditScrubBand)
-        null -> EditToolbarActions(done, null, null, null, null)
     }
 }

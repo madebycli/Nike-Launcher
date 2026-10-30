@@ -17,7 +17,7 @@ internal data class StackPlacement(
 )
 
 /**
- * Where a pin asks for a block's top edge to be, before anything is allowed to push it.
+ * Where a pin asks for a block's top edge to be, before the visible field is clamped to the viewport.
  *
  * Bottom pins count from the usable bottom, above the navigation bar, so a block held "a thumb
  * above the bottom" stays reachable whatever the device draws down there.
@@ -42,28 +42,24 @@ internal fun pinForTop(edge: PinEdge, topPx: Int, heightPx: Int, viewportPx: Int
     return BlockPin(edge, fraction.coerceIn(BlockPin.MIN_FRACTION, BlockPin.MAX_FRACTION))
 }
 
-/**
- * Places the blocks top to bottom.
- *
- * A pinned block goes where its pin says and an unpinned one follows the block above it. Either
- * way a block never overlaps the one above: it is pushed down to clear it by [gapPx], which is
- * the only thing that ever moves a pinned block. Blocks that are not on screen are left out of
- * [blocks] and take no space.
- *
- * Nothing here depends on anything below a block, so a block growing or shrinking moves only
- * what it would otherwise run into.
- */
+/** Keep a pinned field visible; only genuinely oversized content needs ordinary scrolling. */
+internal fun fittedTop(top: Int, height: Int, viewport: Int, inset: Int): Int =
+    top.coerceIn(0, (viewport - inset - height).coerceAtLeast(0))
+
+/** Pins are authoritative. Unpinned frames flow after the preceding reserved frame. */
 internal fun placeStack(blocks: List<StackBlock>, viewportPx: Int, bottomInsetPx: Int, gapPx: Int): StackPlacement {
     val tops = LinkedHashMap<HomeBlock, Int>()
     var previousEnd = 0
+    var contentEnd = 0
     for ((index, block) in blocks.withIndex()) {
-        val floor = if (index == 0) 0 else previousEnd + gapPx
-        val desired = block.pin?.let { pinnedTopPx(it, block.heightPx, viewportPx, bottomInsetPx) } ?: floor
-        val top = maxOf(desired, floor, 0)
+        val followingTop = if (index == 0) 0 else previousEnd + gapPx
+        val top = block.pin?.let { fittedTop(pinnedTopPx(it, block.heightPx, viewportPx, bottomInsetPx), block.heightPx, viewportPx, bottomInsetPx) }
+            ?: followingTop.coerceAtLeast(0)
         tops[block.id] = top
         previousEnd = top + block.heightPx
+        contentEnd = maxOf(contentEnd, previousEnd)
     }
-    return StackPlacement(tops, if (blocks.isEmpty()) 0 else previousEnd)
+    return StackPlacement(tops, contentEnd + if (blocks.isEmpty()) 0 else bottomInsetPx)
 }
 
 /** How near a dragged block has to come to a guide before it lets go of the finger and sits on it. */
