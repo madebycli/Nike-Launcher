@@ -41,8 +41,6 @@ import dev.nikelauncher.widget.WidgetPickerActivity
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.math.abs
-import dev.nikelauncher.ui.common.NotificationGesturePriority
-import dev.nikelauncher.ui.common.LocalNotificationGesturePriority
 
 /** The physical left/right pages keep their meaning even when the app's language is RTL. */
 @Composable
@@ -142,7 +140,6 @@ internal fun WidgetHomePages(
         else scope.launch { pager.animateScrollToPage(homeIndex) }
     }
 
-    val notificationPriority = remember { NotificationGesturePriority() }
     val originalDirection = LocalLayoutDirection.current
     // With no widget page there is nothing to swipe to, so the home screen is not put behind a
     // pager at all: its own vertical drag and spring are then the only gesture on it.
@@ -151,8 +148,7 @@ internal fun WidgetHomePages(
         return
     }
     Box(Modifier.fillMaxSize()) {
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr,
-            LocalNotificationGesturePriority provides notificationPriority) {
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             HorizontalPager(
                 state = pager,
                 key = { pages[it]?.name ?: "home" },

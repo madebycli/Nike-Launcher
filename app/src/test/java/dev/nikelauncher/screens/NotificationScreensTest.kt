@@ -39,10 +39,8 @@ class NotificationScreensTest {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale)) {
                 NikeTheme {
-                    ModalBottomSheet(onDismissRequest = {}, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-                        Column(Modifier.fillMaxWidth().heightIn(max = 766.dp)) {
-                            NotificationSheetContent(controller.items, null, controller, {})
-                        }
+                    dev.nikelauncher.ui.kit.sheet.ViewportSheet({}, rememberModalBottomSheetState(skipPartiallyExpanded = true), "notification-panel") {
+                        NotificationSheetContent(controller.items, null, controller, {})
                     }
                 }
             }
@@ -52,8 +50,16 @@ class NotificationScreensTest {
         rule.onNodeWithText("Weekend plans").performClick()
         rule.waitUntil(5000) { rule.onAllNodesWithContentDescription(text(R.string.notification_photo)).fetchSemanticsNodes().isNotEmpty() }
         rule.shoot("$prefix-conversation")
+        val singleHeight = rule.onNode(hasSetTextAction()).fetchSemanticsNode().boundsInRoot.height
         rule.onNode(hasSetTextAction()).performTextReplacement("A longer reply that wraps onto several lines so the composer stays readable on a Pixel 9.")
         rule.shoot("$prefix-reply")
+        val wrappedHeight = rule.onNode(hasSetTextAction()).fetchSemanticsNode().boundsInRoot.height
+        Assert.assertTrue(wrappedHeight > singleHeight)
+        rule.onNode(hasSetTextAction()).performTextReplacement(("Long reply on a Pixel 9. ").repeat(140))
+        val cappedHeight = rule.onNode(hasSetTextAction()).fetchSemanticsNode().boundsInRoot.height
+        rule.onNode(hasSetTextAction()).performTextReplacement(("Long reply on a Pixel 9. ").repeat(160))
+        Assert.assertEquals(cappedHeight, rule.onNode(hasSetTextAction()).fetchSemanticsNode().boundsInRoot.height)
+        rule.shoot("$prefix-reply-long")
         val chat = controller.items.first()
         val replacement = chat.actions.first().copy(inputs = listOf(android.app.RemoteInput.Builder("replacement").setLabel("Reply").build()))
         rule.runOnIdle { controller.items[0] = chat.copy(actions = listOf(replacement) + chat.actions.drop(1)) }
@@ -73,7 +79,12 @@ class NotificationScreensTest {
         rule.onNodeWithContentDescription(text(R.string.action_back)).performClick()
         rule.onNodeWithText("Planning meeting for next week").performClick()
         rule.shoot("$prefix-plain")
-        rule.onNodeWithContentDescription(text(R.string.notification_dismiss)).performClick()
+        rule.onNodeWithContentDescription(text(R.string.notification_open)).assertDoesNotExist()
+        rule.onNodeWithText(text(R.string.notification_open)).assertDoesNotExist()
+        rule.onNodeWithContentDescription(text(R.string.settings_more)).performClick()
+        rule.onNodeWithText(text(R.string.notification_open)).assertExists()
+        rule.shoot("$prefix-actions")
+        rule.onNodeWithText(text(R.string.notification_dismiss)).performClick()
         Assert.assertEquals(2, controller.items.size)
     }
 }

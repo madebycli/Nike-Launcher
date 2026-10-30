@@ -9,8 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
@@ -68,48 +66,6 @@ fun MenuScope.appShortcutItems(shortcuts: List<ShortcutEntry>, onStarted: () -> 
 
 /** Rasterised at menu-icon size; the drawable itself is whatever density the publisher had. */
 private const val ICON_PX = 72
-
-/**
- * Swipe a row sideways to reach what the app publishes.
- *
- * A separate gesture from the long press on purpose: shortcuts are used daily and the menu
- * behind a long press is set-up-and-done, so they do not belong in the same place.
- *
- * One direction, chosen in settings, so the other stays free to mean something later. It fires
- * once per drag rather than per pixel, and only past a distance no tap wanders.
- *
- * Nothing happens on a row whose app publishes none. There is no way to know that before
- * asking, and asking every row up front is a call into the system per app.
- */
-fun Modifier.swipeForShortcuts(
-    mode: ShortcutSwipe,
-    enabled: Boolean,
-    onSwipe: () -> Unit,
-): Modifier =
-    if (mode == ShortcutSwipe.OFF || !enabled) this else this.pointerInput(mode) {
-        var travelled = 0f
-        var fired = false
-        detectHorizontalDragGestures(
-            onDragStart = { travelled = 0f; fired = false },
-            onDragEnd = { },
-            onDragCancel = { },
-        ) { change, amount ->
-            travelled += amount
-            val far = when (mode) {
-                ShortcutSwipe.RIGHT -> travelled > SWIPE_THRESHOLD_PX
-                ShortcutSwipe.LEFT -> travelled < -SWIPE_THRESHOLD_PX
-                ShortcutSwipe.OFF -> false
-            }
-            if (!fired && far) {
-                fired = true
-                change.consume()
-                onSwipe()
-            }
-        }
-    }
-
-/** Far enough not to fire on a tap that wandered, short enough to feel like a flick. */
-private const val SWIPE_THRESHOLD_PX = 90f
 
 /**
  * The shortcuts on their own, for the swipe. Renders nothing when the app publishes none, so

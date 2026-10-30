@@ -38,6 +38,8 @@ import dev.nikelauncher.data.Folder
 import dev.nikelauncher.data.HomeAlignment
 import dev.nikelauncher.media.NowPlayingWidget
 import dev.nikelauncher.media.openNowPlayingApp
+import dev.nikelauncher.ui.notifications.appNotification
+import dev.nikelauncher.ui.notifications.NotificationSheet
 import dev.nikelauncher.ui.common.AppIcon
 import dev.nikelauncher.ui.common.AppShortcutMenu
 import dev.nikelauncher.ui.common.recordTouchPosition
@@ -98,6 +100,8 @@ internal fun FolderContents(
         }
         members.forEach { member ->
             key(member.key) {
+                var notificationOpen by remember { mutableStateOf(false) }
+                val preview = appNotification(member)
                 Box {
                     Row(
                         modifier = Modifier
@@ -109,7 +113,8 @@ internal fun FolderContents(
                                 end = if (alignment == HomeAlignment.RIGHT) (style.sidePaddingDp + 24).dp else style.sidePaddingDp.dp,
                             )
                             .recordTouchPosition(touch)
-                            .swipeForShortcuts(style.shortcutSwipe, member.kind == EntryKind.APP) { shortcutsFor = member.key }
+                            .swipeForShortcuts(style.shortcutSwipe, member.kind == EntryKind.APP,
+                                onNotifications = if (preview == null) null else ({ notificationOpen = true })) { shortcutsFor = member.key }
                             .combinedClickable(
                                 onClick = { actions.onOpenApp(member) },
                                 onLongClick = {
@@ -137,13 +142,13 @@ internal fun FolderContents(
                                     textAlign = alignment.textAlign(),
                                 )
                                 NotificationLines(
-                                    notificationPreview(member), alignment, style.contentColor,
-                                    interactive = true, onFallback = { actions.onOpenApp(member) },
+                                    preview, alignment, style.contentColor,
                                 )
                             }
                         }
                     }
 
+                    if (notificationOpen) NotificationSheet(member, onDismiss = { notificationOpen = false })
                     AppShortcutMenu(member, shortcutsFor == member.key) { shortcutsFor = null }
 
                     TouchMenu(expanded = menuFor == member.key, offset = menuOffset, onDismissRequest = { menuFor = null }) {

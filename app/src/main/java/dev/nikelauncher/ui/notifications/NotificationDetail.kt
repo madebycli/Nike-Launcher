@@ -30,20 +30,20 @@ internal fun NotificationDetail(preview: NotificationPreview, controller: Notifi
         val opened = if (destination != null) controller.open(preview, destination) else controller.launchApp(preview.packageName)
         if (opened) onClose() else failed = true
     }
-    Column(Modifier.fillMaxWidth()) {
+    Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back)) }
             SenderAvatar(title, preview.conversationIcon ?: preview.smallIcon, 32.dp)
             Text(title, Modifier.weight(1f).padding(horizontal = 12.dp), style = MaterialTheme.typography.titleMedium,
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
-            IconButton(onClick = { if (controller.dismiss(preview)) onBack() else failed = true }) {
-                Icon(Icons.Outlined.Close, stringResource(R.string.notification_dismiss))
-            }
+            IconButton(onClick = onClose) { Icon(Icons.Outlined.Close, stringResource(R.string.action_close)) }
         }
-        NotificationHistory(preview, Modifier.weight(1f, fill = false), open)
+        NotificationHistory(preview, Modifier.weight(1f), open)
         if (failed) Text(stringResource(R.string.notification_failed), Modifier.padding(horizontal = 16.dp),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-        NotificationActions(preview, controller, open, report)
-        NotificationReply(preview, controller, report, Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
+        NotificationReply(preview, controller, report, Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
+            NotificationActions(preview, controller, open,
+                onDismiss = { if (controller.dismiss(preview)) onBack() else failed = true }, report = report)
+        }
     }
 }

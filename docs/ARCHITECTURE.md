@@ -194,3 +194,13 @@ whichever app is the current Home.
 - No generated Baseline Profile. Recording and validating one still needs a device.
 - Robolectric verifies real Compose layouts and simulated interactions. Device gesture velocity,
   notification-provider delivery, system-role dialogs, wallpaper and frame timing need phone checks.
+
+## Follow-up modules
+
+The app-list screen is split into parameters/session, placement effects, nested pull connection,
+scene, rows, menus and search slots. Structural input equality prevents unchanged bundles from
+feeding a composition loop. Home and app-list notification rows share Material NotificationAppContent,
+profile/opt-in gates and a right-swipe overview action. Inline message rows cannot dismiss. Explicit
+shortcut choices survive while absent preferences default off. Notification detail actions live in
+one overflow beside the target-bound reply field. ViewportSheet shares the calendar/weather height,
+insets and compact stock handle with notifications; explicit close hides before removing its owner.

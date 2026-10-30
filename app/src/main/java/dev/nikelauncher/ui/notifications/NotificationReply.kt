@@ -5,7 +5,7 @@ import android.app.RemoteInput
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.input.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,7 +20,7 @@ private data class ReplyOption(val target: PreviewReplyTarget, val input: Remote
 
 /** A draft stays attached to its action and result key when the provider replaces the notification. */
 @Composable
-internal fun NotificationReply(preview: NotificationPreview, controller: NotificationController, report: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+internal fun NotificationReply(preview: NotificationPreview, controller: NotificationController, report: (Boolean) -> Unit, modifier: Modifier = Modifier, leadingActions: @Composable () -> Unit = {}) {
     val options = remember(preview.actions) {
         preview.actions.flatMap { action -> action.inputs.filter { it.allowFreeFormInput || !it.choices.isNullOrEmpty() }
             .map { ReplyOption(PreviewReplyTarget(action.intent, it.resultKey), it, action.title) } }
@@ -31,7 +31,10 @@ internal fun NotificationReply(preview: NotificationPreview, controller: Notific
     LaunchedEffect(options) { if (field.text.isBlank()) chosen = options.firstOrNull()?.target }
     val option = options.firstOrNull { it.target == chosen }
     // Keep a draft visible even if its target disappears; only an explicit choice may retarget it.
-    if (options.isEmpty() && field.text.isBlank()) return
+    if (options.isEmpty() && field.text.isBlank()) {
+        Row(modifier.fillMaxWidth()) { leadingActions() }
+        return
+    }
     val input = option?.input
     val canSend = input != null && field.text.isNotBlank() && field.text.length <= MAX_REPLY &&
         (input.allowFreeFormInput || input.choices.orEmpty().any { it.toString() == field.text.toString() })
@@ -57,14 +60,16 @@ internal fun NotificationReply(preview: NotificationPreview, controller: Notific
                 choices.forEach { choice -> AssistChip(onClick = { send(choice.toString()) }, label = { Text(choice.toString()) }) }
             }
         }
+        if (input?.allowFreeFormInput == false) Row { leadingActions() }
         if (input?.allowFreeFormInput != false) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                leadingActions()
                 TextField(state = field, inputTransformation = InputTransformation.maxLength(MAX_REPLY),
                     modifier = Modifier.weight(1f), shape = MaterialTheme.shapes.extraLarge,
                     placeholder = { Text(input?.label?.toString()?.takeIf { it.isNotBlank() } ?: stringResource(R.string.notification_reply)) },
                     lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 4))
                 FilledIconButton(onClick = { send(field.text.toString()) }, enabled = canSend) {
-                    Icon(Icons.AutoMirrored.Outlined.Send, stringResource(R.string.notification_send))
+                    Icon(Icons.AutoMirrored.Rounded.Send, stringResource(R.string.notification_send))
                 }
             }
         }

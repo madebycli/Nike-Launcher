@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,14 +36,16 @@ internal fun NotificationOverview(
     onSelect: (NotificationPreview) -> Unit,
     onDismiss: (NotificationPreview) -> Boolean,
     onClearAll: () -> Unit,
+    onClose: () -> Unit,
 ) {
     val context = LocalContext.current
-    Column(Modifier.fillMaxWidth()) {
+    Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.notifications_title), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
             if (notifications.isNotEmpty()) {
                 TextButton(onClick = onClearAll) { Text(stringResource(R.string.notification_clear_all)) }
             }
+            IconButton(onClick = onClose) { Icon(Icons.Outlined.Close, stringResource(R.string.action_close)) }
         }
         if (notifications.isEmpty()) {
             Text(
@@ -54,7 +57,7 @@ internal fun NotificationOverview(
             return@Column
         }
         val now = remember(notifications) { System.currentTimeMillis() }
-        LazyColumn(Modifier.fillMaxWidth()) {
+        LazyColumn(Modifier.fillMaxWidth().weight(1f)) {
             items(notifications, key = { it.key }) { preview ->
                 NotificationDismissBox(preview, onDismiss) {
                 Row(

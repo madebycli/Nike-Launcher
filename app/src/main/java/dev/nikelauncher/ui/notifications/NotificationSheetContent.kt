@@ -4,6 +4,8 @@ package dev.nikelauncher.ui.notifications
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.saveable.rememberSaveable
 import dev.nikelauncher.media.NotificationPreview
 import dev.nikelauncher.ui.kit.motion.AppMotion
@@ -24,6 +26,7 @@ internal fun NotificationSheetContent(
     val offset = AppMotion.offset()
     AnimatedContent(
         targetState = selected,
+        modifier = Modifier.fillMaxSize(),
         transitionSpec = {
             val forward = targetState != null
             (slideInHorizontally(offset) { if (forward) it / 4 else -it / 4 } + fadeIn(effects)) togetherWith
@@ -38,6 +41,7 @@ internal fun NotificationSheetContent(
                 onSelect = { selected = it.key },
                 onDismiss = { controller.dismiss(it) },
                 onClearAll = { notifications.forEach { controller.dismiss(it) } },
+                onClose = onClose,
             )
         } else {
             NotificationDetail(preview, controller, onBack = { selected = null }, onClose = onClose)

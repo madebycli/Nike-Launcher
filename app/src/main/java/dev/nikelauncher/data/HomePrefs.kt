@@ -110,7 +110,7 @@ class HomePrefs internal constructor(private val store: DataStore<Preferences>) 
         data.map { prefs ->
             prefs[PrefKeys.SHORTCUT_SWIPE]
                 ?.let { name -> runCatching { ShortcutSwipe.valueOf(name) }.getOrNull() }
-                ?: if (prefs[PrefKeys.SWIPE_FOR_SHORTCUTS] == false) ShortcutSwipe.OFF else ShortcutSwipe.RIGHT
+                ?: if (prefs[PrefKeys.SWIPE_FOR_SHORTCUTS] == true) ShortcutSwipe.RIGHT else ShortcutSwipe.OFF
         }.distinctUntilChanged()
 
     /**
