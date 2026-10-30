@@ -38,9 +38,20 @@
         android:shadowRadius="4"
         android:contentDescription="@string/widget_clock_time" />
 
+    <LinearLayout
+        android:id="@+id/widget_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/widget_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="true">
     <TextClock
         android:id="@+id/widget_date"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:format12Hour="EEEE, d MMMM"
         android:format24Hour="EEEE, d MMMM"
@@ -55,10 +66,25 @@
         android:contentDescription="@string/widget_clock_date" />
 
     <TextView
-        android:id="@+id/widget_weather"
-        android:layout_width="match_parent"
+        android:id="@+id/widget_battery"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/widget_clock_text"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:visibility="gone"
+        android:gravity="start"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="4"
+        android:contentDescription="@string/widget_clock_battery" />
+    <TextView
+        android:id="@+id/widget_weather"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:textColor="@color/widget_clock_text"
         android:textSize="14sp"
         android:maxLines="1"
@@ -69,6 +95,8 @@
         android:shadowDy="1"
         android:shadowRadius="4"
         android:contentDescription="@string/widget_clock_weather" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/widget_notifications"
@@ -87,6 +115,7 @@
 
     <TextView
         android:id="@+id/widget_event_1"
+        android:layout_marginTop="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/widget_clock_text"
@@ -149,18 +178,5 @@
         android:shadowRadius="4"
         android:contentDescription="@string/widget_clock_agenda" />
 
-    <TextView
-        android:id="@+id/widget_battery"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/widget_clock_text"
-        android:textSize="14sp"
-        android:maxLines="1"
-        android:visibility="gone"
-        android:gravity="start"
-        android:shadowColor="#80000000"
-        android:shadowDx="0"
-        android:shadowDy="1"
-        android:shadowRadius="4"
-        android:contentDescription="@string/widget_clock_battery" />
+    </LinearLayout>
 </LinearLayout>

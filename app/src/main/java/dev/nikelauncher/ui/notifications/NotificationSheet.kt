@@ -99,7 +99,7 @@ internal fun NotificationSheet(
     LaunchedEffect(current == null) { if (current == null) selected = null }
     BackHandler(enabled = selected != null) { selected = null }
 
-    val effects = AppMotion.effects()
+    val effects = AppMotion.effects<Float>()
     val offset = AppMotion.offset()
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(Modifier.fillMaxWidth().heightIn(max = (LocalConfiguration.current.screenHeightDp * .83f).dp)) {

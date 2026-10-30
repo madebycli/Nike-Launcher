@@ -14,8 +14,6 @@ import dev.nikelauncher.data.Prefs
 import dev.nikelauncher.data.stripPrivateSpaceFromExport
 import dev.nikelauncher.widget.ClockWidgetConfig
 import dev.nikelauncher.widget.ClockWidgetProvider
-import dev.nikelauncher.widget.backupValues
-import dev.nikelauncher.widget.restoreBackup
 import java.io.File
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
@@ -128,7 +126,7 @@ class SettingsBackup(private val context: Context, private val prefs: Prefs) {
                     val value = stripPrivateSpaceFromExport(name, values.getValue(name), true)
                     if (value == null) values.remove(name) else values[name] = value
                 }
-                val widgets = readWidgets(root.getJSONArray("widgets"), BackupValues.widgetIds(values), clock)
+                val widgets = readWidgets(context, root.getJSONArray("widgets"), BackupValues.widgetIds(values), clock)
                 val assets = readAssets(root.getJSONArray("assets"), context)
                 if (assets.isNotEmpty()) {
                     directory = File(context.filesDir, "restored_assets/" + UUID.randomUUID())

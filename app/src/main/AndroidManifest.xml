@@ -23,6 +23,10 @@
          permission to send it with. -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
 
+    <!-- Optional local forecast access. Requested only when connecting the installed Breezy app. -->
+    <uses-permission android:name="org.breezyweather.READ_PROVIDER" />
+    <uses-permission android:name="org.breezyweather.debug.READ_PROVIDER" />
+
     <application
         android:name=".NikeApp"
         android:allowBackup="true"
@@ -112,6 +116,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".widget.ClockOverviewActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.NikeLauncher.PinShortcut" />
 
         <!-- The launcher's own clock widget. Exported because every widget provider is: the
              system reads it on behalf of whichever host is showing it. -->

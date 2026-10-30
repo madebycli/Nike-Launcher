@@ -8,13 +8,17 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.provider.AlarmClock
-import android.provider.CalendarContract
 import android.provider.Settings
 import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import dev.nikelauncher.R
 import dev.nikelauncher.media.NotificationCountBus
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 
 /**
  * A clock and date, so a fresh launcher has something on it without hunting for a widget that
@@ -37,6 +41,19 @@ class ClockWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
+        /** Application-context requests are coalesced; calendar/provider IO stays off the UI. */
+        private val redrawRequests by lazy {
+            Channel<Context>(Channel.CONFLATED).also { requests ->
+                CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+                    for (appContext in requests) renderAll(appContext)
+                }
+            }
+        }
+
+        fun requestRenderAll(context: Context) {
+            redrawRequests.trySend(context.applicationContext)
+        }
+
         fun componentName(context: Context) =
             ComponentName(context, ClockWidgetProvider::class.java)
 
@@ -72,13 +89,18 @@ class ClockWidgetProvider : AppWidgetProvider() {
          * picks between them by the system setting and would otherwise ignore the choice.
          *
          * The request codes carry the widget id, or two clocks would share one PendingIntent
-         * and the second would silently take the first's target. Three per widget, one for each
-         * row that can be tapped.
+         * and the second would silently take the first's target. Each widget owns sixteen slots.
          */
         fun render(context: Context, manager: AppWidgetManager, widgetId: Int) {
             val config = ClockWidgetConfig.read(context, widgetId)
             val twelve = "h:mm"
             val twentyFour = "HH:mm"
+            val density = context.resources.displayMetrics.density
+            val options = manager.getAppWidgetOptions(widgetId)
+            val hostWidthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,
+                (context.resources.displayMetrics.widthPixels / density).toInt())
+            val availablePx = ((hostWidthDp - 8).coerceAtLeast(0) * density).toInt()
+            val textWidthPx = availablePx * config.textWidthPercent.coerceIn(ClockWidgetConfig.TEXT_WIDTH_RANGE) / 100
             val views = RemoteViews(context.packageName, R.layout.widget_clock).apply {
                 when (config.hourFormat) {
                     ClockWidgetConfig.HourFormat.SYSTEM -> {
@@ -97,6 +119,11 @@ class ClockWidgetProvider : AppWidgetProvider() {
                 setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, config.timeSizeSp.toFloat())
                 setTextColor(R.id.widget_time, config.colorAt(config.timeOpacity))
 
+                val spare = availablePx - textWidthPx
+                val rtl = context.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+                setViewPadding(R.id.widget_text, if (rtl) spare else 0, 0, if (rtl) 0 else spare, 0)
+                setViewPadding(R.id.widget_data, 0,
+                    (config.clockDataGapDp * context.resources.displayMetrics.density).toInt(), 0, 0)
                 val date = config.datePattern
                 if (date == null) {
                     setViewVisibility(R.id.widget_date, View.GONE)
@@ -128,7 +155,7 @@ class ClockWidgetProvider : AppWidgetProvider() {
                     setViewVisibility(R.id.widget_weather, View.VISIBLE)
                     setTextViewText(
                         R.id.widget_weather,
-                        ClockWidgetWeather.formatted(weather, config.weatherFahrenheit),
+                        ClockWidgetWeather.degrees(weather.tempK, config.weatherFahrenheit),
                     )
                     setTextViewTextSize(R.id.widget_weather, TypedValue.COMPLEX_UNIT_SP, config.weatherSizeSp.toFloat())
                     setTextColor(R.id.widget_weather, config.colorAt(config.weatherOpacity))
@@ -165,7 +192,9 @@ class ClockWidgetProvider : AppWidgetProvider() {
                         context,
                         limit = config.agendaCount,
                         lookaheadHours = config.agendaLookaheadHours,
-                        relative = config.agendaRelative,
+                        relative = false,
+                        excluded = config.excludedCalendars,
+                        hourFormat = config.hourFormat,
                     )
                 } else {
                     emptyList()
@@ -176,12 +205,19 @@ class ClockWidgetProvider : AppWidgetProvider() {
                         setViewVisibility(viewId, View.GONE)
                     } else {
                         setViewVisibility(viewId, View.VISIBLE)
-                        setTextViewText(viewId, entry.text)
+                        val paint = android.text.TextPaint().apply {
+                            textSize = config.agendaSizeSp * context.resources.displayMetrics.scaledDensity
+                        }
+                        val suffix = " · ${entry.time.orEmpty()}"
+                        val titleWidth = (textWidthPx - paint.measureText(suffix)).coerceAtLeast(0f)
+                        val title = android.text.TextUtils.ellipsize(entry.title.orEmpty(), paint,
+                            titleWidth, android.text.TextUtils.TruncateAt.END)
+                        setTextViewText(viewId, if (titleWidth > 0) "$title$suffix" else entry.time.orEmpty())
                         setTextViewTextSize(viewId, TypedValue.COMPLEX_UNIT_SP, config.agendaSizeSp.toFloat())
                         setTextColor(viewId, config.colorAt(config.agendaOpacity))
                         setOnClickPendingIntent(
                             viewId,
-                            open(context, calendarIntent(), widgetId * 8 + 4 + index),
+                            open(context, overviewIntent(context, widgetId, "agenda"), widgetId * 16 + 4 + index),
                         )
                     }
                 }
@@ -196,19 +232,18 @@ class ClockWidgetProvider : AppWidgetProvider() {
                     setTextColor(R.id.widget_alarm, config.colorAt(config.agendaOpacity))
                     setOnClickPendingIntent(
                         R.id.widget_alarm,
-                        open(context, clockIntent(context), widgetId * 8 + 7),
+                        open(context, clockIntent(context, config.clockPackage), widgetId * 16 + 7),
                     )
                 }
 
-                setOnClickPendingIntent(R.id.widget_time, open(context, clockIntent(context), widgetId * 3))
-                setOnClickPendingIntent(R.id.widget_date, open(context, calendarIntent(), widgetId * 3 + 1))
-                setOnClickPendingIntent(R.id.widget_battery, open(context, batteryIntent(context), widgetId * 3 + 2))
+                setOnClickPendingIntent(R.id.widget_time, open(context, clockIntent(context, config.clockPackage), widgetId * 16))
+                setOnClickPendingIntent(R.id.widget_date, open(context, overviewIntent(context, widgetId, "agenda"), widgetId * 16 + 1))
+                setOnClickPendingIntent(R.id.widget_battery, open(context, batteryIntent(context), widgetId * 16 + 2))
                 // Only where there is somewhere to go. A row that looks tappable and does
                 // nothing is worse than one that plainly is not.
-                val weatherTarget = config.weatherPackage?.let { launchIntentFor(context, it) }
                 setOnClickPendingIntent(
                     R.id.widget_weather,
-                    weatherTarget?.let { open(context, it, widgetId * 4 + 3) },
+                    open(context, overviewIntent(context, widgetId, "weather"), widgetId * 16 + 3),
                 )
             }
             manager.updateAppWidget(widgetId, views)
@@ -231,7 +266,16 @@ class ClockWidgetProvider : AppWidgetProvider() {
                 ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }.getOrNull()
 
-        private fun clockIntent(context: Context): Intent {
+        internal fun clockIntent(context: Context, preferredPackage: String? = null): Intent {
+            if (preferredPackage != null) {
+                val preferred = Intent(AlarmClock.ACTION_SHOW_ALARMS).setPackage(preferredPackage)
+                val handler = runCatching { context.packageManager.resolveActivity(preferred, 0) }
+                    .getOrNull()?.activityInfo
+                if (handler != null && handler.exported) {
+                    return preferred.setClassName(handler.packageName, handler.name)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
             val showAlarms = Intent(AlarmClock.ACTION_SHOW_ALARMS)
             val handler = runCatching {
                 context.packageManager.resolveActivity(showAlarms, 0)
@@ -251,7 +295,7 @@ class ClockWidgetProvider : AppWidgetProvider() {
          * PendingIntent aimed at nothing fails silently at the tap, which reads as a dead
          * widget rather than as a missing screen.
          */
-        private fun batteryIntent(context: Context): Intent {
+        internal fun batteryIntent(context: Context): Intent {
             val usage = Intent(Intent.ACTION_POWER_USAGE_SUMMARY)
             val resolved = runCatching {
                 context.packageManager.resolveActivity(usage, 0)
@@ -260,8 +304,10 @@ class ClockWidgetProvider : AppWidgetProvider() {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
-        private fun calendarIntent() = Intent(Intent.ACTION_VIEW)
-            .setData(CalendarContract.CONTENT_URI.buildUpon().appendPath("time").build())
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        private fun overviewIntent(context: Context, widgetId: Int, mode: String) =
+            Intent(context, ClockOverviewActivity::class.java)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                .putExtra("mode", mode)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 }

@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import org.json.JSONObject
 
 /**
  * Takes weather from whichever app is already fetching it, over the broadcast Gadgetbridge
@@ -30,13 +29,7 @@ class ClockWidgetWeatherReceiver : BroadcastReceiver() {
         // answer it eventually gives.
         if (json.length > MAX_JSON_CHARS) return
 
-        val parsed = runCatching {
-            val obj = JSONObject(json)
-            // Kelvin, as whole degrees. Gadgetbridge's own WeatherSpec is the shape here.
-            obj.optInt("currentTemp", 0) to obj.optString("currentCondition", "")
-        }.getOrNull() ?: return
-
-        if (!ClockWidgetWeather.store(context, parsed.first, parsed.second)) return
+        if (!ClockWidgetWeather.storePayload(context, json)) return
 
         // The widgets are only ever drawn when something asks, and weather arriving is the
         // only thing that knows this one changed.

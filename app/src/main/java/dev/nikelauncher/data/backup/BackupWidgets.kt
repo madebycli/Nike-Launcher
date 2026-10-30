@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.os.Bundle
 import dev.nikelauncher.widget.ClockWidgetConfig
-import dev.nikelauncher.widget.validateBackup
 import org.json.JSONArray
 
 /** A widget as a backup file holds it. [clock] is its options when it is this launcher's own clock. */
@@ -29,7 +28,7 @@ internal fun readOptions(bundle: Bundle): Map<String, Int> =
     optionNames.filter { bundle.containsKey(it) }.associateWith { bundle.getInt(it) }
 
 /** Checks the widgets of a file against the ids its values refer to: the same set, each once. */
-internal fun readWidgets(array: JSONArray, ids: List<Int>, clock: ComponentName): List<SavedWidget> {
+internal fun readWidgets(context: android.content.Context, array: JSONArray, ids: List<Int>, clock: ComponentName): List<SavedWidget> {
     require(array.length() == ids.size)
     val widgets = (0 until array.length()).map { index ->
         val item = array.getJSONObject(index)
@@ -41,7 +40,7 @@ internal fun readWidgets(array: JSONArray, ids: List<Int>, clock: ComponentName)
         val dimensions = options.keys().asSequence().associateWith { options.getInt(it).also { value -> require(value in 0..10000) } }
         val clockOptions = item.optJSONObject("clock")?.let {
             require(provider == clock)
-            ClockWidgetConfig.validateBackup(it)
+            ClockWidgetConfig.validateBackup(context, it)
         }
         if (provider == clock) require(clockOptions != null)
         SavedWidget(item.getInt("id"), provider, item.getString("label").take(160), dimensions, clockOptions)

@@ -23,11 +23,15 @@ import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.EntryKind
 import dev.nikelauncher.ui.kit.settings.ColorPickerSheet
 import dev.nikelauncher.ui.kit.settings.SettingsPickerSheet
+import dev.nikelauncher.widget.ClockAppKind
+import dev.nikelauncher.widget.ClockAppPickerDialog
+import dev.nikelauncher.widget.ClockCalendarPicker
+import dev.nikelauncher.widget.ClockStyleGallery
 import dev.nikelauncher.widget.ClockWidgetConfig
 import java.util.Date
 
 /** The secondary windows the clock settings can open. */
-enum class ClockConfigDialog { CUSTOM_DATE, WEATHER_APP, TEXT_COLOR }
+enum class ClockConfigDialog { CUSTOM_DATE, WEATHER_APP, TEXT_COLOR, STYLE, CLOCK_APP, CALENDAR_APP, CALENDARS }
 
 @Composable
 internal fun ClockConfigDialogs(
@@ -47,6 +51,22 @@ internal fun ClockConfigDialogs(
             selected = config.weatherPackage,
             onPick = { pkg -> update { it.copy(weatherPackage = pkg) }; dismiss() },
             onDismiss = dismiss,
+        )
+        ClockConfigDialog.STYLE -> AlertDialog(
+            onDismissRequest = dismiss,
+            confirmButton = { TextButton(onClick = dismiss) { Text(stringResource(R.string.widget_settings_done)) } },
+            text = { ClockStyleGallery(config, onSelect = { style -> update { it.copy(style = style) } }) },
+        )
+        ClockConfigDialog.CLOCK_APP -> ClockAppPickerDialog(
+            ClockAppKind.CLOCK, config.clockPackage,
+            onPick = { pkg -> update { it.copy(clockPackage = pkg) }; dismiss() }, onDismiss = dismiss,
+        )
+        ClockConfigDialog.CALENDAR_APP -> ClockAppPickerDialog(
+            ClockAppKind.CALENDAR, config.calendarPackage,
+            onPick = { pkg -> update { it.copy(calendarPackage = pkg) }; dismiss() }, onDismiss = dismiss,
+        )
+        ClockConfigDialog.CALENDARS -> ClockCalendarPicker(
+            config, onChange = { excluded -> update { it.copy(excludedCalendars = excluded) } }, onDismiss = dismiss,
         )
         ClockConfigDialog.TEXT_COLOR -> ColorPickerSheet(
             initial = Color(config.textColor),

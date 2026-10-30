@@ -419,4 +419,164 @@
     <string name="notification_clear_all">Clear all</string>
     <string name="notification_none">No notifications</string>
     <string name="notification_failed">That did not work</string>
+    <string name="calendar_open_event">Open calendar event</string>
+    <string name="clock_action_unavailable">No app available for this action</string>
+    <string name="clock_agenda_title">Your agenda</string>
+    <string name="clock_all_day">All day</string>
+    <string name="clock_allow_calendar">Allow calendar access</string>
+    <string name="clock_battery_charging">%1$d%% · charging</string>
+    <string name="clock_calendar_permission">Allow calendar access to show your events.</string>
+    <string name="clock_calendar_unavailable">Calendar unavailable. Tap to retry.</string>
+    <string name="clock_close">Close</string>
+    <plurals name="clock_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <plurals name="clock_hours">
+        <item quantity="one">%d hr</item>
+        <item quantity="other">%d hr</item>
+    </plurals>
+    <plurals name="clock_in_days">
+        <item quantity="one">in %d day</item>
+        <item quantity="other">in %d days</item>
+    </plurals>
+    <plurals name="clock_in_hours">
+        <item quantity="one">in %d hr</item>
+        <item quantity="other">in %d hr</item>
+    </plurals>
+    <plurals name="clock_in_minutes">
+        <item quantity="one">in %d min</item>
+        <item quantity="other">in %d min</item>
+    </plurals>
+    <string name="clock_loading">Loading calendar…</string>
+    <plurals name="clock_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <string name="clock_new_event">New event</string>
+    <string name="clock_no_events">No upcoming events</string>
+    <string name="clock_now">now</string>
+    <string name="clock_today">today</string>
+    <string name="clock_tomorrow">tomorrow</string>
+    <string name="clock_until">Until %1$s</string>
+    <string name="clock_weather_clear">Clear</string>
+    <string name="clock_weather_cloudy">Cloudy</string>
+    <string name="clock_weather_current">Current weather</string>
+    <string name="clock_weather_daily">Daily forecast</string>
+    <string name="clock_weather_fog">Haze / fog</string>
+    <string name="clock_weather_hourly">Hourly forecast</string>
+    <string name="clock_weather_open_app">Open weather app</string>
+    <string name="clock_weather_rain">Rain</string>
+    <string name="clock_weather_rain_chance">%1$d%% precipitation</string>
+    <string name="clock_weather_snow">Snow</string>
+    <string name="clock_weather_source_hint">Forecasts appear when your connected weather app sends them.</string>
+    <string name="clock_weather_stale">No recent weather received</string>
+    <string name="clock_weather_storm">Thunderstorm</string>
+    <string name="clock_weather_sunrise">Sunrise</string>
+    <string name="clock_weather_sunset">Sunset</string>
+    <string name="clock_weather_title">Weather</string>
+    <string name="clock_weather_unknown">Weather</string>
+    <string name="weather_air_quality">Air quality</string>
+    <string name="weather_aqi_source">Index supplied by the weather app. The bridge does not identify its index standard.</string>
+    <string name="weather_aqi_unit">AQI</string>
+    <string name="weather_aqi_value">AQI %1$d</string>
+    <string name="weather_breezy_connect">Connect Breezy</string>
+    <string name="weather_breezy_location">Select a location in Breezy</string>
+    <string name="weather_breezy_unavailable">Breezy data is unavailable</string>
+    <string name="weather_chart_value_missing">No value received</string>
+    <string name="weather_cloud_cover">Cloud cover</string>
+    <string name="weather_condition_period">%1$s · %2$s</string>
+    <string name="weather_conditions">Conditions</string>
+    <string name="weather_data_updated">Data updated %1$s</string>
+    <string name="weather_day_night">Day and night</string>
+    <string name="weather_daylight_duration">%1$d h %2$d min daylight</string>
+    <string name="weather_daytime">Daytime</string>
+    <string name="weather_details">Details</string>
+    <string name="weather_dew_point">Dew point</string>
+    <string name="weather_direction_value">%1$d°</string>
+    <string name="weather_drizzle">Drizzle</string>
+    <string name="weather_dust">Dust or volcanic ash</string>
+    <string name="weather_feels_like">Feels like</string>
+    <string name="weather_few_clouds">Few clouds</string>
+    <string name="weather_freezing_rain">Freezing rain</string>
+    <string name="weather_hail">Hail</string>
+    <string name="weather_haze">Haze</string>
+    <string name="weather_high">High</string>
+    <string name="weather_humidity">Humidity</string>
+    <string name="weather_low">Low</string>
+    <string name="weather_moon">Moon</string>
+    <string name="weather_moonrise">Moonrise</string>
+    <string name="weather_moonset">Moonset</string>
+    <string name="weather_mostly_cloudy">Mostly cloudy</string>
+    <string name="weather_next_hours">Next hours</string>
+    <string name="weather_nighttime">Night</string>
+    <string name="weather_partly_cloudy">Partly cloudy</string>
+    <string name="weather_percent">%1$d %%</string>
+    <string name="weather_pollutant_value">%1$.1f μg/m³</string>
+    <string name="weather_precipitation">Chance of rain</string>
+    <string name="weather_pressure">Pressure</string>
+    <string name="weather_pressure_value">%1$d hPa</string>
+    <string name="weather_rain_hour">%1$s: chance of rain %2$s</string>
+    <string name="weather_refresh_local">Reload weather</string>
+    <string name="weather_sleet">Sleet</string>
+    <string name="weather_sun_unavailable">Sun times are not available from the weather app.</string>
+    <string name="weather_temperature">Temperature</string>
+    <string name="weather_today">Today</string>
+    <string name="weather_tornado">Tornado</string>
+    <string name="weather_uv">UV index</string>
+    <string name="weather_visibility">Visibility</string>
+    <string name="weather_visibility_value">%1$d m</string>
+    <string name="weather_wind">Wind</string>
+    <string name="weather_wind_chart">Wind (km/h)</string>
+    <string name="weather_wind_direction">Wind direction</string>
+    <string name="weather_wind_value">%1$d km/h</string>
+    <string name="weather_windy">Squalls</string>
+    <string name="widget_settings_choose_app">Choose an app</string>
+    <string name="widget_settings_done">Done</string>
+    <string name="widget_settings_no_app">No app selected</string>
+    <string name="widget_settings_system_app">System default</string>
+    <string name="clock_calendars">Visible calendars</string>
+    <string name="clock_calendars_empty">No visible calendars available</string>
+    <string name="clock_event_busy">Busy</string>
+    <string name="clock_style_analog">Analog</string>
+    <string name="clock_style_capsule">Capsule</string>
+    <string name="clock_style_classic">Classic</string>
+    <string name="clock_style_dot_matrix">Dot matrix</string>
+    <string name="clock_style_fine">Fine</string>
+    <string name="clock_style_flip">Flip</string>
+    <string name="clock_style_glitch">Glitch</string>
+    <string name="clock_style_lines">Concentric</string>
+    <string name="clock_style_minimal">Minimal</string>
+    <string name="clock_style_none">No clock</string>
+    <string name="clock_style_orbit">Orbit</string>
+    <string name="clock_style_outline">Outline</string>
+    <string name="clock_style_overlap">Overlapping</string>
+    <string name="clock_style_pixel">Pixel</string>
+    <string name="clock_style_rail">Rail</string>
+    <string name="clock_style_rings">Orbit rings</string>
+    <string name="clock_style_serif">Serif</string>
+    <string name="clock_style_split">Split</string>
+    <string name="clock_style_vertical">Vertical</string>
+    <string name="clock_style_weekday">Weekday</string>
+    <string name="widget_settings_selected">Selected</string>
+    <string name="widget_settings_style_analog">Dials</string>
+    <string name="widget_settings_style_count">%1$d styles to make it yours</string>
+    <string name="widget_settings_style_graphic">Graphic</string>
+    <string name="widget_settings_style_layout">Layouts</string>
+    <string name="widget_settings_style_type">Typography</string>
+    <string-array name="weather_moon_phases">
+        <item>New moon</item>
+        <item>Waxing crescent</item>
+        <item>First quarter</item>
+        <item>Waxing gibbous</item>
+        <item>Full moon</item>
+        <item>Waning gibbous</item>
+        <item>Last quarter</item>
+        <item>Waning crescent</item>
+    </string-array>
+    <string name="clock_time_suffix">" · %1$s"</string>
+    <string name="widget_clock_data_gap">Clock to data spacing</string>
+    <string name="widget_text_width">Text width</string>
+    <string name="widget_settings_clock_app">Clock app</string>
+    <string name="widget_settings_calendar_app">Calendar app</string>
 </resources>

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.widget
 
+import dev.nikelauncher.data.backup.BackupValues
 import android.content.Context
 
 /**
@@ -33,7 +34,7 @@ data class ClockWidgetConfig(
     val agendaCount: Int,
     /** How far ahead to look, in hours. */
     val agendaLookaheadHours: Int,
-    /** "in 20 minutes" rather than a clock time. Reads better, goes stale. */
+    /** Count down inside the last hour; the visible native widget updates at each boundary. */
     val agendaRelative: Boolean,
     val showAlarm: Boolean,
     val textColor: Int,
@@ -43,7 +44,15 @@ data class ClockWidgetConfig(
     val weatherOpacity: Int,
     val notificationsOpacity: Int,
     val agendaOpacity: Int,
-) {
+    val style: ClockStyle = ClockStyle.CLASSIC,
+    val excludedCalendars: Set<String> = emptySet(),
+    /** Internal spacing; independent from the home layout's widget top/bottom padding. */
+    val clockDataGapDp: Int = 8,
+    val textWidthPercent: Int = 100,
+    /** Optional app choices; null keeps Android's normal action resolution. */
+    val clockPackage: String? = null,
+    val calendarPackage: String? = null,
+) : java.io.Serializable {
     enum class HourFormat { SYSTEM, TWELVE, TWENTY_FOUR }
 
     /** The color as one row should draw it, since each row is faded on its own. */
@@ -51,10 +60,10 @@ data class ClockWidgetConfig(
 
     companion object {
         private const val FILE = "clock_widget"
-        private const val DEFAULT_SIZE_SP = 44
+        private const val DEFAULT_SIZE_SP = 60
         private const val DEFAULT_DATE_SIZE_SP = 16
-        private const val DEFAULT_BATTERY_SIZE_SP = 14
-        private const val DEFAULT_ROW_SIZE_SP = 14
+        private const val DEFAULT_BATTERY_SIZE_SP = 16
+        private const val DEFAULT_ROW_SIZE_SP = 16
         private const val DEFAULT_COLOR = 0xFFFFFFFF.toInt()
         private const val DEFAULT_OPACITY = 100
 
@@ -90,6 +99,8 @@ data class ClockWidgetConfig(
         /** Small steps, since the right size depends on the height the widget was given. */
         val SIZE_RANGE = 16..160
         val DATE_SIZE_RANGE = 10..72
+        val CLOCK_DATA_GAP_RANGE = 0..96
+        val TEXT_WIDTH_RANGE = 25..100
 
         /** Stops short of nothing at all: an invisible row looks like a broken widget. */
         val OPACITY_RANGE = 10..100
@@ -97,7 +108,7 @@ data class ClockWidgetConfig(
         /** More than three and the widget is an agenda rather than a clock. */
         val AGENDA_COUNT_RANGE = 1..3
 
-        /** An hour out to a week; past that it is not what is coming up. */
+        /** Preserve the existing one-hour to one-week control; the full agenda is independent. */
         val AGENDA_HOURS_RANGE = 1..168
 
         /** Shared with the settings preview, so what is shown there is what is drawn. */
@@ -115,13 +126,18 @@ data class ClockWidgetConfig(
             // date at all, which is why one is not stored as the other.
             val stored = prefs.getString(key("date", widgetId), null) ?: DEFAULT_DATE
             return ClockWidgetConfig(
+                style = ClockStyle.entries.firstOrNull { it.name == prefs.getString(key("style", widgetId), null) }
+                    ?: if (prefs.contains(key("size", widgetId))) ClockStyle.CLASSIC else ClockStyle.SPLIT,
+                excludedCalendars = prefs.getStringSet(key("excludedCalendars", widgetId), emptySet()).orEmpty().toSet(),
                 hourFormat = hour,
-                datePattern = stored.takeIf { it.isNotEmpty() },
-                timeSizeSp = prefs.getInt(key("size", widgetId), DEFAULT_SIZE_SP),
-                dateSizeSp = prefs.getInt(key("dateSize", widgetId), DEFAULT_DATE_SIZE_SP),
+                datePattern = stored.takeIf { it.isNotEmpty() }?.let { if (isValidDatePattern(it)) it else DEFAULT_DATE },
+                timeSizeSp = prefs.getInt(key("size", widgetId), DEFAULT_SIZE_SP).coerceIn(SIZE_RANGE),
+                clockDataGapDp = prefs.getInt(key("clockDataGap", widgetId), 8).coerceIn(CLOCK_DATA_GAP_RANGE),
+                textWidthPercent = prefs.getInt(key("textWidth", widgetId), 100).coerceIn(TEXT_WIDTH_RANGE),
+                dateSizeSp = prefs.getInt(key("dateSize", widgetId), DEFAULT_DATE_SIZE_SP).coerceIn(DATE_SIZE_RANGE),
                 showBattery = prefs.getBoolean(key("battery", widgetId), false),
                 showWeather = prefs.getBoolean(key("weather", widgetId), false),
-                weatherSizeSp = prefs.getInt(key("weatherSize", widgetId), DEFAULT_ROW_SIZE_SP),
+                weatherSizeSp = prefs.getInt(key("weatherSize", widgetId), DEFAULT_ROW_SIZE_SP).coerceIn(DATE_SIZE_RANGE),
                 // Asked of the locale only the first time, so changing it later does not
                 // silently undo a choice made by hand.
                 weatherFahrenheit = prefs.getBoolean(
@@ -133,16 +149,20 @@ data class ClockWidgetConfig(
                 // who sent it. A list of package names we happened to think of would be wrong
                 // for whoever is not on it.
                 weatherPackage = prefs.getString(key("weatherPkg", widgetId), null),
+                clockPackage = prefs.getString(key("clockPkg", widgetId), null),
+                calendarPackage = prefs.getString(key("calendarPkg", widgetId), null),
                 showNotifications = prefs.getBoolean(key("notifications", widgetId), false),
                 showAgenda = prefs.getBoolean(key("agenda", widgetId), false),
-                agendaSizeSp = prefs.getInt(key("agendaSize", widgetId), DEFAULT_ROW_SIZE_SP),
+                agendaSizeSp = prefs.getInt(key("agendaSize", widgetId), DEFAULT_ROW_SIZE_SP).coerceIn(DATE_SIZE_RANGE),
                 agendaCount = prefs.getInt(key("agendaCount", widgetId), 1).coerceIn(AGENDA_COUNT_RANGE),
-                agendaLookaheadHours = prefs.getInt(key("agendaHours", widgetId), 24)
-                    .coerceIn(AGENDA_HOURS_RANGE),
+                agendaLookaheadHours = prefs.getInt(
+                    key("agendaHours", widgetId),
+                    if (prefs.contains(key("size", widgetId))) 24 else 12,
+                ).coerceIn(AGENDA_HOURS_RANGE),
                 agendaRelative = prefs.getBoolean(key("agendaRelative", widgetId), true),
                 showAlarm = prefs.getBoolean(key("alarm", widgetId), false),
-                notificationsSizeSp = prefs.getInt(key("notificationsSize", widgetId), DEFAULT_ROW_SIZE_SP),
-                batterySizeSp = prefs.getInt(key("batterySize", widgetId), DEFAULT_BATTERY_SIZE_SP),
+                notificationsSizeSp = prefs.getInt(key("notificationsSize", widgetId), DEFAULT_ROW_SIZE_SP).coerceIn(DATE_SIZE_RANGE),
+                batterySizeSp = prefs.getInt(key("batterySize", widgetId), DEFAULT_BATTERY_SIZE_SP).coerceIn(DATE_SIZE_RANGE),
                 textColor = prefs.getInt(key("color", widgetId), DEFAULT_COLOR),
                 timeOpacity = prefs.getInt(key("timeOpacity", widgetId), DEFAULT_OPACITY),
                 dateOpacity = prefs.getInt(key("dateOpacity", widgetId), DEFAULT_OPACITY),
@@ -154,41 +174,104 @@ data class ClockWidgetConfig(
         }
 
         fun write(context: Context, widgetId: Int, config: ClockWidgetConfig) {
-            context.getSharedPreferences(FILE, Context.MODE_PRIVATE).edit()
-                .putString(key("hour", widgetId), config.hourFormat.name)
-                .putString(key("date", widgetId), config.datePattern.orEmpty())
-                .putInt(key("size", widgetId), config.timeSizeSp)
-                .putInt(key("dateSize", widgetId), config.dateSizeSp)
-                .putBoolean(key("battery", widgetId), config.showBattery)
-                .putBoolean(key("weather", widgetId), config.showWeather)
-                .putInt(key("weatherSize", widgetId), config.weatherSizeSp)
-                .putBoolean(key("weatherF", widgetId), config.weatherFahrenheit)
-                .putString(key("weatherPkg", widgetId), config.weatherPackage)
-                .putBoolean(key("notifications", widgetId), config.showNotifications)
-                .putBoolean(key("agenda", widgetId), config.showAgenda)
-                .putInt(key("agendaSize", widgetId), config.agendaSizeSp)
-                .putInt(key("agendaCount", widgetId), config.agendaCount)
-                .putInt(key("agendaHours", widgetId), config.agendaLookaheadHours)
-                .putBoolean(key("agendaRelative", widgetId), config.agendaRelative)
-                .putBoolean(key("alarm", widgetId), config.showAlarm)
-                .putInt(key("notificationsSize", widgetId), config.notificationsSizeSp)
-                .putInt(key("batterySize", widgetId), config.batterySizeSp)
-                .putInt(key("color", widgetId), config.textColor)
-                .putInt(key("timeOpacity", widgetId), config.timeOpacity)
-                .putInt(key("dateOpacity", widgetId), config.dateOpacity)
-                .putInt(key("batteryOpacity", widgetId), config.batteryOpacity)
-                .putInt(key("weatherOpacity", widgetId), config.weatherOpacity)
-                .putInt(key("notificationsOpacity", widgetId), config.notificationsOpacity)
-                .putInt(key("agendaOpacity", widgetId), config.agendaOpacity)
-                .apply()
+            if (!config.showAgenda || read(context, widgetId).excludedCalendars != config.excludedCalendars)
+                CalendarSnapshotCache.shared.forget(widgetId)
+            restoreBackup(context, widgetId, storedValues(config), synchronous = false)
+        }
+
+        private fun storedValues(config: ClockWidgetConfig): Map<String, Any> = linkedMapOf<String, Any?>(
+            "style" to config.style.name,
+            "excludedCalendars" to config.excludedCalendars,
+            "hour" to config.hourFormat.name,
+            "date" to config.datePattern.orEmpty(),
+            "size" to config.timeSizeSp,
+            "clockDataGap" to config.clockDataGapDp.coerceIn(CLOCK_DATA_GAP_RANGE),
+            "textWidth" to config.textWidthPercent.coerceIn(TEXT_WIDTH_RANGE),
+            "dateSize" to config.dateSizeSp,
+            "battery" to config.showBattery,
+            "weather" to config.showWeather,
+            "weatherSize" to config.weatherSizeSp,
+            "weatherF" to config.weatherFahrenheit,
+            "weatherPkg" to config.weatherPackage,
+            "clockPkg" to config.clockPackage,
+            "calendarPkg" to config.calendarPackage,
+            "notifications" to config.showNotifications,
+            "agenda" to config.showAgenda,
+            "agendaSize" to config.agendaSizeSp,
+            "agendaCount" to config.agendaCount,
+            "agendaHours" to config.agendaLookaheadHours,
+            "agendaRelative" to config.agendaRelative,
+            "alarm" to config.showAlarm,
+            "notificationsSize" to config.notificationsSizeSp,
+            "batterySize" to config.batterySizeSp,
+            "color" to config.textColor,
+            "timeOpacity" to config.timeOpacity,
+            "dateOpacity" to config.dateOpacity,
+            "batteryOpacity" to config.batteryOpacity,
+            "weatherOpacity" to config.weatherOpacity,
+            "notificationsOpacity" to config.notificationsOpacity,
+            "agendaOpacity" to config.agendaOpacity,
+        ).filterValues { it != null }.mapValues { it.value!! }
+
+        /** Shares the normal-write field map, so new clock options join backups automatically. */
+        internal fun backupValues(context: Context, widgetId: Int): Map<String, Any> =
+            storedValues(read(context, widgetId))
+
+        internal fun validateBackup(context: Context, values: org.json.JSONObject): Map<String, Any> {
+            val types = storedValues(read(context, -1)).mapValues { (_, value) ->
+                when (value) {
+                    is String -> "string"
+                    is Boolean -> "boolean"
+                    is Int -> "int"
+                    is Set<*> -> "stringSet"
+                    else -> error("Unsupported clock option")
+                }
+            } + mapOf("weatherPkg" to "string", "clockPkg" to "string", "calendarPkg" to "string")
+            val result = dev.nikelauncher.data.backup.BackupValues.decode(values, types)
+            (result["date"] as? String)?.let { require(it.isEmpty() || isValidDatePattern(it)) }
+            return result
+        }
+
+        internal fun restoreBackup(
+            context: Context,
+            widgetId: Int,
+            values: Map<String, Any>,
+            synchronous: Boolean = true,
+            replaceExisting: Boolean = false,
+        ) {
+            CalendarSnapshotCache.shared.forget(widgetId)
+            val prefs = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            val editor = prefs.edit()
+            // A newly allocated Android widget ID may have belonged to a deleted widget before.
+            // Older backups do not contain fields introduced later, so merely overwriting the
+            // supplied fields would inherit those stale values instead of their normal defaults.
+            // Remove this ID's entire old snapshot in the same transaction as the restored one.
+            if (replaceExisting) prefs.all.keys.filter { it.endsWith("_$widgetId") }.forEach(editor::remove)
+            values.forEach { (name, value) ->
+                when (value) {
+                    is String -> editor.putString(key(name, widgetId), value)
+                    is Boolean -> editor.putBoolean(key(name, widgetId), value)
+                    is Int -> editor.putInt(key(name, widgetId), value)
+                    is Set<*> -> editor.putStringSet(key(name, widgetId), value.filterIsInstance<String>().toSet())
+                    else -> error("Invalid clock option")
+                }
+            }
+            listOf("weatherPkg", "clockPkg", "calendarPkg").filterNot(values::containsKey)
+                .forEach { editor.remove(key(it, widgetId)) }
+            if (synchronous) check(editor.commit()) else editor.apply()
         }
 
         /** Dropped when the widget is, so a later widget cannot inherit its id's settings. */
         fun forget(context: Context, widgetId: Int) {
+            CalendarSnapshotCache.shared.forget(widgetId)
             context.getSharedPreferences(FILE, Context.MODE_PRIVATE).edit()
+                .remove(key("style", widgetId))
+                .remove(key("excludedCalendars", widgetId))
                 .remove(key("hour", widgetId))
                 .remove(key("date", widgetId))
                 .remove(key("size", widgetId))
+                .remove(key("clockDataGap", widgetId))
+                .remove(key("textWidth", widgetId))
                 .remove(key("dateSize", widgetId))
                 .remove(key("battery", widgetId))
                 .remove(key("batterySize", widgetId))
@@ -200,6 +283,8 @@ data class ClockWidgetConfig(
                 .remove(key("weatherSize", widgetId))
                 .remove(key("weatherF", widgetId))
                 .remove(key("weatherPkg", widgetId))
+                .remove(key("clockPkg", widgetId))
+                .remove(key("calendarPkg", widgetId))
                 .remove(key("weatherOpacity", widgetId))
                 .remove(key("notifications", widgetId))
                 .remove(key("notificationsSize", widgetId))

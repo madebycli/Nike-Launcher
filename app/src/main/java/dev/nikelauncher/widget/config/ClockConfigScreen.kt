@@ -58,6 +58,7 @@ fun ClockConfigScreen(
                 },
             )
         }
+        item { SettingsGroup(layoutRows(config, calendarGranted, update) { dialog = it }) }
         item { SettingsGroup(textStyleRows(context, config, update)) }
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {

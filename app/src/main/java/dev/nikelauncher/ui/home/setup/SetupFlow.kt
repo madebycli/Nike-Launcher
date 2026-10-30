@@ -86,7 +86,7 @@ internal fun SetupFlow(
         Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 24.dp)) {
             if (step > 0) SetupStepHeader(step, LAST, onBack = { step-- }, modifier = Modifier.padding(top = 12.dp))
             val offsetSpec = AppMotion.offset()
-            val effectsSpec = AppMotion.effects()
+            val effectsSpec = AppMotion.effects<Float>()
             AnimatedContent(
                 targetState = step,
                 modifier = Modifier.weight(1f).fillMaxWidth(),

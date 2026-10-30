@@ -23,13 +23,13 @@ import androidx.compose.ui.unit.IntSize
 object AppMotion {
 
     @Composable
-    fun spatial(): FiniteAnimationSpec<Float> = scheme { defaultSpatialSpec() }
+    fun <T> spatial(): FiniteAnimationSpec<T> = scheme { defaultSpatialSpec<T>() }
 
     @Composable
-    fun fastSpatial(): FiniteAnimationSpec<Float> = scheme { fastSpatialSpec() }
+    fun <T> fastSpatial(): FiniteAnimationSpec<T> = scheme { fastSpatialSpec<T>() }
 
     @Composable
-    fun slowSpatial(): FiniteAnimationSpec<Float> = scheme { slowSpatialSpec() }
+    fun <T> slowSpatial(): FiniteAnimationSpec<T> = scheme { slowSpatialSpec<T>() }
 
     @Composable
     fun offset(): FiniteAnimationSpec<IntOffset> = scheme { defaultSpatialSpec() }
@@ -41,13 +41,17 @@ object AppMotion {
     fun size(): FiniteAnimationSpec<IntSize> = scheme { defaultSpatialSpec() }
 
     @Composable
-    fun effects(): FiniteAnimationSpec<Float> = scheme { defaultEffectsSpec() }
+    fun <T> effects(): FiniteAnimationSpec<T> = scheme { defaultEffectsSpec<T>() }
 
     @Composable
-    fun fastEffects(): FiniteAnimationSpec<Float> = scheme { fastEffectsSpec() }
+    fun <T> fastEffects(): FiniteAnimationSpec<T> = scheme { fastEffectsSpec<T>() }
 
     @Composable
-    fun slowEffects(): FiniteAnimationSpec<Float> = scheme { slowEffectsSpec() }
+    fun <T> slowEffects(): FiniteAnimationSpec<T> = scheme { slowEffectsSpec<T>() }
+
+    /** For a hero moment that settles slowly and may overshoot. */
+    @Composable
+    fun <T> emphasized(): FiniteAnimationSpec<T> = scheme { slowSpatialSpec<T>() }
 
     @Composable
     fun color(): FiniteAnimationSpec<Color> = scheme { defaultEffectsSpec() }

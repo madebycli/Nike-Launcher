@@ -8,6 +8,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 
 /**
  * Keeps the battery line on the clock widget current.
@@ -25,6 +30,13 @@ object ClockWidgetBattery {
     /** Last level drawn, so the many broadcasts that change nothing visible cost nothing. */
     private var lastPercent = -1
     private var watching = false
+    private val redrawRequests by lazy {
+        Channel<Context>(Channel.CONFLATED).also { requests ->
+            CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+                for (appContext in requests) runCatching { redrawBatteryWidgets(appContext) }
+            }
+        }
+    }
 
     /** The level right now, for a draw that happens between broadcasts. */
     fun percent(context: Context): Int? = runCatching {
@@ -65,6 +77,10 @@ object ClockWidgetBattery {
 
     /** Only the widgets showing a battery line, since a redraw of the rest would change nothing. */
     private fun redraw(context: Context) {
+        redrawRequests.trySend(context.applicationContext)
+    }
+
+    private fun redrawBatteryWidgets(context: Context) {
         val manager = runCatching { AppWidgetManager.getInstance(context) }.getOrNull() ?: return
         val ids = runCatching {
             manager.getAppWidgetIds(ClockWidgetProvider.componentName(context))
