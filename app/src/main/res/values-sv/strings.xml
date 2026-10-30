@@ -654,4 +654,5 @@
     <string name="app_edit_reset_name">Återställ visningsnamn</string>
     <string name="font_google_sans_flex">Google Sans Flex</string>
     <string name="font_niagara">Niagara / Nunito Sans</string>
+    <string name="widget_clock_color_reset">Återställ klockans färg till vitt</string>
 </resources>

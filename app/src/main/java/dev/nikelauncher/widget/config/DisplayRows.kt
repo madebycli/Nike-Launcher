@@ -2,6 +2,8 @@
 package dev.nikelauncher.widget.config
 
 import android.text.format.DateFormat
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -9,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.R
@@ -84,6 +87,13 @@ internal fun displayRows(
                 ) {}
             },
         ),
+    ) + listOfNotNull(
+        // White is where the clock starts, and a colour picked by eye is hard to get back to.
+        if (config.textColor != Color.White.toArgb()) settingsItem(
+            title = stringResource(R.string.widget_clock_color_reset),
+            onClick = { update { it.copy(textColor = Color.White.toArgb()) } },
+            icon = Icons.Filled.RestartAlt,
+        ) else null,
     )
 }
 

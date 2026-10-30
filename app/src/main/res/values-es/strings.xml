@@ -654,4 +654,5 @@
     <string name="app_edit_title">Editar aplicación</string>
     <string name="font_google_sans_flex">Google Sans Flex</string>
     <string name="font_niagara">Niagara / Nunito Sans</string>
+    <string name="widget_clock_color_reset">Restablecer el color del reloj a blanco</string>
 </resources>

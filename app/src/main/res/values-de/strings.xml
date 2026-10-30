@@ -650,4 +650,5 @@
     <string name="app_edit_title">App anpassen</string>
     <string name="font_niagara">Niagara / Nunito Sans</string>
     <string name="font_google_sans_flex">Google Sans Flex</string>
+    <string name="widget_clock_color_reset">Uhrfarbe auf Weiß zurücksetzen</string>
 </resources>
