@@ -14,6 +14,8 @@ data/
   IconPackRepository.kt         icon-pack discovery, appfilter.xml parsing, icon lookup
   Prefs.kt                      owns the DataStore; settings live in Library/Appearance/Home/AppList/Strip/Corner/WidgetPagePrefs.kt, keys in PrefKeys.kt
   backup/                       the backup file: typed values, widgets with new ids, files the settings point at, widgets left to confirm
+  prefs/SearchPrefs.kt           exclusive search mode using legacy booleans; separate button-field edge
+  prefs/SetupPrefs.kt            durable first-run page before external home-role requests
   prefs/WidgetAppPrefs.kt        default clock/calendar/weather apps for newly created clock widgets
   prefs/HomeLayoutPrefs.kt       atomic frame pins, shared block gaps and selected-field edge distances
   Folder.kt                     folder model + JSON persistence + favorites token encoding
@@ -28,10 +30,10 @@ ui/
   home/scroll/                 pure elastic-drag boundaries; HomeScroll owns synchronous input and one settling job
   home/edit/                    frame selection/draft, grouped placement, nudge controls and the Material home-layout settings sheet
   home/pages/                   widget pages: pager, grid, resize and reorder; components/WidgetGridToolbar uses stock button defaults
-  home/corner/                  the corner button, its sheets, a pinned CornerSettingsPreview and the floating search button
-  home/setup/                   the first-run flow; StyleStep pins a StylePreview (the favorites, read from the same prefs) above the style controls
+  home/corner/                  the corner button, its sheets, a pinned CornerSettingsPreview, separate placement canvas/geometry and the floating search button
+  home/setup/                   the first-run flow; StyleStep scrolls its fixed two-app StylePreview together with the controls
   home/wallpaper/               system blur, picture and grain behind the app list
-  applist/                      A-Z list, pull-to-collapse, strip and edge zone, scrub state
+  applist/                      screen parameters/session, placement effects, nested pull connection, scene, rows, search slots, strip and scrub state
   notifications/                live sheet host, testable presentation, grouped message history, Material bubbles/swipe dismissal, provider actions, target-bound reply drafts and image loaders
   settings/                     settings screen, its sections and the picker screens
   theme/                        Material 3 Expressive theme, fonts, wallpaper-aware text color
@@ -56,8 +58,8 @@ The style gallery is the only page that replaces the preview with its own select
 Calendar selection and the style gallery live in separate files. Date and number entry use the
 state-based Material text-field API. The preview reserves a fixed 120-240dp viewport rather than
 resizing to the current text. PreviewContrast chooses among Material surfaces by measured contrast,
-so white text keeps a dark plate in either theme. The first-run style preview reserves 200dp and
-scrolls its unconstrained rows internally. It reuses AlignedIconLabel so large/right-side icons
+so white text keeps a dark plate in either theme. The first-run style preview reserves 264dp for two complete 96dp icons and the maximum row gap.
+It is the first item of the outer settings scroll, so it leaves room for controls when scrolled away. It reuses AlignedIconLabel so large/right-side icons
 keep their requested size and cannot be squeezed by labels or earlier rows.
 
 **Setup uses the same app pickers as widget settings.** `WidgetAppPrefs` stores initial app choices
@@ -68,8 +70,33 @@ also updates an already-bound first-run clock. `AccessStep` and `FavoritesStep` 
 
 **Setup needs only the Material Surface to block touches behind it.** An additional empty clickable
 modifier on the entire setup consumed the down event needed by reorder handles. Favorite rows now
-use the existing `sh.calvin.reorderable.ReorderableColumn` and Material up/down buttons, with ordering
-in the framework-free `RowOrder.kt`.
+use `SelectedFavorites`: the existing `sh.calvin.reorderable.ReorderableColumn` with the same
+segmented Material rows as the available apps. Two tonal icon buttons remove and drag; accessibility
+reorder actions remain available without visible arrow pairs. Ordering stays in `RowOrder.kt`.
+
+**First-run progress is durable before leaving for Android.** `SetupPrefs` writes `setup_step`
+(0-4) to DataStore. `SetupFlow` waits for that value instead of briefly drawing Welcome. A fresh HOME
+task or process therefore resumes Access after the home-role chooser; finishing still uses the
+existing `welcome_seen` flag. This is a simulated lifecycle regression, not an OEM role-dialog test.
+
+**Corner placement is independent of home editing.** Home settings always reach the complete
+button settings, including Enabled. `corner/place` draws home and a separate full-screen placement
+canvas, with Reset and Done. A saved normalized `CornerPosition` maps through pure inset-aware travel
+geometry. Reset changes only the draft; Back cancels, Done writes the pair atomically. The optional
+float keys `corner_position_x/y` are absent for the original corner alignment.
+
+**Search presentation has one owner.** `SearchPrefs` derives None/Button/Bar from the existing
+`applist_search_enabled` and `search_button_floating` booleans, preferring Bar for legacy conflicts.
+Choosing a mode writes both keys atomically. `search_button_at_bottom` (boolean, default true) is
+independent of the existing permanent-bar edge. Hidden-app search retains its original meaning.
+The button and corner focus request reveal the field before focusing it; `AppListSearchSlot` uses
+Material slide/fade motion from the corresponding edge. No key was renamed or retyped; the optional
+corner, search and setup keys remain supported by typed backup format 2.
+
+**Settings navigation shares the kit motion.** `SharedAxis` adapts the full-container forward/back
+slide and fade; both NavHost destinations and inline settings sections use it. Widget and app-row
+menus use `TouchMenu` and expressive Material grouped-menu shapes. Attribution is in NOTICE.md.
+See `animation-manifest.json` for changed transitions and their verification boundaries.
 
 **A home block owns its field even when its contents disappear.** When Now Playing is enabled,
 its fixed-height field remains in the stack during playback, pause, dismissal and silence. Only
@@ -148,6 +175,20 @@ provider updates; changing a target requires an explicit selection. Large notifi
 are decoded up to 1024px; avatar icons remain bounded at 128px. Both loaders run off the main thread.
 Presentation is keyed by selected notification id, so content updates retain the draft and history.
 
+**Notification rows replace the normal label, without repeating the app icon.** Both favorites
+and app-list rows use the same flat Material `NotificationAppContent`, following the Grid preview's
+app/age/title/latest-message hierarchy. `AppNotification` excludes shortcuts, work/private profiles
+and other users before subscribing. A right swipe opens the app overview even with one notification;
+optional shortcut swipes never override it. Inline rows cannot dismiss notifications. Folder excerpts
+share the same eligibility check and row gesture. The app row owns its sheet outside the optional
+preview, so provider removal cannot dispose it mid-close. Shortcut swipes default off; explicit
+stored legacy/user choices survive. Notification details put Open, provider actions and explicit dismissal in one kit overflow
+beside the reply field. Calendar/weather and notifications share `ViewportSheet`: full available
+height below the status bar/cutout, one 24dp stock-handle slot and the same bottom/horizontal insets.
+There is no separate Open row between history and reply. The send symbol is the stock rounded
+Material Send icon. The state-based reply field grows to four lines, then scrolls internally, while
+retaining its explicit action/result-key target and 4096-character bound.
+
 **A backup carries more than settings.** Widgets get new ids on another phone, so each is bound
 again and every reference (home, folders, widget pages) is remapped; a widget the system will not
 bind by itself waits in `WidgetRestoreActivity`. Files the settings point at (a font, icons, the
@@ -194,26 +235,3 @@ whichever app is the current Home.
 - No generated Baseline Profile. Recording and validating one still needs a device.
 - Robolectric verifies real Compose layouts and simulated interactions. Device gesture velocity,
   notification-provider delivery, system-role dialogs, wallpaper and frame timing need phone checks.
-
-## Follow-up modules
-
-The app-list screen is split into parameters/session, placement effects, nested pull connection,
-scene, rows, menus and search slots. Structural input equality prevents unchanged bundles from
-feeding a composition loop. Home and app-list notification rows share Material NotificationAppContent,
-profile/opt-in gates and a right-swipe overview action. Inline message rows cannot dismiss. Explicit
-shortcut choices survive while absent preferences default off. Notification detail actions live in
-one overflow beside the target-bound reply field. ViewportSheet shares the calendar/weather height,
-insets and compact stock handle with notifications; explicit close hides before removing its owner.
-
-SetupPrefs persists setup_step (0-4) before external home-role requests. The style page scrolls
-its fixed 264dp two-app preview together with its controls. SelectedFavorites reuses the same
-segmented Material rows as candidates, with tonal remove/drag buttons and accessibility reordering.
-SearchPrefs provides exclusive None/Button/Bar by atomically writing the existing two booleans;
-legacy conflicts prefer Bar. search_button_at_bottom is independent of the permanent bar edge.
-No persisted key was renamed or retyped; optional keys remain in typed backup format 2.
-
-Home settings always open the complete corner settings, including Enabled, and display the actual
-action rather than an absent app name. A separate home-backed placement route keeps Reset/Back in
-a draft; Done atomically saves corner_position_x/y as normalized travel fractions. Pure geometry
-keeps the whole button within insets on resize. SharedAxis adapts full-container forward/pop slide
-and fade from the attributed settings reference, using Material motion specs.

@@ -198,52 +198,6 @@ fun WidgetSlot(
             }
         }
 
-        TouchAnchoredMenu(expanded = menuExpanded, offset = menuOffset, onDismissRequest = { menuExpanded = false }) {
-            val id = menuForId
-            if (id > 0) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.action_app_info)) },
-                    leadingIcon = { Icon(Icons.Filled.Info, contentDescription = null) },
-                    onClick = { menuExpanded = false; actions.onAppInfo(id) },
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.action_edit_layout)) },
-                    leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
-                    onClick = { menuExpanded = false; onEditLayout() },
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.widget_change_settings)) },
-                    leadingIcon = { Icon(Icons.Filled.Tune, contentDescription = null) },
-                    onClick = { menuExpanded = false; actions.onWidgetSettings(id) },
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.widget_add_another)) },
-                    leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                    onClick = { menuExpanded = false; actions.onAddWidget() },
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.widget_remove_this)) },
-                    leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) },
-                    onClick = { menuExpanded = false; actions.onRemoveWidget(id) },
-                )
-            } else {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.widget_add)) },
-                    leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                    onClick = { menuExpanded = false; actions.onAddWidget() },
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.action_edit_layout)) },
-                    leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
-                    onClick = { menuExpanded = false; onEditLayout() },
-                )
-            }
-            HorizontalDivider()
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.action_open_settings)) },
-                leadingIcon = { Icon(Icons.Filled.Settings, contentDescription = null) },
-                onClick = { menuExpanded = false; actions.onOpenSettings() },
-            )
-        }
+        WidgetMenu(menuExpanded, menuOffset, menuForId, actions, onEditLayout) { menuExpanded = false }
     }
 }

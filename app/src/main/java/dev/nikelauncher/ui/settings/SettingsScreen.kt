@@ -2,6 +2,8 @@
 package dev.nikelauncher.ui.settings
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,6 +26,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.R
 import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.ui.kit.motion.AppMotion
+import dev.nikelauncher.ui.kit.motion.sharedAxisEnter
+import dev.nikelauncher.ui.kit.motion.sharedAxisExit
 import dev.nikelauncher.ui.kit.search.SearchField
 import dev.nikelauncher.ui.kit.settings.SettingsGroup
 import dev.nikelauncher.ui.kit.settings.SettingsScaffold
@@ -31,23 +36,23 @@ import dev.nikelauncher.ui.kit.settings.SettingsSectionLabel
 import dev.nikelauncher.ui.kit.settings.settingsItem
 import dev.nikelauncher.ui.settings.sections.aboutEntries
 import dev.nikelauncher.ui.settings.sections.appListEntries
-import dev.nikelauncher.ui.settings.sections.backgroundEntries
-import dev.nikelauncher.ui.settings.sections.widgetPageEntries
-import dev.nikelauncher.ui.settings.sections.searchButtonEntries
 import dev.nikelauncher.ui.settings.sections.appearanceEntries
 import dev.nikelauncher.ui.settings.sections.appsEntries
+import dev.nikelauncher.ui.settings.sections.backgroundEntries
 import dev.nikelauncher.ui.settings.sections.backupEntries
 import dev.nikelauncher.ui.settings.sections.gesturesEntries
 import dev.nikelauncher.ui.settings.sections.homeEntries
 import dev.nikelauncher.ui.settings.sections.notificationEntries
+import dev.nikelauncher.ui.settings.sections.searchButtonEntries
 import dev.nikelauncher.ui.settings.sections.stripEntries
+import dev.nikelauncher.ui.settings.sections.widgetPageEntries
 
 /**
  * The settings: a list of sections, one section at a time, and a search box over all of them.
  *
  * The open section is saved, not just remembered: settings that change the window (the rotation
- * lock) rebuild the activity, and a plain remember would drop whoever was three rows into a
- * section back at the top menu.
+ * lock) rebuild the activity, and a plain remember would drop whoever was three rows into a section
+ * back at the top menu.
  */
 @Composable
 fun SettingsScreen(env: SettingsEnv, onBack: () -> Unit, modifier: Modifier = Modifier) {
@@ -58,19 +63,20 @@ fun SettingsScreen(env: SettingsEnv, onBack: () -> Unit, modifier: Modifier = Mo
         if (query.isNotBlank()) query = "" else openName = null
     }
 
-    val entries = (
-        appearanceEntries(env) + homeEntries(env) + widgetPageEntries(env) + appListEntries(env) + backgroundEntries(env) + searchButtonEntries(env) + stripEntries(env) +
-            gesturesEntries(env) + notificationEntries(env) + appsEntries(env) +
-            backupEntries(env) + aboutEntries(env)
-        ).filter { it.visible }
-    val shown = remember(entries, query, open) {
-        val matching = when {
-            query.isNotBlank() -> entries.filter { it.matches(query) }
-            open != null -> entries.filter { it.section == open }
-            else -> emptyList()
-        }
-        matching.groupBy { it.section }.toList()
-    }
+    val entries =
+        (appearanceEntries(env) +
+                homeEntries(env) +
+                widgetPageEntries(env) +
+                appListEntries(env) +
+                backgroundEntries(env) +
+                searchButtonEntries(env) +
+                stripEntries(env) +
+                gesturesEntries(env) +
+                notificationEntries(env) +
+                appsEntries(env) +
+                backupEntries(env) +
+                aboutEntries(env))
+            .filter { it.visible }
 
     val dimReveal = env.previews.dimReveal()
     val dimColor by env.prefs.appearance.dimColor.collectAsState(0xFF000000.toInt())
@@ -80,34 +86,70 @@ fun SettingsScreen(env: SettingsEnv, onBack: () -> Unit, modifier: Modifier = Mo
 
     Box(modifier.fillMaxSize()) {
         DimPreview(env.previews, Color(dimColor), dimReveal)
-        SettingsScaffold(
-            title = stringResource(open?.labelRes ?: R.string.settings_title),
-            onBack = { if (open != null) openName = null else onBack() },
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 1f - dimReveal),
-        ) {
-            item {
-                SearchField(query, { query = it }, stringResource(R.string.settings_search))
-            }
-            if (open == null && query.isBlank()) {
-                item {
-                    SettingsGroup(
-                        SettingsSection.entries.map { section ->
-                            settingsItem(
-                                title = stringResource(section.labelRes),
-                                onClick = { openName = section.name },
-                                icon = section.icon,
-                                trailing = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) },
-                            )
-                        },
-                    )
+        val spatial = AppMotion.offset()
+        val effects = AppMotion.effects<Float>()
+        AnimatedContent(
+            targetState = openName,
+            transitionSpec = {
+                val forward = targetState != null
+                sharedAxisEnter(forward, spatial, effects) togetherWith
+                    sharedAxisExit(forward, spatial, effects)
+            },
+            label = "settingsSection",
+        ) { target ->
+            val open = target?.let { SettingsSection.valueOf(it) }
+            val shown =
+                remember(entries, query, open) {
+                    val matching =
+                        when {
+                            query.isNotBlank() -> entries.filter { it.matches(query) }
+                            open != null -> entries.filter { it.section == open }
+                            else -> emptyList()
+                        }
+                    matching.groupBy { it.section }.toList()
                 }
-            }
-            items(shown, key = { it.first.name }) { (section, group) ->
-                SettingsSectionLabel(stringResource(section.labelRes), Modifier.padding(bottom = 8.dp))
-                SettingsGroup(group.map { it.row })
-            }
-            if (query.isNotBlank() && shown.isEmpty()) {
-                item { Text(stringResource(R.string.settings_search_none), style = MaterialTheme.typography.bodyMedium) }
+            SettingsScaffold(
+                title = stringResource(open?.labelRes ?: R.string.settings_title),
+                onBack = { if (open != null) openName = null else onBack() },
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 1f - dimReveal),
+            ) {
+                item {
+                    SearchField(query, { query = it }, stringResource(R.string.settings_search))
+                }
+                if (open == null && query.isBlank()) {
+                    item {
+                        SettingsGroup(
+                            SettingsSection.entries.map { section ->
+                                settingsItem(
+                                    title = stringResource(section.labelRes),
+                                    onClick = { openName = section.name },
+                                    icon = section.icon,
+                                    trailing = {
+                                        Icon(
+                                            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                )
+                            }
+                        )
+                    }
+                }
+                items(shown, key = { it.first.name }) { (section, group) ->
+                    SettingsSectionLabel(
+                        stringResource(section.labelRes),
+                        Modifier.padding(bottom = 8.dp),
+                    )
+                    SettingsGroup(group.map { it.row })
+                }
+                if (query.isNotBlank() && shown.isEmpty()) {
+                    item {
+                        Text(
+                            stringResource(R.string.settings_search_none),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
             }
         }
         PreviewOverlays(env.previews, edgeSide, edgeWidth, sectionTop)

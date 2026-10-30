@@ -13,9 +13,9 @@ Material 3 / Material 3 Expressive first, then the AniSync reference, and only t
 | Section label | `SettingsSectionLabel` | `ui/kit/settings` |
 | Popup menu | `Menu { item / divider / gap / scrollable }` → `DropdownMenuPopup` | `ui/kit/menu` |
 | Dropdown field | `MenuField` | `ui/kit/menu` |
-| Bottom sheet | `ModalBottomSheet` | Material 3 |
+| Bottom sheet | `ModalBottomSheet`; `ViewportSheet` for the shared calendar/notification full viewport and compact handle | Material 3 / `ui/kit/sheet` |
 | Dialog | `AlertDialog` | Material 3 |
-| Content swap | `FadeThrough.contentTransform()` | `ui/kit/motion` |
+| Navigation / content swap | `SharedAxis` for directional navigation; `FadeThrough.contentTransform()` for content | `ui/kit/motion` |
 | Pressed feedback on custom content | `Modifier.bouncyClickable` | `ui/kit/motion` |
 | Animation specs | `AppMotion.spatial() / effects() / …` | `ui/kit/motion` |
 | Drag-to-reorder lists | `sh.calvin.reorderable` | library |

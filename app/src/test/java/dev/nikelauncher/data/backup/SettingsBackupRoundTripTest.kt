@@ -63,6 +63,9 @@ class SettingsBackupRoundTripTest {
             clockPackage = "fake.clock", calendarPackage = "fake.calendar", excludedCalendars = setOf("2"),
         )
         ClockWidgetConfig.write(app, 77, clock)
+        prefs.corner.setPosition(CornerPosition(.25f, .75f))
+        prefs.search.setMode(dev.nikelauncher.data.prefs.SearchDisplayMode.BUTTON)
+        prefs.search.setButtonAtBottom(false)
         val before = prefs.storedValues()
         val backup = prefs.exportJson(true).json
         prefs.replaceBackupValues(emptyMap())

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "transitions": [
+    {
+      "name": "settings-navigation",
+      "source": "ui/kit/motion/SharedAxis.kt",
+      "owners": [
+        "ui/NikeNavHost.kt",
+        "ui/settings/SettingsScreen.kt"
+      ],
+      "motion": "Material AppMotion offset and effects; full container Start forward, End on pop",
+      "verification": "MenuMotionScreensTest intermediate measured positions; AppScreensTest actual destinations"
+    },
+    {
+      "name": "button-search-field",
+      "source": "ui/applist/AppListSearchSlot.kt",
+      "motion": "Material slide/fade from the configured top or bottom edge",
+      "verification": "MenuMotionScreensTest intermediate positions; UserFlowScreensTest real search entry"
+    },
+    {
+      "name": "widget-and-app-menus",
+      "source": "ui/kit/menu/Menu.kt",
+      "motion": "Stock expressive DropdownMenuPopup and grouped shapes",
+      "verification": "MenuMotionScreensTest rendered widget menu; no device frame-time claim"
+    },
+    {
+      "name": "notification-sheet",
+      "source": "ui/kit/sheet/ViewportSheet.kt",
+      "owners": [
+        "widget/ClockOverviewSheet.kt",
+        "ui/notifications/NotificationSheet.kt"
+      ],
+      "motion": "Stock ModalBottomSheet shared with calendar/weather; explicit close hides before removing owner",
+      "verification": "NotificationScreensTest light/dark/large text; WeatherScreensTest shared viewport; UserFlowScreensTest actual sheet entry"
+    }
+  ]
+}

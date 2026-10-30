@@ -8,6 +8,8 @@ Each walk-through needs a test process of its own, because the preferences store
 
 ```bash
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.SetupScreensTest"
+NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.UserFlowScreensTest"
+NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.MenuMotionScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.AppScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.HomeScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.HomeLayoutScreensTest"
@@ -60,10 +62,23 @@ at 150% font scale produce `home-fixed*` images. Data and app-launch boundaries 
 
 `PreviewLayoutScreensTest` renders the real first-run StyleStep and clock PinnedPreview in light
 and dark themes. It checks exact preview bounds while changing icon size, spacing, label size and
-clock size, and checks all three icons retain their full requested dimensions, including icons to
+clock size, and checks both icons retain their full requested dimensions, including icons to
 the right of large labels. `preview-fixed*` images include white and black clocks.
 
 `HomeScrollInteractionTest` runs in ordinary unit-test checks. It drives the real draggable and
 animation clock through release, cancellation, an interrupted rebound and swipe-up completion.
 Its deep-pull test records GLOBAL_ACTION_NOTIFICATIONS through the real SystemUi/accessibility
 service path with a Robolectric service. This verifies the request, not the on-device system panel.
+
+The follow-up setup test recreates the real activity on Access and checks that Welcome does not
+return. Selected and available favorite rows share height and Material styling; the real drag is
+checked against the stored order. Preview tests assert exactly two full-size icons and that the
+preview scrolls away with its controls.
+
+`UserFlowScreensTest` navigates from Home settings with the corner disabled, restores it, drags its
+separate placement draft, resets and saves it. It then injects in-memory notifications and swipes
+on home (with a widget page enabled) and the app list, checking that the app overview opens and no
+notification cancellation occurs. It also exercises corner search and the independent field edges.
+`MenuMotionScreensTest` renders the real widget menu and samples intermediate measured positions
+for the shared settings transition and both search-field origins using the production Material
+specs. These checks prove direction/state under the test clock, not smoothness on a phone.

@@ -31,7 +31,7 @@ spacing. All labels are resources in six locales. HomeLayoutPrefs owns the two n
 which remain in backup format 2; selected padding edits preserve unselected inherited values.
 
 Clock previews reserve a fixed viewport and choose their Material plate by actual contrast in both
-themes. The setup style preview reserves 200dp and scrolls internally; AlignedIconLabel keeps sibling
+themes. The setup style preview reserves 264dp for two complete icons and scrolls with its controls; AlignedIconLabel keeps sibling
 and right-side icons at the requested dimensions. See ARCHITECTURE.md for module details.
 
 New verification: ordinary HomeScrollInteractionTest, per-module drag/editor/contrast logic tests,
@@ -64,7 +64,7 @@ horizontal position after a partial/cancelled swipe before verifying full swipe 
   Reply drafts retain their target across provider updates; send waits for explicit retargeting.
 - Added setup defaults for clock/calendar/weather apps, included in the existing backup. New
   clocks receive them; reopening a saved clock retains its own settings. Reused the clock app
-  pickers. Split Access/Favorites steps; use the existing reorderable library and up/down buttons.
+  pickers. Split Access/Favorites steps; use the existing reorderable library and tonal remove/drag buttons.
   Removed an extra setup-wide clickable modifier that consumed the reorder handle's down event.
   The setup render test verifies the stored order after both an arrow move and a drag.
 - Added floating-search foreground/automatic-foreground controls using the already existing
@@ -78,6 +78,38 @@ horizontal position after a partial/cancelled swipe before verifying full swipe 
   hidden consumers do not subscribe. This is not a device frame-time benchmark.
 - Rendered actual German weather sheet headers at font scale 1.5. They fit the Pixel 9 viewport.
   Updated architecture and comparison/performance records.
+
+## Live-test follow-up
+
+- Persist first-run progress in `SetupPrefs` before leaving for the Android home-role chooser.
+  A recreated activity resumes Access. Real OEM/system role handover still needs a phone.
+- Put the fixed two-app style preview into the same outer settings scroll. Selected favorites use
+  the same stock segmented rows as candidates, without the count, dividers or visible arrow pair.
+- Restore complete corner settings from Settings > Home even when disabled. A separate home-backed
+  placement route keeps Reset/Back in a draft and commits normalized, inset-aware coordinates on Done.
+- Derive exclusive None/Button/Bar search presentation from the existing two booleans. The optional
+  button field has its own stored edge and matching Material slide origin. Corner search reveals
+  the field before focusing it. Explicit shortcut preferences survive; new installs default to Off.
+- Split the app-list monolith into session, parameters, placement effects, pull connection, scene,
+  rows, menu and search files. Structural parameter equality avoids composition feedback from an
+  unchanged input bundle. Existing scroll/scrub algorithms remain intact.
+- Share compact notification app/header/age/message rows between home and app list. Right swipe
+  opens the app overview, including when there is one notification; inline swipes cannot clear it.
+  Personal snapshots never appear on work/private/other-user or shortcut rows. Long press goes
+  through the stock interactive ListItem, including its clickable icon/header children.
+- Move Open/provider/dismiss actions to one overflow beside the reply field. Use the rounded Material
+  Send icon. Calendar/weather and notifications share `ViewportSheet`, with the same available height,
+  insets and compact stock handle. Close hides the sheet before removing its owner.
+- Adapt full-container forward/pop navigation from the attributed settings reference into SharedAxis;
+  use it for destinations and inline settings. Widget/app menus use the expressive grouped kit.
+
+New screen suites: `UserFlowScreensTest` exercises real navigation, corner recovery/placement,
+notification menu/gesture entry and both search edges. `MenuMotionScreensTest` measures intermediate
+positions under the test clock and renders the widget menu. These are not phone FPS measurements.
+`SetupScreensTest` waits for the durable page and checks recreation, equal favorite row heights and
+stored drag order. `NotificationScreensTest` checks multiline growth and a four-line height cap,
+target replacement and overflow actions in light/dark/large text. Full-resolution review files and
+APK delivery remain outside git. The user's customized default configuration is still deferred.
 
 ## Verification entry points
 
