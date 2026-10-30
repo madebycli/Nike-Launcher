@@ -58,6 +58,16 @@ android {
             )
             signingConfig = if (hasSigningConfig) signingConfigs.getByName("release") else null
         }
+        // The release build (R8, resource shrinking) signed with the debug key, installable beside
+        // the debug build, for judging speed on a phone: a debug build runs Compose unoptimised and
+        // says little about how smooth anything is.
+        create("perf") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".perf"
+            versionNameSuffix = "-perf"
+            matchingFallbacks += "release"
+        }
     }
 
     compileOptions {

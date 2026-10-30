@@ -38,6 +38,9 @@
         android:theme="@style/Theme.NikeLauncher"
         android:supportsRtl="true">
 
+        <!-- Lets a profiler or Perfetto attach to the optimised build over adb shell. -->
+        <profileable android:shell="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
