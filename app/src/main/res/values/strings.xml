@@ -614,4 +614,7 @@
     <string name="action_uninstall">Uninstall</string>
     <string name="quick_zone_height">Area height</string>
     <string name="quick_zone_bottom">Distance from bottom</string>
+    <string name="search_button_floating">Floating search button</string>
+    <string name="search_button_hide_scrolling">Hide while scrolling</string>
+    <string name="corner_colors">Button colors</string>
 </resources>

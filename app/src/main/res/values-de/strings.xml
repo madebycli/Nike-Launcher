@@ -406,4 +406,7 @@
     <string name="action_uninstall">Deinstallieren</string>
     <string name="quick_zone_height">Höhe des Bereichs</string>
     <string name="quick_zone_bottom">Abstand vom unteren Rand</string>
+    <string name="search_button_floating">Schwebender Suchknopf</string>
+    <string name="search_button_hide_scrolling">Beim Scrollen ausblenden</string>
+    <string name="corner_colors">Buttonfarben</string>
 </resources>

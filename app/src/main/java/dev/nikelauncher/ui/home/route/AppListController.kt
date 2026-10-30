@@ -60,6 +60,11 @@ internal class AppListController(
     private var launchClose: Job? = null
     private var keepThroughPause = false
 
+    /** Asks the list for the cursor. */
+    fun focusSearch() {
+        searchFocusTick++
+    }
+
     /** Opened the whole way, as tapping the edge does. */
     fun openFully(focusSearch: Boolean = false) {
         visible = true
