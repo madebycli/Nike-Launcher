@@ -75,6 +75,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.LocalTextStyle
 import dev.nikelauncher.ui.theme.launcherTextShadow
 import androidx.compose.runtime.Composable
+import dev.nikelauncher.ui.home.rows.FolderIcon
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -124,7 +125,6 @@ import dev.nikelauncher.data.ScrubBubbleShape
 import dev.nikelauncher.data.EntryKind
 import dev.nikelauncher.data.Folder
 import dev.nikelauncher.data.folderToken
-import dev.nikelauncher.ui.home.FolderIcon
 import androidx.compose.material.icons.filled.Delete
 import dev.nikelauncher.data.PRIVATE_SPACE_UNLOCKED_CLASS
 import dev.nikelauncher.NikeApp
@@ -1574,7 +1574,7 @@ private fun AppRow(
             }
         }
 
-        AppShortcutMenu(app, shortcutMenu, labelSizeSp) { shortcutMenu = false }
+        AppShortcutMenu(app, shortcutMenu) { shortcutMenu = false }
 
         DropdownMenu(expanded = menuExpanded, onDismissRequest = onDismissMenu, offset = menuOffset) {
             // Not offered while the favorites keep themselves. Starring an app wrote to a list

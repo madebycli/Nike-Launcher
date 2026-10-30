@@ -22,16 +22,6 @@ class HomePrefs internal constructor(private val store: DataStore<Preferences>) 
 
     private val data get() = store.data
 
-    /** Every padding a user can set by hand; their presence is what retires the first-run layout. */
-    private val padKeys = listOf(
-        PrefKeys.NOW_PLAYING_PAD_TOP,
-        PrefKeys.NOW_PLAYING_PAD_BOTTOM,
-        PrefKeys.WIDGET_PAD_TOP,
-        PrefKeys.WIDGET_PAD_BOTTOM,
-        PrefKeys.FAVORITES_PAD_TOP,
-        PrefKeys.FAVORITES_PAD_BOTTOM,
-    )
-
     /**
      * Absent means this install predates multiple widgets, so the lone [PrefKeys.WIDGET_ID] is
      * promoted. An empty string is different: it means every widget was removed, and must not
@@ -51,17 +41,25 @@ class HomePrefs internal constructor(private val store: DataStore<Preferences>) 
 
     val nowPlayingHeightDp: Flow<Int> = data.map { it[PrefKeys.NOW_PLAYING_HEIGHT_DP] ?: 64 }.distinctUntilChanged()
 
-    /** Draggable top/bottom padding for each home block, set in edit mode. */
-    val homePaddings: Flow<HomePaddings> = data.map {
-        HomePaddings(
-            nowPlayingTop = it[PrefKeys.NOW_PLAYING_PAD_TOP] ?: 8,
-            nowPlayingBottom = it[PrefKeys.NOW_PLAYING_PAD_BOTTOM] ?: 8,
-            widgetTop = it[PrefKeys.WIDGET_PAD_TOP] ?: 8,
-            widgetBottom = it[PrefKeys.WIDGET_PAD_BOTTOM] ?: 8,
-            favoritesTop = it[PrefKeys.FAVORITES_PAD_TOP] ?: 8,
-            favoritesBottom = it[PrefKeys.FAVORITES_PAD_BOTTOM] ?: 24,
-        )
+    /** Where each home block is held; a block never moved holds its default place. */
+    val homePins: Flow<HomePins> = data.map { pref ->
+        HomePins.Default.run {
+            copy(
+                widget = pref[PrefKeys.HOME_PIN_WIDGET]?.let(BlockPin::decode) ?: widget,
+                nowPlaying = pref[PrefKeys.HOME_PIN_NOW_PLAYING]?.let(BlockPin::decode) ?: nowPlaying,
+                favorites = pref[PrefKeys.HOME_PIN_FAVORITES]?.let(BlockPin::decode) ?: favorites,
+            )
+        }
     }.distinctUntilChanged()
+
+    suspend fun setHomePin(block: HomeBlock, pin: BlockPin?) {
+        val key = when (block) {
+            HomeBlock.WIDGET -> PrefKeys.HOME_PIN_WIDGET
+            HomeBlock.NOW_PLAYING -> PrefKeys.HOME_PIN_NOW_PLAYING
+            HomeBlock.FAVORITES -> PrefKeys.HOME_PIN_FAVORITES
+        }
+        store.edit { if (pin == null) it.remove(key) else it[key] = pin.encode() }
+    }
 
     /**
      * Whether swiping a row sideways offers the shortcuts its app publishes.
@@ -96,9 +94,6 @@ class HomePrefs internal constructor(private val store: DataStore<Preferences>) 
     val nowPlayingEnabled: Flow<Boolean> = data.map { it[PrefKeys.NOW_PLAYING_ENABLED] ?: false }.distinctUntilChanged()
 
     val widgetId: Flow<Int> = data.map { it[PrefKeys.WIDGET_ID] ?: -1 }.distinctUntilChanged()
-
-    /** Index into the merged (favorites + widget) home list where the widget sits. 0 = top. */
-    val widgetPosition: Flow<Int> = data.map { it[PrefKeys.WIDGET_POSITION] ?: 0 }.distinctUntilChanged()
 
     val widgetHeightDp: Flow<Int> = data.map { it[PrefKeys.WIDGET_HEIGHT_DP] ?: 180 }.distinctUntilChanged()
 
@@ -144,35 +139,8 @@ class HomePrefs internal constructor(private val store: DataStore<Preferences>) 
 
     val welcomeSeen: Flow<Boolean> = data.map { it[PrefKeys.WELCOME_SEEN] ?: false }.distinctUntilChanged()
 
-    /** True once any padding has been set by hand, which retires the computed first-run layout. */
-    val hasCustomLayout: Flow<Boolean> =
-        data.map { pref -> padKeys.any { pref.contains(it) } }.distinctUntilChanged()
-
-    /**
-     * Whether the favorites' own top gap has been set by hand.
-     *
-     * What retires the computed centred placement, rather than any layout padding at all.
-     * Adjusting the gap *below* the favorites used to retire it too, which meant the centred
-     * top had to be written out first to keep them where they were — and getting that wrong
-     * sent them to the top of the screen with no obvious way back.
-     */
-    val hasCustomFavoritesTop: Flow<Boolean> =
-        data.map { pref -> pref.contains(PrefKeys.FAVORITES_PAD_TOP) }.distinctUntilChanged()
-
     suspend fun setNowPlayingHeightDp(v: Int) {
         store.edit { it[PrefKeys.NOW_PLAYING_HEIGHT_DP] = v }
-    }
-
-    suspend fun setHomePadding(slot: PaddingSlot, v: Int) {
-        val key = when (slot) {
-            PaddingSlot.NOW_PLAYING_TOP -> PrefKeys.NOW_PLAYING_PAD_TOP
-            PaddingSlot.NOW_PLAYING_BOTTOM -> PrefKeys.NOW_PLAYING_PAD_BOTTOM
-            PaddingSlot.WIDGET_TOP -> PrefKeys.WIDGET_PAD_TOP
-            PaddingSlot.WIDGET_BOTTOM -> PrefKeys.WIDGET_PAD_BOTTOM
-            PaddingSlot.FAVORITES_TOP -> PrefKeys.FAVORITES_PAD_TOP
-            PaddingSlot.FAVORITES_BOTTOM -> PrefKeys.FAVORITES_PAD_BOTTOM
-        }
-        store.edit { it[key] = v }
     }
 
     suspend fun setShortcutSwipe(v: ShortcutSwipe) {
@@ -197,10 +165,6 @@ class HomePrefs internal constructor(private val store: DataStore<Preferences>) 
 
     suspend fun setNowPlayingEnabled(v: Boolean) {
         store.edit { it[PrefKeys.NOW_PLAYING_ENABLED] = v }
-    }
-
-    suspend fun setWidgetPosition(v: Int) {
-        store.edit { it[PrefKeys.WIDGET_POSITION] = v }
     }
 
     suspend fun setWidgetHeightDp(v: Int) {

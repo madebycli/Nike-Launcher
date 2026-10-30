@@ -2,11 +2,6 @@
 package dev.nikelauncher.ui.common
 
 import android.content.pm.ShortcutInfo
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,37 +11,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
 import dev.nikelauncher.NikeApp
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.ShortcutSwipe
+import dev.nikelauncher.ui.kit.menu.Menu
+import dev.nikelauncher.ui.kit.menu.MenuScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /** Most an app is allowed to contribute, so a menu stays a menu rather than a list. */
 private const val MAX_SHORTCUTS = 5
 
+/** One shortcut an app publishes, ready to be a menu row. */
+class ShortcutEntry(val label: String, val icon: ImageBitmap?, val start: () -> Unit)
+
 /**
- * The shortcuts an app publishes, as items at the top of its long-press menu.
- *
- * Read when the menu opens rather than with the app list: it is a call into the system per
- * app, and an app list is hundreds of apps of which one is ever asked about.
- *
- * Emits nothing at all when an app publishes none, so the menu is unchanged for most of them.
+ * The shortcuts an app publishes, read when [expanded] turns true rather than with the app list:
+ * it is a call into the system per app, and an app list is hundreds of apps of which one is ever
+ * asked about. Empty for an app that publishes none.
  */
 @Composable
-fun AppShortcutItems(
-    app: AppInfo,
-    expanded: Boolean,
-    labelSizeSp: Int,
-    onStarted: () -> Unit,
-) {
+fun rememberAppShortcuts(app: AppInfo, expanded: Boolean): List<ShortcutEntry> {
     val context = LocalContext.current
     val nikeApp = context.applicationContext as NikeApp
     val density = LocalConfiguration.current.densityDpi
@@ -54,49 +44,30 @@ fun AppShortcutItems(
 
     LaunchedEffect(app.key, expanded) {
         if (!expanded) return@LaunchedEffect
-        shortcuts = withContext(Dispatchers.IO) {
-            nikeApp.appRepository.appShortcuts(app).take(MAX_SHORTCUTS)
-        }
+        shortcuts = withContext(Dispatchers.IO) { nikeApp.appRepository.appShortcuts(app).take(MAX_SHORTCUTS) }
     }
-
-    if (shortcuts.isEmpty()) return
-
-    shortcuts.forEach { shortcut ->
+    return shortcuts.mapNotNull { shortcut ->
         val label = (shortcut.shortLabel ?: shortcut.longLabel)?.toString().orEmpty()
-        if (label.isBlank()) return@forEach
-        val iconDp = iconSizeFor(labelSizeSp)
+        if (label.isBlank()) return@mapNotNull null
         val icon = remember(shortcut.id, density) {
             runCatching {
-                nikeApp.appRepository.shortcutIcon(shortcut, density)
-                    ?.toBitmap(ICON_PX, ICON_PX)
-                    ?.asImageBitmap()
+                nikeApp.appRepository.shortcutIcon(shortcut, density)?.toBitmap(ICON_PX, ICON_PX)?.asImageBitmap()
             }.getOrNull()
         }
-        DropdownMenuItem(
-            text = { Text(label, fontSize = labelSizeSp.sp) },
-            leadingIcon = icon?.let {
-                { Image(bitmap = it, contentDescription = null, modifier = Modifier.size(iconDp)) }
-            },
-            onClick = {
-                nikeApp.appRepository.startAppShortcut(shortcut)
-                onStarted()
-            },
-        )
+        ShortcutEntry(label, icon) { nikeApp.appRepository.startAppShortcut(shortcut) }
+    }
+}
+
+/** Adds an app's shortcuts to a menu; adds nothing when it publishes none. */
+@Composable
+fun MenuScope.appShortcutItems(shortcuts: List<ShortcutEntry>, onStarted: () -> Unit) {
+    shortcuts.forEach { entry ->
+        item(text = entry.label, leadingImage = entry.icon, onClick = { entry.start(); onStarted() })
     }
 }
 
 /** Rasterised at menu-icon size; the drawable itself is whatever density the publisher had. */
 private const val ICON_PX = 72
-
-/**
- * The icon beside a shortcut, sized from the label it sits next to.
- *
- * Tied to the launcher's own label size rather than given a setting of its own: this is the
- * same list of app names as everywhere else, and a panel that ignored the size set for those
- * was the thing worth fixing. Bounded so it stays an icon in a menu at either extreme.
- */
-private fun iconSizeFor(labelSizeSp: Int): Dp =
-    (labelSizeSp * 1.5f).dp.coerceIn(20.dp, 44.dp)
 
 /**
  * Swipe a row sideways to reach what the app publishes.
@@ -151,8 +122,9 @@ private const val SWIPE_THRESHOLD_PX = 90f
  * the same size on every use, which is what makes it something you reach for rather than read.
  */
 @Composable
-fun AppShortcutMenu(app: AppInfo, expanded: Boolean, labelSizeSp: Int, onDismiss: () -> Unit) {
-    DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
-        AppShortcutItems(app, expanded, labelSizeSp) { onDismiss() }
+fun AppShortcutMenu(app: AppInfo, expanded: Boolean, onDismiss: () -> Unit) {
+    val shortcuts = rememberAppShortcuts(app, expanded)
+    Menu(expanded = expanded && shortcuts.isNotEmpty(), onDismissRequest = onDismiss) {
+        appShortcutItems(shortcuts, onDismiss)
     }
 }

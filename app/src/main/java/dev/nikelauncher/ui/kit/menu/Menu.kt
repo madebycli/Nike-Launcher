@@ -2,7 +2,9 @@
 // Adapted from AniSync (GPL-3.0-or-later), presentation/components/menu/Menu.kt.
 package dev.nikelauncher.ui.kit.menu
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -193,8 +195,14 @@ private fun MenuItemRow(entry: MenuEntry.Item, index: Int, count: Int) {
         onClick = entry.onClick,
         text = { Text(entry.text, maxLines = entry.maxLines, overflow = TextOverflow.Ellipsis) },
         shapes = MenuDefaults.itemShape(index, count),
-        leadingIcon = entry.leadingIcon?.let { icon ->
-            { Icon(imageVector = icon, contentDescription = null) }
+        leadingIcon = when {
+            entry.leadingIcon != null -> {
+                { Icon(imageVector = entry.leadingIcon, contentDescription = null) }
+            }
+            entry.leadingImage != null -> {
+                { Image(bitmap = entry.leadingImage, contentDescription = null, modifier = Modifier.size(24.dp)) }
+            }
+            else -> null
         },
         trailingContent = entry.trailingLabel?.let { trailing ->
             {

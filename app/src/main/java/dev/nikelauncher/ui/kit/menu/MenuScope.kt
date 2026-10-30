@@ -2,6 +2,7 @@
 // Adapted from AniSync (GPL-3.0-or-later), presentation/components/menu/Menu.kt.
 package dev.nikelauncher.ui.kit.menu
 
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /** Content of a [Menu]: items, dividers and gaps between groups. */
@@ -10,6 +11,7 @@ interface MenuScope {
         text: String,
         onClick: () -> Unit,
         leadingIcon: ImageVector? = null,
+        leadingImage: ImageBitmap? = null,
         trailingLabel: String? = null,
         supportingText: String? = null,
         destructive: Boolean = false,
@@ -36,6 +38,7 @@ internal sealed interface MenuEntry {
         val text: String,
         val onClick: () -> Unit,
         val leadingIcon: ImageVector?,
+        val leadingImage: ImageBitmap?,
         val trailingLabel: String?,
         val supportingText: String?,
         val destructive: Boolean,
@@ -57,6 +60,7 @@ internal class MenuScopeImpl : MenuScope {
         text: String,
         onClick: () -> Unit,
         leadingIcon: ImageVector?,
+        leadingImage: ImageBitmap?,
         trailingLabel: String?,
         supportingText: String?,
         destructive: Boolean,
@@ -69,6 +73,7 @@ internal class MenuScopeImpl : MenuScope {
                 text = text,
                 onClick = onClick,
                 leadingIcon = leadingIcon,
+                leadingImage = leadingImage,
                 trailingLabel = trailingLabel,
                 supportingText = supportingText,
                 destructive = destructive,
