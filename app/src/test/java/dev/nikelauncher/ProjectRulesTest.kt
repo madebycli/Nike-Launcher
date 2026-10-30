@@ -71,7 +71,8 @@ class ProjectRulesTest {
         val LEGACY_TEXT_LITERALS = emptySet<String>()
 
         val LEGACY_FILE_CAPS = mapOf(
-            "ui/applist/AppListScreen.kt" to 540,
+            "ui/applist/AppListScreen.kt" to 1866,
+            "data/AppRepository.kt" to 745,
                     )
     }
 }

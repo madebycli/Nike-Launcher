@@ -56,7 +56,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Info
@@ -1409,7 +1408,7 @@ fun AppListScreen(
                 shape = when (scrubBubbleShape) {
                     ScrubBubbleShape.CIRCLE -> CircleShape
                     ScrubBubbleShape.SQUARE -> RectangleShape
-                    else -> RoundedCornerShape(22.dp)
+                    else -> MaterialTheme.shapes.largeIncreased
                 },
                 modifier = Modifier
                     .align(if (activeSide == EdgeSide.LEFT) Alignment.TopStart else Alignment.TopEnd)
@@ -1507,7 +1506,7 @@ private fun AppRow(
                 .padding(horizontal = 20.dp)
                 .background(
                     color = if (pressed) contentColor.copy(alpha = 0.15f) else Color.Transparent,
-                    shape = RoundedCornerShape(18.dp),
+                    shape = MaterialTheme.shapes.largeIncreased,
                 )
                 .combinedClickable(
                     interactionSource = interaction,
@@ -1716,7 +1715,7 @@ private fun FolderListRow(
                 .padding(horizontal = 20.dp)
                 .background(
                     color = if (pressed) contentColor.copy(alpha = 0.15f) else Color.Transparent,
-                    shape = RoundedCornerShape(18.dp),
+                    shape = MaterialTheme.shapes.largeIncreased,
                 )
                 .combinedClickable(
                     interactionSource = interaction,
@@ -1821,7 +1820,7 @@ private fun SearchField(
                 }
             }
         },
-        shape = RoundedCornerShape(28.dp),
+        shape = MaterialTheme.shapes.extraLarge,
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = contentColor,
             unfocusedTextColor = contentColor,
