@@ -661,4 +661,46 @@
     <string name="edit_move_right">Mover a la derecha</string>
     <string name="edit_edge_distance">Distancia al borde</string>
     <string name="edit_value_dp">%1$d dp</string>
+
+
+    <string name="clock_style">Estilo de reloj</string>
+    <string name="widget_settings_absolute">Mostrar siempre la hora</string>
+    <string name="widget_settings_agenda_open">Abrir agenda</string>
+    <string name="widget_settings_alarm">Próxima alarma</string>
+    <string name="widget_settings_appearance">Apariencia</string>
+    <string name="widget_settings_appearance_summary">Tamaño, color y transparencia del texto</string>
+    <string name="widget_settings_battery">Nivel de batería</string>
+    <string name="widget_settings_calendar_all">Todos los calendarios visibles</string>
+    <string name="widget_settings_calendar_selected">Selección personalizada</string>
+    <string name="widget_settings_calendar_summary">Fecha, próximos eventos y calendarios</string>
+    <string name="widget_settings_clock">Reloj</string>
+    <string name="widget_settings_colour_summary">Elige un color para tu widget</string>
+    <string name="widget_settings_date">Mostrar fecha</string>
+    <string name="widget_settings_date_format">Formato de fecha</string>
+    <string name="widget_settings_date_heading">Fecha</string>
+    <string name="widget_settings_disabled">Desactivado</string>
+    <string name="widget_settings_display">En la pantalla de inicio</string>
+    <string name="widget_settings_event_count">Eventos en la pantalla de inicio</string>
+    <string name="widget_settings_events">Próximos eventos</string>
+    <string name="widget_settings_format">Formato de hora</string>
+    <string name="widget_settings_hours">%1$d h</string>
+    <string name="widget_settings_lookahead">Antelación</string>
+    <string name="widget_settings_more">Mostrar también</string>
+    <string name="widget_settings_notifications">Número de notificaciones</string>
+    <string name="widget_settings_opacity">Opacidad</string>
+    <string name="widget_settings_range">%1$d–%2$d</string>
+    <string name="widget_settings_relative">Cuenta atrás durante la última hora</string>
+    <string name="widget_settings_spacing">Espaciado</string>
+    <string name="widget_settings_text_color">Color del texto</string>
+    <string name="widget_settings_text_size">Tamaño del texto</string>
+    <string name="widget_settings_time_labels">Horas de los eventos</string>
+    <string name="widget_settings_title">Tu widget</string>
+    <string name="widget_settings_unit">Unidad de temperatura</string>
+    <string name="widget_settings_weather_app">App del tiempo</string>
+    <string name="widget_settings_weather_open">Abrir previsión del tiempo</string>
+    <string name="widget_settings_weather_ready">El tiempo está actualizado</string>
+    <string name="widget_settings_weather_show">Mostrar el tiempo</string>
+    <string name="widget_settings_weather_summary">Temperatura, previsión y app del tiempo</string>
+    <string name="widget_settings_weather_waiting">Esperando datos del tiempo</string>
+
 </resources>

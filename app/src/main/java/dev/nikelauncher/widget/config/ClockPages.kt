@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.widget.config
 
-import android.content.Context
 import android.text.format.DateFormat
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.icons.Icons
@@ -21,10 +20,9 @@ import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import dev.nikelauncher.R
+import dev.nikelauncher.widget.clockAppLabel
 import dev.nikelauncher.ui.kit.settings.ChoiceChips
 import dev.nikelauncher.ui.kit.settings.SettingsGroup
 import dev.nikelauncher.ui.kit.settings.SettingsRow
@@ -37,17 +35,6 @@ import dev.nikelauncher.widget.ClockWidgetConfig.HourFormat
 import java.util.Date
 
 private val chevron: @Composable () -> Unit = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) }
-
-/** The name of an app by its package, or the "system default" wording when none is chosen. */
-@Composable
-internal fun appLabel(pkg: String?): String {
-    val context = LocalContext.current
-    val default = stringResource(R.string.widget_settings_system_app)
-    return remember(context, pkg, default) { pkg?.let { packageLabel(context, it) } ?: default }
-}
-
-private fun packageLabel(context: Context, pkg: String): String =
-    runCatching { context.packageManager.getApplicationLabel(context.packageManager.getApplicationInfo(pkg, 0)).toString() }.getOrDefault(pkg)
 
 /** The first page: the four areas, then what else the widget can carry. */
 @Composable
@@ -96,7 +83,7 @@ internal fun ColumnScope.ClockPage(config: ClockWidgetConfig, update: ConfigUpda
                     onSelect = { choice -> update { it.copy(hourFormat = choice) } },
                 )
             },
-            settingsItem(stringResource(R.string.widget_settings_clock_app), { open(ClockConfigDialog.CLOCK_APP) }, Icons.Filled.Apps, appLabel(config.clockPackage), trailing = chevron),
+            settingsItem(stringResource(R.string.widget_settings_clock_app), { open(ClockConfigDialog.CLOCK_APP) }, Icons.Filled.Apps, clockAppLabel(config.clockPackage), trailing = chevron),
         ),
     )
 }
@@ -105,6 +92,7 @@ internal fun ColumnScope.ClockPage(config: ClockWidgetConfig, update: ConfigUpda
 @Composable
 internal fun ColumnScope.CalendarPage(
     config: ClockWidgetConfig,
+    lastDatePattern: String,
     calendarGranted: Boolean,
     update: ConfigUpdate,
     open: (ClockConfigDialog) -> Unit,
@@ -118,7 +106,7 @@ internal fun ColumnScope.CalendarPage(
     SettingsSectionLabel(stringResource(R.string.widget_settings_display))
     SettingsGroup(
         buildList<SettingsRow> {
-            add(settingsSwitch(stringResource(R.string.widget_settings_date), config.datePattern != null, { on -> update { it.copy(datePattern = if (on) ClockWidgetConfig.DEFAULT_DATE else null) } }, Icons.Filled.Today))
+            add(settingsSwitch(stringResource(R.string.widget_settings_date), config.datePattern != null, { on -> update { it.copy(datePattern = if (on) lastDatePattern else null) } }, Icons.Filled.Today))
             if (config.datePattern != null) {
                 add(
                     settingsBlock(stringResource(R.string.widget_settings_date_format)) {
@@ -184,7 +172,7 @@ internal fun ColumnScope.CalendarPage(
     }
     SettingsGroup(
         listOf(
-            settingsItem(stringResource(R.string.widget_settings_calendar_app), { open(ClockConfigDialog.CALENDAR_APP) }, Icons.Filled.Apps, appLabel(config.calendarPackage), trailing = chevron),
+            settingsItem(stringResource(R.string.widget_settings_calendar_app), { open(ClockConfigDialog.CALENDAR_APP) }, Icons.Filled.Apps, clockAppLabel(config.calendarPackage), trailing = chevron),
             settingsItem(stringResource(R.string.widget_settings_agenda_open), openAgenda, Icons.AutoMirrored.Filled.OpenInNew),
         ),
     )

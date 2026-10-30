@@ -7,6 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.then
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedTextField
@@ -55,16 +60,18 @@ internal fun configNumber(
 
 @Composable
 private fun ExactNumberDialog(title: String, value: Int, range: IntRange, onChange: (Int) -> Unit, onDismiss: () -> Unit) {
-    var input by remember { mutableStateOf(value.toString()) }
-    val number = input.toIntOrNull()
+    val input = rememberTextFieldState(value.toString())
+    val number = input.text.toString().toIntOrNull()
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             OutlinedTextField(
-                value = input,
-                onValueChange = { input = it.filter(Char::isDigit).take(4) },
-                singleLine = true,
+                state = input,
+                inputTransformation = InputTransformation.maxLength(4).then {
+                    if (asCharSequence().any { !it.isDigit() }) revertAllChanges()
+                },
+                lineLimits = TextFieldLineLimits.SingleLine,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 supportingText = { Text(stringResource(R.string.widget_settings_range, range.first, range.last)) },
                 isError = number == null || number !in range,

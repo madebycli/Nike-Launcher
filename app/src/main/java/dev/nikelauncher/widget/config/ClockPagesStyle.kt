@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.widget.config
 
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.size
@@ -26,6 +25,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.R
+import dev.nikelauncher.widget.clockAppLabel
 import dev.nikelauncher.ui.kit.settings.ChoiceChips
 import dev.nikelauncher.ui.kit.settings.SettingsGroup
 import dev.nikelauncher.ui.kit.settings.SettingsRow
@@ -61,7 +61,8 @@ internal fun ColumnScope.WeatherPage(
                         )
                     },
                 )
-                add(settingsItem(stringResource(R.string.widget_settings_weather_app), { open(ClockConfigDialog.WEATHER_APP) }, Icons.Filled.Apps, appLabel(config.weatherPackage), trailing = chevron))
+                add(settingsItem(stringResource(R.string.widget_settings_weather_app), { open(ClockConfigDialog.WEATHER_APP) }, Icons.Filled.Apps,
+                    config.weatherPackage?.let { clockAppLabel(it) } ?: stringResource(R.string.settings_quick_launch_none), trailing = chevron))
             }
         },
     )
@@ -80,7 +81,7 @@ internal fun ColumnScope.WeatherPage(
 
 /** The text colour and, for each part that is showing, its size and opacity. */
 @Composable
-internal fun ColumnScope.AppearancePage(context: Context, c: ClockWidgetConfig, update: ConfigUpdate, open: (ClockConfigDialog) -> Unit) {
+internal fun ColumnScope.AppearancePage(c: ClockWidgetConfig, update: ConfigUpdate, open: (ClockConfigDialog) -> Unit) {
     SettingsGroup(
         buildList<SettingsRow> {
             add(
@@ -110,7 +111,7 @@ internal fun ColumnScope.AppearancePage(context: Context, c: ClockWidgetConfig, 
         SettingsGroup(
             listOf(
                 configNumber(sizeTitle, size, range, onChange = onSize),
-                configNumber(opacityTitle, opacity, ClockWidgetConfig.OPACITY_RANGE, "$opacity%", onOpacity),
+                configNumber(opacityTitle, opacity, ClockWidgetConfig.OPACITY_RANGE, stringResource(R.string.widget_clock_battery_percent, opacity), onOpacity),
             ),
         )
     }
@@ -118,10 +119,10 @@ internal fun ColumnScope.AppearancePage(context: Context, c: ClockWidgetConfig, 
         part(stringResource(R.string.widget_settings_clock), c.timeSizeSp, c.timeOpacity, ClockWidgetConfig.SIZE_RANGE,
             { v -> update { it.copy(timeSizeSp = v) } }, { v -> update { it.copy(timeOpacity = v) } })
         SettingsSectionLabel(stringResource(R.string.widget_settings_spacing))
-        SettingsGroup(listOf(configNumber(stringResource(R.string.widget_clock_data_gap), c.clockDataGapDp, ClockWidgetConfig.CLOCK_DATA_GAP_RANGE, "${c.clockDataGapDp} dp") { v -> update { it.copy(clockDataGapDp = v) } }))
+        SettingsGroup(listOf(configNumber(stringResource(R.string.widget_clock_data_gap), c.clockDataGapDp, ClockWidgetConfig.CLOCK_DATA_GAP_RANGE, stringResource(R.string.edit_value_dp, c.clockDataGapDp)) { v -> update { it.copy(clockDataGapDp = v) } }))
     }
     SettingsSectionLabel(stringResource(R.string.widget_text_width))
-    SettingsGroup(listOf(configNumber(stringResource(R.string.widget_text_width), c.textWidthPercent, ClockWidgetConfig.TEXT_WIDTH_RANGE, "${c.textWidthPercent}%") { v -> update { it.copy(textWidthPercent = v) } }))
+    SettingsGroup(listOf(configNumber(stringResource(R.string.widget_text_width), c.textWidthPercent, ClockWidgetConfig.TEXT_WIDTH_RANGE, stringResource(R.string.widget_clock_battery_percent, c.textWidthPercent)) { v -> update { it.copy(textWidthPercent = v) } }))
     if (c.datePattern != null) part(stringResource(R.string.widget_settings_date_heading), c.dateSizeSp, c.dateOpacity, ClockWidgetConfig.DATE_SIZE_RANGE,
         { v -> update { it.copy(dateSizeSp = v) } }, { v -> update { it.copy(dateOpacity = v) } })
     if (c.showAgenda || c.showAlarm) part(stringResource(R.string.widget_settings_calendar), c.agendaSizeSp, c.agendaOpacity, ClockWidgetConfig.DATE_SIZE_RANGE,

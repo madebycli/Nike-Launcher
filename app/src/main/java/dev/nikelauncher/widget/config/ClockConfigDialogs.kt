@@ -3,6 +3,10 @@ package dev.nikelauncher.widget.config
 
 import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -10,7 +14,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
@@ -26,7 +29,6 @@ import dev.nikelauncher.ui.kit.settings.SettingsPickerSheet
 import dev.nikelauncher.widget.ClockAppKind
 import dev.nikelauncher.widget.ClockAppPickerDialog
 import dev.nikelauncher.widget.ClockCalendarPicker
-import dev.nikelauncher.widget.ClockStyleGallery
 import dev.nikelauncher.widget.ClockWidgetConfig
 import java.util.Date
 
@@ -80,7 +82,8 @@ internal fun ClockConfigDialogs(
  */
 @Composable
 private fun CustomDateDialog(initial: String, onConfirm: (String) -> Unit, onDismiss: () -> Unit) {
-    var text by remember { mutableStateOf(initial) }
+    val field = rememberTextFieldState(initial)
+    val text = field.text.toString()
     val valid = ClockWidgetConfig.isValidDatePattern(text)
     val preview = if (valid) {
         runCatching { DateFormat.format(text, Date()).toString() }.getOrDefault("")
@@ -93,9 +96,9 @@ private fun CustomDateDialog(initial: String, onConfirm: (String) -> Unit, onDis
         text = {
             Column {
                 OutlinedTextField(
-                    value = text,
-                    onValueChange = { if (it.length <= ClockWidgetConfig.MAX_DATE_PATTERN) text = it },
-                    singleLine = true,
+                    state = field,
+                    inputTransformation = InputTransformation.maxLength(ClockWidgetConfig.MAX_DATE_PATTERN),
+                    lineLimits = TextFieldLineLimits.SingleLine,
                     isError = !valid,
                     label = { Text(stringResource(R.string.widget_clock_date_custom_label)) },
                     supportingText = { Text(preview) },
@@ -125,7 +128,7 @@ private fun WeatherAppSheet(selected: String?, onPick: (String?) -> Unit, onDism
     }
     val none = stringResource(R.string.settings_quick_launch_none)
     SettingsPickerSheet(
-        title = stringResource(R.string.widget_clock_weather_opens),
+        title = stringResource(R.string.widget_settings_weather_app),
         items = listOf<AppInfo?>(null) + apps,
         selected = apps.firstOrNull { it.componentName.packageName == selected },
         itemLabel = { it?.label ?: none },

@@ -150,7 +150,7 @@
     <string name="icon_shape_rounded">Скруглённый</string>
     <string name="icon_shape_square">Квадратный</string>
     <string name="settings_icon_pack_themed">Material</string>
-    
+
     <!-- Text color choices -->
     <string name="text_color_auto">Авто</string>
     <string name="text_color_light">Светлый</string>
@@ -681,5 +681,47 @@
     <string name="edit_move_right">Вправо</string>
     <string name="edit_edge_distance">Отступ от края</string>
     <string name="edit_value_dp">%1$d dp</string>
+
+
+    <string name="clock_style">Стиль часов</string>
+    <string name="widget_settings_absolute">Всегда показывать время</string>
+    <string name="widget_settings_agenda_open">Открыть расписание</string>
+    <string name="widget_settings_alarm">Следующий будильник</string>
+    <string name="widget_settings_appearance">Оформление</string>
+    <string name="widget_settings_appearance_summary">Размер, цвет и прозрачность текста</string>
+    <string name="widget_settings_battery">Уровень заряда</string>
+    <string name="widget_settings_calendar_all">Все видимые календари</string>
+    <string name="widget_settings_calendar_selected">Свой выбор</string>
+    <string name="widget_settings_calendar_summary">Дата, ближайшие события и календари</string>
+    <string name="widget_settings_clock">Часы</string>
+    <string name="widget_settings_colour_summary">Выберите цвет виджета</string>
+    <string name="widget_settings_date">Показывать дату</string>
+    <string name="widget_settings_date_format">Формат даты</string>
+    <string name="widget_settings_date_heading">Дата</string>
+    <string name="widget_settings_disabled">Выключено</string>
+    <string name="widget_settings_display">На главном экране</string>
+    <string name="widget_settings_event_count">События на главном экране</string>
+    <string name="widget_settings_events">Ближайшие события</string>
+    <string name="widget_settings_format">Формат времени</string>
+    <string name="widget_settings_hours">%1$d ч</string>
+    <string name="widget_settings_lookahead">Период просмотра</string>
+    <string name="widget_settings_more">Также показывать</string>
+    <string name="widget_settings_notifications">Число уведомлений</string>
+    <string name="widget_settings_opacity">Непрозрачность</string>
+    <string name="widget_settings_range">%1$d–%2$d</string>
+    <string name="widget_settings_relative">Обратный отсчёт в последний час</string>
+    <string name="widget_settings_spacing">Интервалы</string>
+    <string name="widget_settings_text_color">Цвет текста</string>
+    <string name="widget_settings_text_size">Размер текста</string>
+    <string name="widget_settings_time_labels">Время событий</string>
+    <string name="widget_settings_title">Ваш виджет</string>
+    <string name="widget_settings_unit">Единица температуры</string>
+    <string name="widget_settings_weather_app">Приложение погоды</string>
+    <string name="widget_settings_weather_open">Открыть прогноз погоды</string>
+    <string name="widget_settings_weather_ready">Погода обновлена</string>
+    <string name="widget_settings_weather_show">Показывать погоду</string>
+    <string name="widget_settings_weather_summary">Температура, прогноз и приложение погоды</string>
+    <string name="widget_settings_weather_waiting">Ожидание данных о погоде</string>
+
 </resources>
 

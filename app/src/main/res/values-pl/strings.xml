@@ -343,7 +343,7 @@
     <string name="now_playing_previous">Poprzedni</string>
     <string name="now_playing_play_pause">Odtwórz/Pauza</string>
     <string name="now_playing_next">Następny</string>
-    
+
     <plurals name="widget_clock_notification_count">
         <item quantity="one">%1$d powiadomienie</item>
         <item quantity="few">%1$d powiadomienia</item>
@@ -686,4 +686,46 @@
     <string name="edit_move_right">W prawo</string>
     <string name="edit_edge_distance">Odstęp od krawędzi</string>
     <string name="edit_value_dp">%1$d dp</string>
+
+
+    <string name="clock_style">Styl zegara</string>
+    <string name="widget_settings_absolute">Zawsze pokazuj godzinę</string>
+    <string name="widget_settings_agenda_open">Otwórz plan dnia</string>
+    <string name="widget_settings_alarm">Następny alarm</string>
+    <string name="widget_settings_appearance">Wygląd</string>
+    <string name="widget_settings_appearance_summary">Rozmiar, kolor i przezroczystość tekstu</string>
+    <string name="widget_settings_battery">Poziom baterii</string>
+    <string name="widget_settings_calendar_all">Wszystkie widoczne kalendarze</string>
+    <string name="widget_settings_calendar_selected">Własny wybór</string>
+    <string name="widget_settings_calendar_summary">Data, nadchodzące wydarzenia i kalendarze</string>
+    <string name="widget_settings_clock">Zegar</string>
+    <string name="widget_settings_colour_summary">Wybierz kolor widżetu</string>
+    <string name="widget_settings_date">Pokaż datę</string>
+    <string name="widget_settings_date_format">Format daty</string>
+    <string name="widget_settings_date_heading">Data</string>
+    <string name="widget_settings_disabled">Wyłączone</string>
+    <string name="widget_settings_display">Na ekranie głównym</string>
+    <string name="widget_settings_event_count">Wydarzenia na ekranie głównym</string>
+    <string name="widget_settings_events">Nadchodzące wydarzenia</string>
+    <string name="widget_settings_format">Format godziny</string>
+    <string name="widget_settings_hours">%1$d godz.</string>
+    <string name="widget_settings_lookahead">Wyprzedzenie</string>
+    <string name="widget_settings_more">Pokaż również</string>
+    <string name="widget_settings_notifications">Liczba powiadomień</string>
+    <string name="widget_settings_opacity">Krycie</string>
+    <string name="widget_settings_range">%1$d–%2$d</string>
+    <string name="widget_settings_relative">Odliczanie w ostatniej godzinie</string>
+    <string name="widget_settings_spacing">Odstępy</string>
+    <string name="widget_settings_text_color">Kolor tekstu</string>
+    <string name="widget_settings_text_size">Rozmiar tekstu</string>
+    <string name="widget_settings_time_labels">Godziny wydarzeń</string>
+    <string name="widget_settings_title">Twój widżet</string>
+    <string name="widget_settings_unit">Jednostka temperatury</string>
+    <string name="widget_settings_weather_app">Aplikacja pogodowa</string>
+    <string name="widget_settings_weather_open">Otwórz prognozę pogody</string>
+    <string name="widget_settings_weather_ready">Pogoda jest aktualna</string>
+    <string name="widget_settings_weather_show">Pokaż pogodę</string>
+    <string name="widget_settings_weather_summary">Temperatura, prognoza i aplikacja pogodowa</string>
+    <string name="widget_settings_weather_waiting">Oczekiwanie na pogodę</string>
+
 </resources>

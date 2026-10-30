@@ -661,4 +661,46 @@
     <string name="edit_move_right">Flytta åt höger</string>
     <string name="edit_edge_distance">Avstånd från kanten</string>
     <string name="edit_value_dp">%1$d dp</string>
+
+
+    <string name="clock_style">Klockstil</string>
+    <string name="widget_settings_absolute">Visa alltid klockslaget</string>
+    <string name="widget_settings_agenda_open">Öppna agenda</string>
+    <string name="widget_settings_alarm">Nästa alarm</string>
+    <string name="widget_settings_appearance">Utseende</string>
+    <string name="widget_settings_appearance_summary">Textstorlek, färg och genomskinlighet</string>
+    <string name="widget_settings_battery">Batterinivå</string>
+    <string name="widget_settings_calendar_all">Alla synliga kalendrar</string>
+    <string name="widget_settings_calendar_selected">Eget urval</string>
+    <string name="widget_settings_calendar_summary">Datum, kommande händelser och kalendrar</string>
+    <string name="widget_settings_clock">Klocka</string>
+    <string name="widget_settings_colour_summary">Välj en färg för din widget</string>
+    <string name="widget_settings_date">Visa datum</string>
+    <string name="widget_settings_date_format">Datumformat</string>
+    <string name="widget_settings_date_heading">Datum</string>
+    <string name="widget_settings_disabled">Av</string>
+    <string name="widget_settings_display">På hemskärmen</string>
+    <string name="widget_settings_event_count">Händelser på hemskärmen</string>
+    <string name="widget_settings_events">Kommande händelser</string>
+    <string name="widget_settings_format">Tidsformat</string>
+    <string name="widget_settings_hours">%1$d h</string>
+    <string name="widget_settings_lookahead">Framförhållning</string>
+    <string name="widget_settings_more">Visa även</string>
+    <string name="widget_settings_notifications">Antal aviseringar</string>
+    <string name="widget_settings_opacity">Opacitet</string>
+    <string name="widget_settings_range">%1$d–%2$d</string>
+    <string name="widget_settings_relative">Nedräkning under sista timmen</string>
+    <string name="widget_settings_spacing">Avstånd</string>
+    <string name="widget_settings_text_color">Textfärg</string>
+    <string name="widget_settings_text_size">Textstorlek</string>
+    <string name="widget_settings_time_labels">Händelsetider</string>
+    <string name="widget_settings_title">Din widget</string>
+    <string name="widget_settings_unit">Temperaturenhet</string>
+    <string name="widget_settings_weather_app">Väderapp</string>
+    <string name="widget_settings_weather_open">Öppna väderprognos</string>
+    <string name="widget_settings_weather_ready">Vädret är uppdaterat</string>
+    <string name="widget_settings_weather_show">Visa väder</string>
+    <string name="widget_settings_weather_summary">Temperatur, prognos och väderapp</string>
+    <string name="widget_settings_weather_waiting">Väntar på väder</string>
+
 </resources>

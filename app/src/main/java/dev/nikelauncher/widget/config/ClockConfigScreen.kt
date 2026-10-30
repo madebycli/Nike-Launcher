@@ -69,7 +69,8 @@ fun ClockConfigScreen(
     onCancel: () -> Unit,
 ) {
     val context = LocalContext.current
-    var config by remember { mutableStateOf(initial) }
+    var config by rememberSaveable { mutableStateOf(initial) }
+    var lastDatePattern by rememberSaveable { mutableStateOf(initial.datePattern ?: ClockWidgetConfig.DEFAULT_DATE) }
     var page by rememberSaveable { mutableStateOf(ConfigPage.HOME) }
     var dialog by remember { mutableStateOf<ClockConfigDialog?>(null) }
     var overview by remember { mutableStateOf<String?>(null) }
@@ -82,7 +83,10 @@ fun ClockConfigScreen(
         // that silently has nothing in it.
         config = config.copy(showAgenda = granted)
     }
-    val update: ConfigUpdate = { change -> config = change(config) }
+    val update: ConfigUpdate = { change ->
+        config = change(config)
+        config.datePattern?.let { lastDatePattern = it }
+    }
     val state = rememberClockLiveState(widgetId, override = config)
     val holder = rememberSaveableStateHolder()
     val effectsSpec = AppMotion.effects<Float>()
@@ -132,10 +136,10 @@ fun ClockConfigScreen(
                             ConfigPage.HOME -> HomePage(config, update) { page = it }
                             ConfigPage.CLOCK -> ClockPage(config, update, { page = ConfigPage.STYLES }) { dialog = it }
                             ConfigPage.CALENDAR -> CalendarPage(
-                                config, calendarGranted, update, { dialog = it }, { overview = "agenda" },
+                                config, lastDatePattern, calendarGranted, update, { dialog = it }, { overview = "agenda" },
                             ) { askCalendar.launch(Manifest.permission.READ_CALENDAR) }
                             ConfigPage.WEATHER -> WeatherPage(config, state.weatherReading != null, update, { dialog = it }) { overview = "weather" }
-                            ConfigPage.APPEARANCE -> AppearancePage(context, config, update) { dialog = it }
+                            ConfigPage.APPEARANCE -> AppearancePage(config, update) { dialog = it }
                             ConfigPage.STYLES -> Unit
                         }
                     }

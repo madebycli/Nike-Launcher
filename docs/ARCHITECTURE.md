@@ -123,3 +123,12 @@ whichever app is the current Home.
   remaining first-launch win.
 - Unit tests cover only framework-free logic. Anything touching `PackageManager`,
   `ComponentName` or Compose needs Robolectric or an instrumented test.
+
+## Clock configuration
+
+Clock configuration uses a saved draft until Done, including the previous enabled date format.
+Date and exact-number entry use state-based Material fields. Calendar selection lives apart from
+the style gallery; selected previews use the matching content colour. ClockAppLabel is shared.
+ClockConfigScreensTest renders six pages, all twenty styles and dialogs at Pixel 9 dimensions,
+in English and German at 150% font scale. Missing clock strings are supplied in es/pl/ru/sv.
+Native Canvas software PixelCopy avoids missing unchanged RenderNodes in repeated captures.
