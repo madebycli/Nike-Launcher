@@ -26,7 +26,7 @@ ui/
   home/edit/                    edit mode: frames, drag handles, snap guides
   home/pages/                   widget pages: pager, grid, resize and reorder
   home/corner/                  the corner button, its sheets and the floating search button
-  home/setup/                   the first-run flow
+  home/setup/                   the first-run flow; StyleStep pins a StylePreview (the favorites, read from the same prefs) above the style controls
   home/wallpaper/               system blur, picture and grain behind the app list
   applist/                      A-Z list, pull-to-collapse, strip and edge zone, scrub state
   notifications/                the notification sheet: overview, conversation, actions, reply
