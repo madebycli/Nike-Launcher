@@ -108,5 +108,7 @@ class CornerPrefs internal constructor(private val store: DataStore<Preferences>
     suspend fun setHideSearchWhileScrolling(v: Boolean) = store.edit { it[Keys.SEARCH_HIDE_WHILE_SCROLLING] = v }.let { }
     suspend fun setSearchColorMode(v: CornerColorMode) = store.edit { it[Keys.SEARCH_COLOR_MODE] = v.name }.let { }
     suspend fun setSearchBackground(v: Int) = store.edit { it[Keys.SEARCH_BACKGROUND] = v or 0xFF000000.toInt() }.let { }
+    suspend fun setSearchForeground(v: Int) = store.edit { it[Keys.SEARCH_FOREGROUND] = v or 0xFF000000.toInt() }.let { }
+    suspend fun setSearchAutomaticForeground(v: Boolean) = store.edit { it[Keys.SEARCH_AUTO_FOREGROUND] = v }.let { }
     suspend fun setSearchBackgroundOpacity(v: Int) = store.edit { it[Keys.SEARCH_BACKGROUND_OPACITY] = v.coerceIn(0, 100) }.let { }
 }

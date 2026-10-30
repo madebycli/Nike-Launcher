@@ -158,3 +158,10 @@ already-bound initial clock. AccessStep and FavoritesStep are separate modules a
 ReorderableRows uses the existing reorderable library plus Material up/down controls; RowOrder is pure.
 The setup-wide extra clickable modifier was removed because it consumed drag-handle down events.
 SetupScreensTest verifies persisted order after both an arrow change and a simulated drag.
+
+## Search colours and corner preview
+
+Floating search exposes the existing independent foreground and automatic-foreground keys.
+CornerSettingsPreview stays above scrolling controls and the title wraps at large German text.
+The real backup round-trip test restores defaults, clock options under a newly allocated widget id,
+horizontal offsets, quick-launch region and search colours without changing backup format 2.

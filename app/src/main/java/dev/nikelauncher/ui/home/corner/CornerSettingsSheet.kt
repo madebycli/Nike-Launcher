@@ -3,7 +3,6 @@ package dev.nikelauncher.ui.home.corner
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -28,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -40,10 +38,8 @@ import dev.nikelauncher.NikeApp
 import dev.nikelauncher.R
 import dev.nikelauncher.data.CORNER_SIZE_RANGE
 import dev.nikelauncher.data.CornerAction
-import dev.nikelauncher.data.CornerAppearance
 import dev.nikelauncher.data.CornerColorMode
 import dev.nikelauncher.data.CornerIcon
-import dev.nikelauncher.data.CornerSettings
 import dev.nikelauncher.data.CornerShape
 import dev.nikelauncher.ui.kit.settings.ChoiceChips
 import dev.nikelauncher.ui.kit.settings.ColorPickerSheet
@@ -89,15 +85,13 @@ internal fun CornerSettingsSheet(
     val swipeLabel = stringResource(current.swipe.label)
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-        Column(
-            Modifier.fillMaxWidth().heightIn(max = LocalConfiguration.current.screenHeightDp.dp * .85f)
-                .verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                CornerButtonFace(current.shape, current.sizeDp, current.tap, null, overWallpaper, appearance = appearance)
-                Text(stringResource(R.string.corner_title), style = MaterialTheme.typography.titleLarge)
-            }
+        Column(Modifier.fillMaxWidth().heightIn(max = LocalConfiguration.current.screenHeightDp.dp * .85f)) {
+            CornerSettingsPreview(current, overWallpaper)
+            Column(
+                Modifier.fillMaxWidth().weight(1f, fill = false).verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp).padding(bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
             SettingsGroup {
                 switchItem(enabledTitle, current.enabled, { v -> scope.launch { prefs.setEnabled(v) } }, icon = Icons.Outlined.TouchApp)
                 item(tapTitle, { chooser = Chooser.TAP }, icon = current.tap.icon, value = tapLabel)
@@ -155,6 +149,7 @@ internal fun CornerSettingsSheet(
             }
             TextButton(onClick = { scope.launch { prefs.resetColors() } }, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.corner_reset_colors))
+            }
             }
         }
     }

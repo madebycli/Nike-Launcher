@@ -38,7 +38,7 @@ internal fun searchButtonEntries(env: SettingsEnv): List<SettingsEntry> {
     val floating by corner.floatingSearch.collectAsState(true)
     val hide by corner.hideSearchWhileScrolling.collectAsState(true)
     val appearance by corner.searchAppearance.collectAsState(CornerAppearance())
-    var picking by remember { mutableStateOf(false) }
+    var picking by remember { mutableStateOf<Boolean?>(null) }
     val floatingTitle = stringResource(R.string.search_button_floating)
     val hideTitle = stringResource(R.string.search_button_hide_scrolling)
     val colorsTitle = stringResource(R.string.corner_colors)
@@ -47,13 +47,16 @@ internal fun searchButtonEntries(env: SettingsEnv): List<SettingsEntry> {
     val classic = stringResource(R.string.corner_color_classic)
     val material = stringResource(R.string.corner_color_material)
     val custom = stringResource(R.string.corner_color_custom)
+    val automaticTitle = stringResource(R.string.corner_auto_icon_color)
+    val foregroundTitle = stringResource(R.string.corner_icon_color)
 
-    if (picking) {
+    if (picking != null) {
+        val background = picking == true
         ColorPickerSheet(
-            initial = Color(appearance.background),
+            initial = Color(if (background) appearance.background else appearance.foreground),
             wallpaperColors = MaterialTheme.colorScheme.let { listOf(it.primary, it.secondary, it.tertiary, it.primaryContainer) },
-            onPick = { color -> env.write { corner.setSearchBackground(color.toArgb()) } },
-            onDismiss = { picking = false },
+            onPick = { color -> env.write { if (background) corner.setSearchBackground(color.toArgb()) else corner.setSearchForeground(color.toArgb()) } },
+            onDismiss = { picking = null },
         )
     }
     return listOfNotNull(
@@ -71,6 +74,15 @@ internal fun searchButtonEntries(env: SettingsEnv): List<SettingsEntry> {
             SECTION,
             settingsItem(backgroundTitle, { picking = true }, value = "#%06X".format(appearance.background and 0xFFFFFF), icon = Icons.Filled.Palette),
             "search button color",
+        ) else null,
+        if (floating && appearance.colorMode == CornerColorMode.CUSTOM) SettingsEntry(
+            SECTION, settingsSwitch(automaticTitle, appearance.automaticForeground, icon = Icons.Filled.Palette) {
+                env.write { corner.setSearchAutomaticForeground(it) }
+            }, "search button foreground",
+        ) else null,
+        if (floating && appearance.colorMode == CornerColorMode.CUSTOM && !appearance.automaticForeground) SettingsEntry(
+            SECTION, settingsItem(foregroundTitle, { picking = false }, value = "#%06X".format(appearance.foreground and 0xFFFFFF), icon = Icons.Filled.Palette),
+            "search button foreground",
         ) else null,
         if (floating) SettingsEntry(SECTION, settingsBlock(opacityTitle, value = "${appearance.backgroundOpacity}%", icon = Icons.Filled.Opacity) {
             SettingsSlider(appearance.backgroundOpacity.toFloat(), 0f..100f, { v -> env.write { corner.setSearchBackgroundOpacity(v.toInt()) } }, step = 5f)
