@@ -20,23 +20,25 @@ that tag were also opened. The reference app was not executed in an emulator.
 | Weather settings | Enabled state, Celsius/Fahrenheit, selected app, forecast and provider status retained |
 | Home editing | Independent reserved fields, grouped selection/movement/spacing, per-field edge distance and persistent drafts; actual edit controls exercised beneath gesture annotations |
 | Gesture zones | Left/right/both edges, band-only/full-height zones, system inset and corner keep-out geometry; quick-launch app names and configured region; up/down direction markers |
+| Inline app notifications | One shared Material app/age/title/message row on home and app list; right swipe and menu open the app overview even for one notification; no inline dismissal; profile isolation tested |
 | Notification overview | Actual sheet rendered with invented snapshots; Material swipe dismissal and explicit clear/dismiss controls |
 | Conversation | Consecutive-author grouping and pause timestamps, incoming/outgoing sides, newest-message anchoring, hide action, inline attachments and provider actions |
 | Reply | Material field, suggestions, multiple input options and target-bound draft; replacing a provider action disables send until explicitly selected |
 | Pictures | Inline content URI fixture and large-picture fixture rendered; large-picture decoding no longer uses avatar resolution |
-| Corner button | Existing shape/action/size/badge/background/icon/opacity controls and live preview; German font scale 1.5 renders |
-| Floating search button | Independent stored background and foreground, automatic foreground, colour mode and opacity; missing foreground controls added and settings page rendered |
+| Corner button | Complete settings reachable while disabled; separate draft placement/reset/Done route and inset-aware normalized position; actual navigation and German font scale 1.5 renders |
+| Search presentation | Exclusive None/Button/Bar, preserved legacy keys, independent button-field edge and matching slide origin; colours/opacity retained; actual search entry and intermediate transition positions checked |
 | Widget side pages | Existing two-column grid, selection, size dialog, move/remove/settings actions; real grid rendered and resize confirmation exercised; pure drag/resize logic remains covered by its existing tests |
-| Setup access | Home role, notification access and calendar access retained; clock/calendar/weather app choices added using the widget's existing pickers |
-| Setup style | Live favorites preview, icon sizes/labels/spacing, list search/effects, widget side pages and installed icon-pack choice retained |
-| Setup favorites | Add/remove, up/down and library drag ordering; the test verifies the persisted order after both arrow and drag operations |
-| Backup/restore | Real exporter/restorer test covers new defaults, offsets, region, search colours and clock configuration under a newly allocated widget id |
+| Setup access | Durable page before external role request; activity recreation stays on Access; clock/calendar/weather app choices reuse widget pickers; OEM role dialog remains a phone check |
+| Setup style | Fixed two-app preview is the first outer-scroll item; both requested icon sizes and scroll-away position asserted in light/dark/large text |
+| Setup favorites | Same Material segmented rows for selected/candidate apps, no count or arrow pair; tonal remove/drag controls; equal row height and stored library drag order checked |
+| Backup/restore | Real exporter/restorer test includes default apps, frame offsets, region, search colours, corner coordinates, independent button-field edge and clock configuration under a newly allocated widget id |
+| Popup and submenu motion | Shared calendar/weather/notification viewport and compact stock handle; lower reply overflow and rounded Material Send; expressive widget/app menus; shared full-container navigation tested in both directions |
 | Weather sheet header | Actual overview/daily/hourly sheet rendered in German at font scale 1.5; the existing flexible title width fits the Pixel 9 viewport |
 | Home performance | Measured band-state recomposition scope, then isolated it; `docs/PERFORMANCE.md` records the limits |
 
 ## Resource-name audit
 
-The tagged reference contains 422 English string keys. Nike contains 618. The 94 reference key
+The tagged reference contains 426 English resource keys. Nike contains 640. The 94 reference key
 names absent from Nike were reviewed by area; absent names do not by themselves indicate absent
 behaviour. Existing Nike keys were kept stable.
 
@@ -55,7 +57,7 @@ behaviour. Existing Nike keys were kept stable.
   following the project's no-explanatory-UI rule.
 
 All English resource keys now have matching entries in de/es/pl/ru/sv. The clock-settings work
-filled 39 missing strings in each of es/pl/ru/sv; gesture labels were added in all six locales.
+filled 39 missing strings in each of es/pl/ru/sv; gesture labels and nine new corner/search labels are present in all six locales.
 
 ## Verification boundaries
 
@@ -64,3 +66,8 @@ notifications and weather data. They establish layout and state after the simula
 They do not establish animation timing, physical swipe velocity, wallpaper integration, installed
 icon-pack quality, live notification delivery, Android role/bind dialogs or frame times on a phone.
 The generated `perf` APK is intended for those remaining Pixel 9 checks.
+
+The follow-up uses actual app navigation for corner recovery/placement and notification entry on both
+home and app list. The app-list walkthrough also renders menus with and without notifications.
+MenuMotionScreensTest samples measured transition positions with the test clock; it does not measure
+phone animation smoothness. Setup screenshots wait for the persisted page before capturing.
