@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalConfiguration
+import dev.nikelauncher.data.AppListBackgroundEffect
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.AzStripVisibility
 import dev.nikelauncher.data.EdgeSide
@@ -99,6 +100,11 @@ fun rememberHomeSettings(prefs: Prefs, library: LibraryState, appsByKey: Map<Str
         quickLaunchRight = library.quickLaunchRightKey?.let { appsByKey[it] },
         dimWallpaperAlpha = a.dimWallpaperAlpha.collectAsState(0.35f).value,
         dimHomeAlpha = a.dimHomeAlpha.collectAsState(0f).value,
+        appListBackgroundEffect = l.backgroundEffect.collectAsState(AppListBackgroundEffect.NONE).value,
+        appListBackgroundStrength = l.backgroundStrength.collectAsState(50).value,
+        appListBackgroundImage = l.backgroundImage.collectAsState(null).value,
+        appListBackgroundEdges = l.backgroundEdges.collectAsState(false).value,
+        appListGrain = l.grain.collectAsState(0).value,
         dimColor = a.dimColor.collectAsState(0xFF000000.toInt()).value,
         hapticsEnabled = s.hapticsEnabled.collectAsState(true).value,
         showFavoriteLabels = a.showFavoriteLabels.collectAsState(true).value,

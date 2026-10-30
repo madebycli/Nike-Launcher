@@ -3,6 +3,7 @@ package dev.nikelauncher.ui.home
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import dev.nikelauncher.data.AppListBackgroundEffect
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.AzStripVisibility
 import dev.nikelauncher.data.EdgeSide
@@ -71,6 +72,11 @@ data class HomeSettings(
     val quickLaunchRight: AppInfo?,
     val dimWallpaperAlpha: Float,
     val dimHomeAlpha: Float,
+    val appListBackgroundEffect: AppListBackgroundEffect,
+    val appListBackgroundStrength: Int,
+    val appListBackgroundImage: String?,
+    val appListBackgroundEdges: Boolean,
+    val appListGrain: Int,
     val dimColor: Int,
     val hapticsEnabled: Boolean,
     val showFavoriteLabels: Boolean,

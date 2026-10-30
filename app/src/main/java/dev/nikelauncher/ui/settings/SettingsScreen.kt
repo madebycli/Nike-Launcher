@@ -31,6 +31,7 @@ import dev.nikelauncher.ui.kit.settings.SettingsSectionLabel
 import dev.nikelauncher.ui.kit.settings.settingsItem
 import dev.nikelauncher.ui.settings.sections.aboutEntries
 import dev.nikelauncher.ui.settings.sections.appListEntries
+import dev.nikelauncher.ui.settings.sections.backgroundEntries
 import dev.nikelauncher.ui.settings.sections.appearanceEntries
 import dev.nikelauncher.ui.settings.sections.appsEntries
 import dev.nikelauncher.ui.settings.sections.backupEntries
@@ -56,7 +57,7 @@ fun SettingsScreen(env: SettingsEnv, onBack: () -> Unit, modifier: Modifier = Mo
     }
 
     val entries = (
-        appearanceEntries(env) + homeEntries(env) + appListEntries(env) + stripEntries(env) +
+        appearanceEntries(env) + homeEntries(env) + appListEntries(env) + backgroundEntries(env) + stripEntries(env) +
             gesturesEntries(env) + notificationEntries(env) + appsEntries(env) +
             backupEntries(env) + aboutEntries(env)
         ).filter { it.visible }

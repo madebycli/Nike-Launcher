@@ -51,6 +51,45 @@ class AppListPrefs internal constructor(private val store: DataStore<Preferences
     val notificationTextSp: Flow<Int> =
         data.map { it[PrefKeys.NOTIFICATION_TEXT_SP] ?: 12 }.distinctUntilChanged()
 
+    /** Blur is the compositor's, applied to the real wallpaper; an image is softened once and drawn. */
+    val backgroundEffect: Flow<AppListBackgroundEffect> = data.map {
+        runCatching { AppListBackgroundEffect.valueOf(it[PrefKeys.APP_LIST_BACKGROUND_EFFECT] ?: "NONE") }
+            .getOrDefault(AppListBackgroundEffect.NONE)
+            .let { effect -> if (effect == AppListBackgroundEffect.PIXEL) AppListBackgroundEffect.NONE else effect }
+    }.distinctUntilChanged()
+
+    val backgroundStrength: Flow<Int> =
+        data.map { (it[PrefKeys.APP_LIST_BACKGROUND_STRENGTH] ?: 50).coerceIn(0, 100) }.distinctUntilChanged()
+
+    /** Whether the picture shows only toward the edges, leaving the middle to the wallpaper. */
+    val backgroundEdges: Flow<Boolean> =
+        data.map { it[PrefKeys.APP_LIST_BACKGROUND_EDGES] ?: false }.distinctUntilChanged()
+
+    val grain: Flow<Int> = data.map { (it[PrefKeys.APP_LIST_GRAIN] ?: 0).coerceIn(0, 100) }.distinctUntilChanged()
+
+    val backgroundImage: Flow<String?> =
+        data.map { it[PrefKeys.APP_LIST_BACKGROUND_IMAGE] }.distinctUntilChanged()
+
+    suspend fun setBackgroundEffect(v: AppListBackgroundEffect) {
+        store.edit { it[PrefKeys.APP_LIST_BACKGROUND_EFFECT] = v.name }
+    }
+
+    suspend fun setBackgroundStrength(v: Int) {
+        store.edit { it[PrefKeys.APP_LIST_BACKGROUND_STRENGTH] = v.coerceIn(0, 100) }
+    }
+
+    suspend fun setBackgroundEdges(v: Boolean) {
+        store.edit { it[PrefKeys.APP_LIST_BACKGROUND_EDGES] = v }
+    }
+
+    suspend fun setGrain(v: Int) {
+        store.edit { it[PrefKeys.APP_LIST_GRAIN] = v.coerceIn(0, 100) }
+    }
+
+    suspend fun setBackgroundImage(v: String?) {
+        store.edit { if (v == null) it.remove(PrefKeys.APP_LIST_BACKGROUND_IMAGE) else it[PrefKeys.APP_LIST_BACKGROUND_IMAGE] = v }
+    }
+
     /** How far down the screen a scrubbed letter is parked, as a percentage of the viewport. */
     val sectionTopPercent: Flow<Int> =
         data.map { (it[PrefKeys.SECTION_TOP_PERCENT] ?: 26).coerceIn(SECTION_TOP_RANGE) }

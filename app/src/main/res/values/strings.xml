@@ -606,4 +606,9 @@
     <string name="corner_title">Quick button</string>
     <string name="widget_settings_calendar">Calendar</string>
     <string name="widget_settings_weather">Weather</string>
+    <string name="settings_app_list_background_edges">Picture toward the edges only</string>
+    <string name="settings_app_list_background_image">Background image</string>
+    <string name="settings_app_list_effect_blur">Blur</string>
+    <string name="settings_app_list_effect_strength">Effect strength</string>
+    <string name="settings_app_list_grain">Grain</string>
 </resources>

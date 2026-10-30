@@ -398,4 +398,9 @@
     <string name="corner_title">Schnellbutton</string>
     <string name="widget_settings_calendar">Kalender</string>
     <string name="widget_settings_weather">Wetter</string>
+    <string name="settings_app_list_background_edges">Bild nur zu den Rändern</string>
+    <string name="settings_app_list_background_image">Hintergrundbild</string>
+    <string name="settings_app_list_effect_blur">Weichzeichnen</string>
+    <string name="settings_app_list_effect_strength">Effektstärke</string>
+    <string name="settings_app_list_grain">Körnung</string>
 </resources>

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemGestures
 import androidx.compose.foundation.lazy.rememberLazyListState
+import dev.nikelauncher.ui.kit.motion.AppMotion
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +62,7 @@ import dev.nikelauncher.R
 import dev.nikelauncher.ui.common.FolderPickerDialog
 import dev.nikelauncher.ui.common.toast
 import dev.nikelauncher.ui.home.route.AppListController
+import dev.nikelauncher.ui.home.route.WallpaperLayers
 import dev.nikelauncher.ui.home.route.AppListHost
 import dev.nikelauncher.ui.home.route.BandEditing
 import dev.nikelauncher.ui.home.route.EdgeGestureExclusion
@@ -254,18 +256,7 @@ fun HomeRoute(
             animationSpec = if (snapNow) snap() else tween(HOME_FADE_MS, easing = LinearOutSlowInEasing),
             label = "homeAlpha",
         )
-        // One dim for the wallpaper, belonging to neither screen and drawn under both, so moving
-        // between the two values has nothing to hand over.
-        val wallpaperDim by animateFloatAsState(
-            targetValue = when {
-                bands.editing -> 0f
-                controller.visible -> settings.dimWallpaperAlpha
-                else -> homeDim
-            },
-            animationSpec = if (snapNow) snap() else tween(HOME_FADE_MS, easing = LinearOutSlowInEasing),
-            label = "wallpaperDim",
-        )
-        if (wallpaperDim > 0f) Box(Modifier.fillMaxSize().background(Color(settings.dimColor).copy(alpha = wallpaperDim)))
+        WallpaperLayers(settings, listVisible = controller.visible, editing = bands.editing, homeDim = homeDim, snapNow = snapNow)
 
         Box(
             Modifier

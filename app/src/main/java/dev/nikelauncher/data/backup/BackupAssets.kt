@@ -22,6 +22,7 @@ internal const val ASSET_IMAGE = "image"
 internal const val MAX_ASSET_TOTAL_BYTES = 40 * 1024 * 1024
 
 private const val PREF_FONT_FILE = "font_file"
+private const val PREF_BACKGROUND_IMAGE = "app_list_background_image"
 
 internal fun digest(bytes: ByteArray): String =
     MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
@@ -85,6 +86,7 @@ internal fun validateAsset(context: Context, bytes: ByteArray, kind: String) {
 /** Swaps every file reference in [values] for what [replace] returns, given the reference and its kind. */
 internal fun rewriteAssets(values: MutableMap<String, Any>, replace: (String, String) -> String) {
     (values[PREF_FONT_FILE] as? String)?.let { values[PREF_FONT_FILE] = replace(it, ASSET_FONT) }
+    (values[PREF_BACKGROUND_IMAGE] as? String)?.takeIf { it.isNotBlank() }?.let { values[PREF_BACKGROUND_IMAGE] = replace(it, ASSET_IMAGE) }
     (values[PREF_ICON_OVERRIDES] as? String)?.let { raw ->
         val icons = JSONObject(raw)
         icons.keys().forEach { key -> icons.put(key, replace(icons.getString(key), ASSET_IMAGE)) }
