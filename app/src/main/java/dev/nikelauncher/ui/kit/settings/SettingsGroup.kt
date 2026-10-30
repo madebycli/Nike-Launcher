@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.selection.selectableGroup
 import dev.nikelauncher.ui.kit.onboarding.IconBlob
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Switch
@@ -47,7 +48,18 @@ class SettingsRowCollector internal constructor() {
 @Composable
 private fun SettingsRowContent(row: SettingsRow, index: Int, count: Int) {
     val shapes = ListItemDefaults.segmentedShapes(index, count)
-    val colors = ListItemDefaults.segmentedColors()
+    // One plate colour for every kind of row. Left to themselves, a switch row that is on is
+    // drawn in the secondary container and a plain row in the page colour, which makes a group
+    // read as unrelated slabs.
+    val plate = MaterialTheme.colorScheme.surfaceContainer
+    val colors = ListItemDefaults.segmentedColors(
+        containerColor = plate,
+        selectedContainerColor = plate,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        selectedContentColor = MaterialTheme.colorScheme.onSurface,
+        supportingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        selectedSupportingContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
     when (row) {
         is SettingsRow.Item -> SegmentedListItem(
             onClick = row.onClick,
@@ -78,7 +90,7 @@ private fun SettingsRowContent(row: SettingsRow, index: Int, count: Int) {
             selected = row.selected,
             onClick = row.onClick,
             shapes = shapes,
-            colors = ListItemDefaults.segmentedColors(),
+            colors = colors,
             supportingContent = row.value?.let { value -> { Text(value) } },
             trailingContent = { RadioButton(selected = row.selected, onClick = null) },
             content = { Text(row.title) },

@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material3.AssistChip
@@ -69,7 +70,9 @@ internal fun BlockFrame(
     val outline = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
 
     Box(
+        // Held in from the screen edges, so the outline is seen all the way round.
         modifier
+            .padding(horizontal = FrameInset)
             .then(
                 if (takeByBody) Modifier.pointerInput(block) {
                     detectVerticalDragGestures(
@@ -82,7 +85,8 @@ internal fun BlockFrame(
             )
             .border(BorderStroke(if (selected) 2.dp else 1.dp, outline), MaterialTheme.shapes.large),
     ) {
-        content()
+        // The chip straddles the top edge, so its lower half would sit on whatever comes first.
+        Box(Modifier.padding(top = ChipHalfHeight)) { content() }
         if (coverBody) {
             // Nothing inside answers a touch while editing, so the body only selects and moves.
             Box(Modifier.matchParentSize().pointerInput(block) { detectTapGestures(onTap = { current.onSelect() }) })
@@ -108,3 +112,4 @@ internal fun BlockFrame(
 }
 
 private val ChipHalfHeight = 16.dp
+private val FrameInset = 8.dp

@@ -44,13 +44,14 @@ import kotlin.math.roundToInt
 internal class HomeScroll(
     private val scope: CoroutineScope,
     actions: GestureActions,
-    private val swipeUpOpensAppList: Boolean,
+    swipeUpOpensAppList: Boolean,
     private val peekPullPx: Float,
     private val deepPullPx: Float,
     private val quickLaunchPx: Float,
 ) {
     /** Replaced on every composition, so the scroll itself outlives changes to what the gestures do. */
     var actions: GestureActions = actions
+    var swipeUpOpensAppList: Boolean = swipeUpOpensAppList
     val offsetY = Animatable(0f)
     var viewportHeight by mutableIntStateOf(0)
     var contentHeight by mutableIntStateOf(0)
@@ -172,9 +173,10 @@ internal class HomeScroll(
 internal fun rememberHomeScroll(actions: GestureActions, swipeUpOpensAppList: Boolean, homeIntentTick: Int): HomeScroll {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
-    // Keyed on the setting only: the gesture actions are rebuilt whenever any setting changes, and a
-    // scroll recreated with them would drop the offset and the drag in progress.
-    val scroll = remember(swipeUpOpensAppList) {
+    // Never keyed. A scroll made anew keeps the root's size only if the root is resized afterwards,
+    // so one recreated on a settings change or on entering edit mode had a viewport of zero and put
+    // every block at the top until something resized the screen. Whatever can change is copied in.
+    val scroll = remember {
         HomeScroll(
             scope = scope,
             actions = actions,
@@ -184,7 +186,10 @@ internal fun rememberHomeScroll(actions: GestureActions, swipeUpOpensAppList: Bo
             quickLaunchPx = with(density) { 80.dp.toPx() },
         )
     }
-    SideEffect { scroll.actions = actions }
+    SideEffect {
+        scroll.actions = actions
+        scroll.swipeUpOpensAppList = swipeUpOpensAppList
+    }
     LaunchedEffect(homeIntentTick) { if (homeIntentTick > 0) scroll.scrollToTop() }
     // Turning the phone changes how much there is to scroll through: a stack dragged up in
     // landscape kept that offset when the screen went tall again, which left it above the top.

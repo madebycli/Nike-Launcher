@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -49,7 +50,8 @@ internal fun StylePreview(app: NikeApp, apps: List<AppInfo>, favorites: List<App
     val family = fontFamilyOf(font, fontFile)
 
     val shown = (favorites.ifEmpty { apps }).take(PREVIEW_ROWS)
-    Surface(modifier.fillMaxWidth(), shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+    // Capped, so the biggest icons cannot leave the controls without room; what does not fit is cut.
+    Surface(modifier.fillMaxWidth().heightIn(max = 200.dp), shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         Column(
             Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(spacing.dp),

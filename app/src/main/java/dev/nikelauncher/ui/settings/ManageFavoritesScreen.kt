@@ -148,72 +148,76 @@ internal fun FavoritesChooser(
         }
 
         item {
-            ReorderableRows(
-                keys = shownKeys,
-                // What was left out goes back where it was, by the rule that left it
-                // out. The screen writes back the whole list it was given, so without this
-                // the first drag would delete every favorite this screen is hiding.
-                onReorder = { order -> onReorder(restoreConcealed(favoriteKeys, order, conceal)) },
-            ) { key ->
-                val folder = folderIdFromToken(key)?.let { foldersById[it] }
-                val app = appsByKey[key]
-                when {
-                    folder != null -> {
-                        // A folder is one favorite like any other and moves among them,
-                        // but it is not an app: what it holds is edited in its own screen,
-                        // so there is nothing here to untick.
-                        Icon(
-                            Icons.Filled.Folder,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                        )
-                        Spacer(Modifier.width(16.dp))
-                        Text(
-                            folder.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-
-                    app != null -> {
-                        AppIcon(app = app, sizeDp = minOf(iconSizeDp, 44))
-                        Spacer(Modifier.width(16.dp))
-                        Text(
-                            nameOverrides[app.key] ?: app.label,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f),
-                        )
-                        IconButton(onClick = { onSetFavorite(app, false) }) {
-                            Icon(Icons.Filled.RemoveCircleOutline, contentDescription = stringResource(R.string.favorites_remove))
-                        }
-                    }
-
-                    // Whatever this key was is gone: an app uninstalled, or a shortcut
-                    // its publisher withdrew. Shown rather than skipped so the count
-                    // matches what is listed, and with the same untick as everything
-                    // else, because otherwise it is a row that can never be got rid of.
-                    else -> {
-                        Text(
-                            stringResource(R.string.folder_member_missing),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                            modifier = Modifier.weight(1f),
-                        )
-                        IconButton(onClick = { onForget(key) }) {
-                            Icon(Icons.Filled.RemoveCircleOutline, contentDescription = stringResource(R.string.favorites_remove))
-                        }
-                    }
-                }
-            }
-        }
-
-        item {
             SearchField(
                 query = query,
                 onQueryChange = { query = it },
                 placeholder = stringResource(R.string.applist_search),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
+        }
+
+        // Typing narrows to what could be added, so the chosen ones do not take the room the matches need.
+        if (query.isBlank()) {
+            item {
+                ReorderableRows(
+                    keys = shownKeys,
+                    // What was left out goes back where it was, by the rule that left it
+                    // out. The screen writes back the whole list it was given, so without this
+                    // the first drag would delete every favorite this screen is hiding.
+                    onReorder = { order -> onReorder(restoreConcealed(favoriteKeys, order, conceal)) },
+                ) { key ->
+                    val folder = folderIdFromToken(key)?.let { foldersById[it] }
+                    val app = appsByKey[key]
+                    when {
+                        folder != null -> {
+                            // A folder is one favorite like any other and moves among them,
+                            // but it is not an app: what it holds is edited in its own screen,
+                            // so there is nothing here to untick.
+                            Icon(
+                                Icons.Filled.Folder,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            )
+                            Spacer(Modifier.width(16.dp))
+                            Text(
+                                folder.name,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+
+                        app != null -> {
+                            AppIcon(app = app, sizeDp = minOf(iconSizeDp, 44))
+                            Spacer(Modifier.width(16.dp))
+                            Text(
+                                nameOverrides[app.key] ?: app.label,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.weight(1f),
+                            )
+                            IconButton(onClick = { onSetFavorite(app, false) }) {
+                                Icon(Icons.Filled.RemoveCircleOutline, contentDescription = stringResource(R.string.favorites_remove))
+                            }
+                        }
+
+                        // Whatever this key was is gone: an app uninstalled, or a shortcut
+                        // its publisher withdrew. Shown rather than skipped so the count
+                        // matches what is listed, and with the same untick as everything
+                        // else, because otherwise it is a row that can never be got rid of.
+                        else -> {
+                            Text(
+                                stringResource(R.string.folder_member_missing),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                modifier = Modifier.weight(1f),
+                            )
+                            IconButton(onClick = { onForget(key) }) {
+                                Icon(Icons.Filled.RemoveCircleOutline, contentDescription = stringResource(R.string.favorites_remove))
+                            }
+                        }
+                    }
+                }
+            }
+
         }
 
         itemsIndexed(candidates, key = { _, app -> app.key }) { index, app ->

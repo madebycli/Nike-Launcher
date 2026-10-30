@@ -11,6 +11,9 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -55,6 +58,7 @@ private const val LAST = STEPS - 1
  * the HOME key unwinds the navigation stack and would dismiss a destination the moment it
  * appeared, and a dialog can be measured taller than an edge-to-edge window.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun SetupFlow(
     app: NikeApp,
@@ -109,7 +113,8 @@ internal fun SetupFlow(
                     else -> DoneStep()
                 }
             }
-            Row(
+            // The keyboard is for finding an app; the way on comes back when it goes.
+            if (!WindowInsets.isImeVisible) Row(
                 Modifier.fillMaxWidth().padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,

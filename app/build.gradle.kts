@@ -70,6 +70,10 @@ android {
         }
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -126,6 +130,10 @@ dependencies {
     testImplementation(libs.junit)
     // Real JSON on the unit-test classpath; the android.jar stub only throws.
     testImplementation(libs.org.json)
+    // Renders screens on the JVM at phone size, so a layout can be looked at without a device.
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // Black-box instrumented tests drive the home-screen role itself (set-default-home, system dialogs).
     androidTestImplementation(libs.androidx.test.ext.junit)
