@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.graphicsLayer
@@ -47,9 +46,9 @@ import dev.nikelauncher.data.Folder
 import dev.nikelauncher.media.NowPlayingBus
 import dev.nikelauncher.media.isListenerEnabled
 import dev.nikelauncher.service.SystemUi
-import dev.nikelauncher.ui.applist.BandEditOverlay
 import dev.nikelauncher.ui.home.edit.HomeGestureZones
-import dev.nikelauncher.ui.applist.EdgeScrubber
+import dev.nikelauncher.ui.home.route.ObserveScrubBand
+import dev.nikelauncher.ui.home.route.HomeBandOverlays
 import dev.nikelauncher.ui.applist.ScrubState
 import dev.nikelauncher.R
 import dev.nikelauncher.ui.common.toast
@@ -149,7 +148,6 @@ fun HomeRoute(
             save = { top, height -> scope.launch { app.prefs.strip.setScrubBand(top, height) } },
         )
     }
-    val band = bands.band
 
     // The one place a row press is turned into something happening. A row that is not an app is
     // recognised once, here, rather than in each place a press is wired up.
@@ -242,7 +240,9 @@ fun HomeRoute(
     val insetRightDp = if (settings.edgeZoneInsetAuto) with(density) { gestureInsets.getRight(this, layoutDirection).toDp().value.roundToInt() } else settings.edgeZoneInsetDp
     // A widget page keeps the system gestures in the places its controls are; the strip's own
     // exclusion would overwrite them, and there is no strip to protect there.
-    if (!onSidePage) EdgeGestureExclusion(settings.edgeSide, settings.edgeZoneWidthDp, insetLeftDp, insetRightDp, band)
+    if (!onSidePage) ObserveScrubBand(bands) { band ->
+        EdgeGestureExclusion(settings.edgeSide, settings.edgeZoneWidthDp, insetLeftDp, insetRightDp, band)
+    }
 
     val homeContentAlpha by animateFloatAsState(if (bands.editing) 0f else 1f, label = "homeContentAlpha")
     // Edit mode borrows the app list's dim: its controls are small and a busy wallpaper made them hard to read.
@@ -284,7 +284,9 @@ fun HomeRoute(
                     editMode = homeEditMode,
                     onEditModeChange = { homeEditMode = it },
                     editOverlay = {
-                        if (!controller.visible && !onSidePage) HomeGestureZones(settings, band, insetLeftDp, insetRightDp, cornerButtonBounds, data.nameOverrides)
+                        if (!controller.visible && !onSidePage) ObserveScrubBand(bands) { band ->
+                            HomeGestureZones(settings, band, insetLeftDp, insetRightDp, cornerButtonBounds, data.nameOverrides)
+                        }
                     },
                 )
             }
@@ -301,6 +303,7 @@ fun HomeRoute(
                     else layout(0, 0) {}
                 },
         ) {
+            ObserveScrubBand(bands, active = controller.visible) { band ->
             AppListHost(
                 app = app,
                 settings = settings,
@@ -324,50 +327,17 @@ fun HomeRoute(
                 launchEntry = ::launchEntry,
                 onNavigate = onNavigate,
             )
+            }
         }
 
-        // The band editor draws no letters of its own: the strip is what shows the range being
-        // dragged, so it is given whether or not the always-on setting asked for it. Edit layout is
-        // the other way round: its own controls sit where the strip does.
-        val showIdleStrip = when {
-            controller.visible -> false
-            bands.editing -> true
-            homeEditMode -> false
-            else -> settings.stripInsetSide != null
-        }
-        if (showIdleStrip) {
-            EdgeScrubber(
-                letters = listModel.letters,
-                scrubY = { null },
-                pullPx = { 0f },
-                band = band,
-                side = scrub.side,
-                style = settings.scrubStyle,
-                ripple = settings.rippleParams,
-                modifier = Modifier.align(if (scrub.side == EdgeSide.LEFT) Alignment.CenterStart else Alignment.CenterEnd),
-            )
-        }
-
+        HomeBandOverlays(settings, bands, scrub, listModel.letters, controller.visible, homeEditMode, viewportHeightPx,
+            onReset = { bands.live = null; scope.launch { app.prefs.strip.clearScrubBand() } })
 
         folderPickerFor?.let { target ->
             FolderPickerHost(app, target, folders, appsByKey, data.nameOverrides) { folderPickerFor = null }
         }
 
-        if (bands.editing) {
-            BandEditOverlay(
-                band = bands.live ?: band,
-                side = scrub.side,
-                viewportHeightPx = viewportHeightPx,
-                letters = listModel.letters,
-                onBandChange = { bands.live = it },
-                // Stays open rather than exiting: dropping the stored range hands the strip back to
-                // the favorites, and the point of a reset is watching it land there.
-                onReset = { bands.live = null; scope.launch { app.prefs.strip.clearScrubBand() } },
-                onDone = bands::commit,
-            )
-        }
-
-        if (!homeEditMode && !bands.editing && controller.query.isEmpty()) {
+        if (!homeEditMode && !bands.editing && controller.query.isEmpty()) ObserveScrubBand(bands) { band ->
             EdgeZones(
                 settings = settings,
                 scrub = scrub,

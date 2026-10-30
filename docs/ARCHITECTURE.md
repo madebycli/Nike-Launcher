@@ -10,10 +10,11 @@ analytics, no ads, no accounts.
 MainActivity.kt                 Activity, window setup, status-bar peek
 NikeApp.kt                  Application; owns Prefs, repositories, widget host
 data/
-  AppInfo.kt, AppRepository.kt  component + label, PackageManager queries, launch, app-info intents
+  AppInfo.kt, AppRepository.kt  profile-aware activity keys, LauncherApps queries, launch and app-info intents
   IconPackRepository.kt         icon-pack discovery, appfilter.xml parsing, icon lookup
   Prefs.kt                      owns the DataStore; settings live in Library/Appearance/Home/AppList/Strip/Corner/WidgetPagePrefs.kt, keys in PrefKeys.kt
   backup/                       the backup file: typed values, widgets with new ids, files the settings point at, widgets left to confirm
+  prefs/WidgetAppPrefs.kt        default clock/calendar/weather apps for newly created clock widgets
   Folder.kt                     folder model + JSON persistence + favorites token encoding
   HomePins.kt                   where each home block is held (edge + fraction)
   WidgetPages.kt                the grids of widgets on the pages either side of home
@@ -21,21 +22,22 @@ data/
 ui/
   NikeNavHost.kt                collects settings once, hosts the navigation graph, shows the first-run setup
   home/HomeRoute.kt             home destination: pages, app-list overlay, edge zones
-  home/route/                   the pieces of the route: list host, wallpaper layers, page host, gesture exclusions
+  home/route/                   list host, wallpaper layers, page host, gesture exclusions; ObserveScrubBand isolates band subscriptions
   home/stack/, blocks/, rows/   the pinned stack, its blocks, favorite and folder rows
-  home/edit/                    edit mode: frames, drag handles, snap guides
-  home/pages/                   widget pages: pager, grid, resize and reorder
-  home/corner/                  the corner button, its sheets and the floating search button
+  home/edit/                    edit mode: frames, drag handles, snap guides; NudgePanel moves the selected frame vertically and its clipped contents horizontally
+  home/pages/                   widget pages: pager, grid, resize and reorder; components/WidgetGridToolbar uses stock button defaults
+  home/corner/                  the corner button, its sheets, a pinned CornerSettingsPreview and the floating search button
   home/setup/                   the first-run flow; StyleStep pins a StylePreview (the favorites, read from the same prefs) above the style controls
   home/wallpaper/               system blur, picture and grain behind the app list
   applist/                      A-Z list, pull-to-collapse, strip and edge zone, scrub state
-  notifications/                the notification sheet: overview, conversation, actions, reply
+  notifications/                live sheet host, testable presentation, grouped message history, Material bubbles/swipe dismissal, provider actions, target-bound reply drafts and image loaders
   settings/                     settings screen, its sections and the picker screens
   theme/                        Material 3 Expressive theme, fonts, wallpaper-aware text color
   kit/                          shared building blocks: motion, menu, settings rows, onboarding (see docs/COMPONENTS.md)
 media/                          notification listener, preview bus and parser, Now Playing
 service/                        haptics, status-bar fader, accessibility service, system UI
 widget/                         clock widget (model, faces, weather, calendar, overview sheets), widget host, picker, restore
+  config/                       clock settings: screen/navigation, clock/calendar rows, appearance/weather rows, pinned preview, exact number input and dialogs
 ```
 
 ## Things that look wrong until you know why
@@ -44,6 +46,34 @@ widget/                         clock widget (model, faces, weather, calendar, o
 `android:windowShowWallpaper`, so the real system wallpaper shows through a
 transparent window. "Dim wallpaper" is therefore just a scrim `Box`, not image
 processing.
+
+**Clock settings are a draft until Done.** The serializable configuration and last enabled date
+pattern survive activity recreation. Disabling the date preserves its format for the next time it
+is enabled. Every page uses the settings kit; the pinned preview uses the actual clock header.
+The style gallery is the only page that replaces the preview with its own selected-style card.
+Calendar selection and the style gallery live in separate files. Date and number entry use the
+state-based Material text-field API.
+
+**Setup uses the same app pickers as widget settings.** `WidgetAppPrefs` stores initial app choices
+in the main DataStore, so they travel in the existing typed backup format. The three new keys are
+`default_widget_clock_app`, `default_widget_calendar_app`, and `default_widget_weather_app`.
+Existing saved widget configurations take precedence when reopened. Choosing an app during setup
+also updates an already-bound first-run clock. `AccessStep` and `FavoritesStep` have separate files.
+
+**Setup needs only the Material Surface to block touches behind it.** An additional empty clickable
+modifier on the entire setup consumed the down event needed by reorder handles. Favorite rows now
+use the existing `sh.calvin.reorderable.ReorderableColumn` and Material up/down buttons, with ordering
+in the framework-free `RowOrder.kt`.
+
+**A block frame and its contents have independent positions.** `HomePins` anchors a full-width frame
+vertically. `BlockOffsets` stores each block's horizontal content offset in `block_offset_*`; content
+is clipped to its frame. `NudgePanel` also changes row/widget edge padding through their existing
+preferences. These keys are included in the settings backup.
+
+**Edit-mode gesture annotations do not receive touches.** `HomeGestureZones` uses Canvas and Material
+badges without pointer handlers, below the nudge panel and edit toolbar. `GestureZoneGeometry` follows edge side/insets/width, the optional
+letter-band confinement, corner-button keep-out, and `QuickLaunchRegion`. Pull-down and swipe-up
+labels describe directions on the home drag surface; they do not introduce new gesture hit zones.
 
 **`LongPressFrameLayout` wraps every embedded widget** instead of a Compose
 `pointerInput`. A Compose long-press detector owns the whole touch stream once it
@@ -76,6 +106,11 @@ rectangle to the band the strip actually occupies.
 the phone is unlocked and previews are on; locking, switching it off or losing the listener
 clears it. Replies and actions go through the bus, which checks each request against the
 notification as it is now.
+`NotificationChat` groups consecutive authors without sorting provider messages. History follows
+the newest message until the reader scrolls away. A draft retains its action and result key across
+provider updates; changing a target requires an explicit selection. Large notification pictures
+are decoded up to 1024px; avatar icons remain bounded at 128px. Both loaders run off the main thread.
+Presentation is keyed by selected notification id, so content updates retain the draft and history.
 
 **A backup carries more than settings.** Widgets get new ids on another phone, so each is bound
 again and every reference (home, folders, widget pages) is remapped; a widget the system will not
@@ -84,7 +119,7 @@ list picture) travel inside the file, checked before anything is written.
 
 ## Recomposition
 
-Two deliberate choices keep scrubbing off the main thread's back:
+The moving state has narrow subscribers:
 
 - **`ScrubState`** holds the letter, position and elastic pull. It is passed down as
   one stable object so only the composable that *reads* a field is invalidated. When
@@ -95,6 +130,11 @@ Two deliberate choices keep scrubbing off the main thread's back:
   count because the cache key includes the rasterised pixel size: moving the
   icon-size slider adds a generation rather than replacing one, and a single 96dp
   icon on a dense screen is ~450 KB.
+- **`ObserveScrubBand`** reads `BandEditing.band` inside the consumers rather than `HomeRoute`.
+  The hidden app list does not observe the moving band; it reads the latest value when revealed.
+  The focused 120-update probe in `BandRecompositionTest` records 121 outer compositions before
+  isolation and 1 afterwards, with 121 visible-consumer compositions and 1 hidden-consumer
+  composition. These are snapshot/recomposition counts, not phone frame-time measurements.
 
 ## Permissions
 
@@ -114,61 +154,7 @@ whichever app is the current Home.
 
 ## Known gaps
 
-- No search in the A-Z list; the edge scrubber is the only way to find an app.
-- Work-profile apps are invisible. `AppRepository` uses `PackageManager` rather than
-  `LauncherApps`, and `AppInfo` carries no `UserHandle`. Fixing this changes
-  `AppInfo.key`, which is the persisted favorites key, so it needs a data migration.
-- Double-tap-to-lock works only in the app list, not on the home screen.
-- No Baseline Profile. Generating one needs a device or emulator; it is the largest
-  remaining first-launch win.
-- Unit tests cover only framework-free logic. Anything touching `PackageManager`,
-  `ComponentName` or Compose needs Robolectric or an instrumented test.
-
-## Clock configuration
-
-Clock configuration uses a saved draft until Done, including the previous enabled date format.
-Date and exact-number entry use state-based Material fields. Calendar selection lives apart from
-the style gallery; selected previews use the matching content colour. ClockAppLabel is shared.
-ClockConfigScreensTest renders six pages, all twenty styles and dialogs at Pixel 9 dimensions,
-in English and German at 150% font scale. Missing clock strings are supplied in es/pl/ru/sv.
-Native Canvas software PixelCopy avoids missing unchanged RenderNodes in repeated captures.
-
-## Home edit annotations
-
-HomeGestureZones draws Canvas rectangles and stock Material badges without pointer handlers,
-below the nudge panel and toolbar. Pure GestureZoneGeometry follows edge insets, band confinement,
-corner keep-out and quick-launch region. Direction labels use resources in all six locales.
-HomeScreensTest exercises controls through the overlay; frame chips use filled Material colours.
-
-## Notification presentation
-
-NotificationSheet owns live state; NotificationSheetContent is the real presentation with an
-injectable controller. NotificationChat keeps provider order while grouping authors and pauses.
-MessageBubble and NotificationDismissBox use Material swipe dismissal; stable message keys keep
-hiding local to the chosen bubble. NotificationHistory follows newest messages until scrolled away.
-NotificationReply keeps action/result-key identity through updates and requires explicit retargeting.
-Provider metadata supplies action icons, and large pictures decode off-thread up to 1024px.
-NotificationScreensTest covers overview, conversation, replies and invented image attachments.
-
-## Setup defaults and ordering
-
-WidgetAppPrefs adds default_widget_clock_app, default_widget_calendar_app and default_widget_weather_app
-in the existing DataStore and typed backup format. Saved clocks take precedence; setup updates an
-already-bound initial clock. AccessStep and FavoritesStep are separate modules and reuse widget pickers.
-ReorderableRows uses the existing reorderable library plus Material up/down controls; RowOrder is pure.
-The setup-wide extra clickable modifier was removed because it consumed drag-handle down events.
-SetupScreensTest verifies persisted order after both an arrow change and a simulated drag.
-
-## Search colours and corner preview
-
-Floating search exposes the existing independent foreground and automatic-foreground keys.
-CornerSettingsPreview stays above scrolling controls and the title wraps at large German text.
-The real backup round-trip test restores defaults, clock options under a newly allocated widget id,
-horizontal offsets, quick-launch region and search colours without changing backup format 2.
-
-## Widget pages and weather verification
-
-WidgetGridToolbar uses stock Material button shapes and wrapping minimum-height controls.
-The grid now fits the regular 400-line cap; its size exception is removed. WidgetPagesScreensTest
-renders the real grid and confirms resizing. WeatherScreensTest injects live-state fixtures into
-the actual overview/daily/hourly sheets and checks German headers at 150% font scale.
+- Double-tap-to-lock is handled by the app list/edge zone. The bare home wallpaper has no double-tap handler.
+- No generated Baseline Profile. Recording and validating one still needs a device.
+- Robolectric verifies real Compose layouts and simulated interactions. Device gesture velocity,
+  notification-provider delivery, system-role dialogs, wallpaper and frame timing need phone checks.
