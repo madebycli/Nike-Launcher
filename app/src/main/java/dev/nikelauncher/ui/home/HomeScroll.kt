@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -42,12 +43,14 @@ import kotlin.math.roundToInt
 @Stable
 internal class HomeScroll(
     private val scope: CoroutineScope,
-    private val actions: GestureActions,
+    actions: GestureActions,
     private val swipeUpOpensAppList: Boolean,
     private val peekPullPx: Float,
     private val deepPullPx: Float,
     private val quickLaunchPx: Float,
 ) {
+    /** Replaced on every composition, so the scroll itself outlives changes to what the gestures do. */
+    var actions: GestureActions = actions
     val offsetY = Animatable(0f)
     var viewportHeight by mutableIntStateOf(0)
     var contentHeight by mutableIntStateOf(0)
@@ -169,7 +172,9 @@ internal class HomeScroll(
 internal fun rememberHomeScroll(actions: GestureActions, swipeUpOpensAppList: Boolean, homeIntentTick: Int): HomeScroll {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
-    val scroll = remember(actions, swipeUpOpensAppList) {
+    // Keyed on the setting only: the gesture actions are rebuilt whenever any setting changes, and a
+    // scroll recreated with them would drop the offset and the drag in progress.
+    val scroll = remember(swipeUpOpensAppList) {
         HomeScroll(
             scope = scope,
             actions = actions,
@@ -179,6 +184,7 @@ internal fun rememberHomeScroll(actions: GestureActions, swipeUpOpensAppList: Bo
             quickLaunchPx = with(density) { 80.dp.toPx() },
         )
     }
+    SideEffect { scroll.actions = actions }
     LaunchedEffect(homeIntentTick) { if (homeIntentTick > 0) scroll.scrollToTop() }
     // Turning the phone changes how much there is to scroll through: a stack dragged up in
     // landscape kept that offset when the screen went tall again, which left it above the top.
