@@ -1,2 +1,0 @@
-Fixed:
-* The app list could stutter for the first few seconds after opening.

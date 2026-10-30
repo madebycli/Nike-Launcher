@@ -1,2 +1,0 @@
-Fixed:
-* With the status bar peek set to 0, the status bar no longer fades out when you come back from an app.

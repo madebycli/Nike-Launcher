@@ -1,6 +1,0 @@
-New:
-* Polish translation, thanks to kompowiec.
-* Swedish translation, thanks to noscirep.
-
-Fixed:
-* Tapping the corner button could open the app list instead.
