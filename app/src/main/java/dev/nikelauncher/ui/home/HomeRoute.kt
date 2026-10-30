@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.home
+package dev.nikelauncher.ui.home
 
 import android.app.SearchManager
 import android.content.Intent
 import android.graphics.Rect
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.animation.core.Animatable
@@ -54,39 +53,40 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import dev.victorialauncher.TypedKey
-import dev.victorialauncher.VictoriaApp
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.EntryKind
-import dev.victorialauncher.data.restoreConcealed
-import dev.victorialauncher.data.AzStripVisibility
-import dev.victorialauncher.data.EdgeSide
-import dev.victorialauncher.data.RippleParams
-import dev.victorialauncher.data.ScrubStyle
-import dev.victorialauncher.data.ScrubBubbleShape
-import dev.victorialauncher.data.FavoritesSource
-import dev.victorialauncher.data.ShortcutSwipe
-import dev.victorialauncher.data.HomeAlignment
-import dev.victorialauncher.data.IconSide
-import dev.victorialauncher.data.Folder
-import dev.victorialauncher.data.HomePaddings
-import dev.victorialauncher.data.QuickLaunchSlot
-import dev.victorialauncher.data.PaddingSlot
-import dev.victorialauncher.data.folderToken
-import dev.victorialauncher.media.NowPlayingBus
-import dev.victorialauncher.media.isListenerEnabled
-import dev.victorialauncher.service.SystemUi
-import dev.victorialauncher.ui.applist.AppListModel
-import dev.victorialauncher.ui.applist.AppListScreen
-import dev.victorialauncher.ui.applist.BandEditOverlay
-import dev.victorialauncher.ui.applist.EdgeScrubber
-import dev.victorialauncher.ui.applist.EdgeTouchZone
-import dev.victorialauncher.ui.applist.ScrubBand
-import dev.victorialauncher.ui.applist.ScrubberGeometry
-import dev.victorialauncher.ui.applist.ScrubState
-import dev.victorialauncher.ui.applist.buildAppListModel
-import dev.victorialauncher.ui.common.FolderPickerDialog
-import dev.victorialauncher.widget.WidgetSlotActions
+import dev.nikelauncher.ui.common.toast
+import dev.nikelauncher.TypedKey
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.EntryKind
+import dev.nikelauncher.data.restoreConcealed
+import dev.nikelauncher.data.AzStripVisibility
+import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.data.RippleParams
+import dev.nikelauncher.data.ScrubStyle
+import dev.nikelauncher.data.ScrubBubbleShape
+import dev.nikelauncher.data.FavoritesSource
+import dev.nikelauncher.data.ShortcutSwipe
+import dev.nikelauncher.data.HomeAlignment
+import dev.nikelauncher.data.IconSide
+import dev.nikelauncher.data.Folder
+import dev.nikelauncher.data.HomePaddings
+import dev.nikelauncher.data.QuickLaunchSlot
+import dev.nikelauncher.data.PaddingSlot
+import dev.nikelauncher.data.folderToken
+import dev.nikelauncher.media.NowPlayingBus
+import dev.nikelauncher.media.isListenerEnabled
+import dev.nikelauncher.service.SystemUi
+import dev.nikelauncher.ui.applist.AppListModel
+import dev.nikelauncher.ui.applist.AppListScreen
+import dev.nikelauncher.ui.applist.BandEditOverlay
+import dev.nikelauncher.ui.applist.EdgeScrubber
+import dev.nikelauncher.ui.applist.EdgeTouchZone
+import dev.nikelauncher.ui.applist.ScrubBand
+import dev.nikelauncher.ui.applist.ScrubberGeometry
+import dev.nikelauncher.ui.applist.ScrubState
+import dev.nikelauncher.ui.applist.buildAppListModel
+import dev.nikelauncher.ui.common.FolderPickerDialog
+import dev.nikelauncher.widget.WidgetSlotActions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -96,7 +96,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.Immutable
 import android.content.res.Configuration
 import android.net.Uri
-import dev.victorialauncher.R
+import dev.nikelauncher.R
 
 /** Width of the invisible strip at each screen edge that opens the app list. */
 /** Android only honors this much gesture exclusion per side, so spend it on the strip. */
@@ -126,7 +126,7 @@ private val SWIPE_OPEN_DISTANCE = 150.dp
  */
 @Composable
 fun HomeRoute(
-    app: VictoriaApp,
+    app: NikeApp,
     homeIntentTick: Int,
     /**
      * The app a corner button opens, or null for no button.
@@ -316,11 +316,7 @@ fun HomeRoute(
     /** Locking is a strip gesture now, so the toast that explains it lives with the strip. */
     fun lockOrExplain() {
         if (!SystemUi.lockScreen()) {
-            Toast.makeText(
-                context,
-                context.getString(R.string.toast_enable_accessibility_lock),
-                Toast.LENGTH_SHORT,
-            ).show()
+            context.toast(R.string.toast_enable_accessibility_lock)
         }
     }
 
@@ -412,8 +408,8 @@ fun HomeRoute(
     //
     // Without this it reaches the activity and finishes it, which is the default. A home
     // activity that finishes leaves the system to show whatever home-ish task is underneath
-    // — and when the default launcher was switched *to* Victoria, the previous launcher's
-    // task is still sitting there, so it comes back to the front. That looks like Victoria
+    // — and when the default launcher was switched *to* Nike, the previous launcher's
+    // task is still sitting there, so it comes back to the front. That looks like Nike
     // handing control over, but it is simply this one exiting. A reboot clears the old task,
     // which is why it seemed to come and go, and why killing that launcher's process drops
     // to the system one instead.
@@ -812,11 +808,7 @@ fun HomeRoute(
                     // Say so rather than failing silently — that way a pull that does nothing
                     // tells you whether the gesture or the permission is at fault.
                     if (!SystemUi.expandNotificationShade(context)) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.toast_enable_accessibility_shade),
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                        context.toast(R.string.toast_enable_accessibility_shade)
                     }
                 },
                 onManageFavorites = { onNavigate("favorites") },

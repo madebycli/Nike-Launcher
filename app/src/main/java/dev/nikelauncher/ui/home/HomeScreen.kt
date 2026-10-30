@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.home
+package dev.nikelauncher.ui.home
 
-import android.widget.Toast
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.calculateTargetValue
@@ -10,8 +9,9 @@ import androidx.compose.animation.core.spring
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material.icons.filled.Widgets
-import dev.victorialauncher.widget.WidgetPage
-import dev.victorialauncher.data.FolderWidget
+import dev.nikelauncher.ui.common.toast
+import dev.nikelauncher.widget.WidgetPage
+import dev.nikelauncher.data.FolderWidget
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -81,7 +81,7 @@ import androidx.compose.material.icons.filled.Height
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.LocalTextStyle
-import dev.victorialauncher.ui.theme.launcherTextShadow
+import dev.nikelauncher.ui.theme.launcherTextShadow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -119,37 +119,37 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.victorialauncher.data.AppInfo
-import dev.victorialauncher.data.EdgeSide
-import dev.victorialauncher.data.ShortcutSwipe
-import dev.victorialauncher.data.EntryKind
-import dev.victorialauncher.data.Folder
-import dev.victorialauncher.data.QuickLaunchSlot
-import dev.victorialauncher.data.HomeAlignment
-import dev.victorialauncher.data.IconSide
-import dev.victorialauncher.data.HomePaddings
-import dev.victorialauncher.data.folderToken
-import dev.victorialauncher.data.PaddingSlot
-import dev.victorialauncher.media.NowPlayingWidget
-import dev.victorialauncher.media.openNowPlayingApp
-import dev.victorialauncher.service.HapticUtil
+import dev.nikelauncher.data.AppInfo
+import dev.nikelauncher.data.EdgeSide
+import dev.nikelauncher.data.ShortcutSwipe
+import dev.nikelauncher.data.EntryKind
+import dev.nikelauncher.data.Folder
+import dev.nikelauncher.data.QuickLaunchSlot
+import dev.nikelauncher.data.HomeAlignment
+import dev.nikelauncher.data.IconSide
+import dev.nikelauncher.data.HomePaddings
+import dev.nikelauncher.data.folderToken
+import dev.nikelauncher.data.PaddingSlot
+import dev.nikelauncher.media.NowPlayingWidget
+import dev.nikelauncher.media.openNowPlayingApp
+import dev.nikelauncher.service.HapticUtil
 import androidx.compose.runtime.CompositionLocalProvider
-import dev.victorialauncher.ui.common.AppIcon
-import dev.victorialauncher.ui.common.swipeForShortcuts
-import dev.victorialauncher.ui.common.AppShortcutMenu
-import dev.victorialauncher.ui.common.TouchAnchoredMenu
-import dev.victorialauncher.ui.common.LocalIconConfig
-import dev.victorialauncher.ui.common.EditAppDialog
-import dev.victorialauncher.ui.common.FolderIconImage
-import dev.victorialauncher.ui.common.recordTouchPosition
-import dev.victorialauncher.widget.WidgetSlot
-import dev.victorialauncher.widget.WidgetSlotActions
+import dev.nikelauncher.ui.common.AppIcon
+import dev.nikelauncher.ui.common.swipeForShortcuts
+import dev.nikelauncher.ui.common.AppShortcutMenu
+import dev.nikelauncher.ui.common.TouchAnchoredMenu
+import dev.nikelauncher.ui.common.LocalIconConfig
+import dev.nikelauncher.ui.common.EditAppDialog
+import dev.nikelauncher.ui.common.FolderIconImage
+import dev.nikelauncher.ui.common.recordTouchPosition
+import dev.nikelauncher.widget.WidgetSlot
+import dev.nikelauncher.widget.WidgetSlotActions
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
-import dev.victorialauncher.R
-import dev.victorialauncher.media.NotificationCountBus
-import dev.victorialauncher.media.NotificationLine
+import dev.nikelauncher.R
+import dev.nikelauncher.media.NotificationCountBus
+import dev.nikelauncher.media.NotificationLine
 import androidx.compose.ui.res.stringResource
 
 private sealed interface HomeItem {
@@ -1675,7 +1675,7 @@ private fun FolderRow(
                             .padding(horizontal = sidePaddingDp.dp)
                             .clickable {
                                 if (!openNowPlayingApp(context)) {
-                                    Toast.makeText(context, context.getString(R.string.now_playing_open_failed), Toast.LENGTH_SHORT).show()
+                                    context.toast(R.string.now_playing_open_failed)
                                 }
                             },
                     )
@@ -1847,11 +1847,7 @@ private fun NowPlayingBlock(
                     // can't, rather than leaving a tap that looks ignored.
                     onClick = {
                         if (!openNowPlayingApp(context)) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.now_playing_open_failed),
-                                Toast.LENGTH_SHORT,
-                            ).show()
+                            context.toast(R.string.now_playing_open_failed)
                         }
                     },
                     onLongClick = {

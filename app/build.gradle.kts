@@ -1,9 +1,10 @@
 import java.util.Properties
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
 }
 
 // Release signing is read from a gitignored keystore.properties so a fresh clone
@@ -15,8 +16,8 @@ val keystoreProperties = Properties().apply {
 val hasSigningConfig = keystoreProperties.getProperty("storeFile") != null
 
 android {
-    namespace = "dev.victorialauncher"
-    compileSdk = 35
+    namespace = "dev.nikelauncher"
+    compileSdk = 37
 
     lint {
         // Translations are contributed, so they arrive behind the strings they translate, and
@@ -26,12 +27,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "dev.victorialauncher"
+        applicationId = "dev.nikelauncher"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 120
-        versionName = "0.90.4"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        targetSdk = 37
+        versionCode = 1
+        versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -65,14 +65,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs += listOf(
-            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-            "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-        )
-    }
-
     buildFeatures {
         compose = true
         buildConfig = true
@@ -92,35 +84,42 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        optIn.addAll(
+            "androidx.compose.material3.ExperimentalMaterial3Api",
+            "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
+            "androidx.compose.foundation.ExperimentalFoundationApi",
+        )
+    }
+}
+
 dependencies {
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
-    implementation("androidx.activity:activity-compose:1.9.2")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
 
-    implementation(platform("androidx.compose:compose-bom:2024.09.02"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 
-    implementation("androidx.navigation:navigation-compose:2.8.0")
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.reorderable)
+    implementation(libs.kotlinx.collections.immutable)
 
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
     // Real JSON on the unit-test classpath; the android.jar stub only throws.
-    testImplementation("org.json:json:20231013")
+    testImplementation(libs.org.json)
 
-    // Black-box instrumented tests: UiAutomator so they can drive the home-screen role
-    // itself (set-default-home, system dialogs) rather than only what runs in-process.
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test:runner:1.6.2")
-    androidTestImplementation("androidx.test:rules:1.6.1")
-    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
-
-    // Black-box instrumented tests: UiAutomator so they can drive the home-screen role
-    // itself (set-default-home, system dialogs) rather than only what runs in-process.
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test:runner:1.6.2")
-    androidTestImplementation("androidx.test:rules:1.6.1")
-    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
+    // Black-box instrumented tests drive the home-screen role itself (set-default-home, system dialogs).
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.uiautomator)
 }

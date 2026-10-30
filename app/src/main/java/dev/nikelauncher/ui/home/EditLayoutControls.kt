@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-package dev.victorialauncher.ui.home
+package dev.nikelauncher.ui.home
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -41,7 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.victorialauncher.R
+import dev.nikelauncher.R
 
 /** Every value in edit mode moves a dp at a time; holding is what covers distance. */
 const val PADDING_STEP_DP = 1
