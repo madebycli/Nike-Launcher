@@ -37,6 +37,7 @@ class ClockWidgetConfigActivity : ComponentActivity() {
         setContent {
             NikeTheme {
                 ClockConfigScreen(
+                    widgetId = widgetId,
                     initial = ClockWidgetConfig.read(this, widgetId),
                     onSave = ::save,
                     onCancel = ::finish,

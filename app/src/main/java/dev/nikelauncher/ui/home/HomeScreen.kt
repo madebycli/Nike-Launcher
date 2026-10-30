@@ -184,7 +184,6 @@ fun HomeScreen(
                     viewportHeightPx = { scroll.viewportHeight },
                     bottomInsetPx = { bottomInsetPx },
                     pins = { editor.pins },
-                    offsets = { data.blockOffsets },
                     metrics = metrics,
                 ) {
                     fun frame(block: HomeBlock) = FrameCallbacks(
@@ -196,6 +195,7 @@ fun HomeScreen(
                     if (showWidget) {
                         BlockFrame(
                             block = HomeBlock.WIDGET,
+                            contentOffsetDp = data.blockOffsets.widget,
                             editing = editMode,
                             selected = editor.selected == HomeBlock.WIDGET,
                             takeByBody = true,
@@ -219,6 +219,7 @@ fun HomeScreen(
                     if (showNowPlaying) {
                         BlockFrame(
                             block = HomeBlock.NOW_PLAYING,
+                            contentOffsetDp = data.blockOffsets.nowPlaying,
                             editing = editMode,
                             selected = editor.selected == HomeBlock.NOW_PLAYING,
                             takeByBody = true,
@@ -240,6 +241,7 @@ fun HomeScreen(
                     }
                     BlockFrame(
                         block = HomeBlock.FAVORITES,
+                        contentOffsetDp = data.blockOffsets.favorites,
                         editing = editMode,
                         selected = editor.selected == HomeBlock.FAVORITES,
                         takeByBody = false,
@@ -305,6 +307,7 @@ fun HomeScreen(
                     visible = editMode,
                     state = selectedBlock?.let { block ->
                         NudgeState(
+                            topDp = with(density) { metrics.top(block).toDp().value.roundToInt() },
                             offsetDp = data.blockOffsets[block],
                             edgeDp = if (block == HomeBlock.WIDGET) settings.widgetSidePaddingDp else settings.sidePaddingDp,
                             onMove = { dx, dy ->

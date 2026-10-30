@@ -31,7 +31,7 @@ import dev.nikelauncher.widget.ClockWidgetConfig
 import java.util.Date
 
 /** The secondary windows the clock settings can open. */
-enum class ClockConfigDialog { CUSTOM_DATE, WEATHER_APP, TEXT_COLOR, STYLE, CLOCK_APP, CALENDAR_APP, CALENDARS }
+enum class ClockConfigDialog { CUSTOM_DATE, WEATHER_APP, TEXT_COLOR, CLOCK_APP, CALENDAR_APP, CALENDARS }
 
 @Composable
 internal fun ClockConfigDialogs(
@@ -51,11 +51,6 @@ internal fun ClockConfigDialogs(
             selected = config.weatherPackage,
             onPick = { pkg -> update { it.copy(weatherPackage = pkg) }; dismiss() },
             onDismiss = dismiss,
-        )
-        ClockConfigDialog.STYLE -> AlertDialog(
-            onDismissRequest = dismiss,
-            confirmButton = { TextButton(onClick = dismiss) { Text(stringResource(R.string.widget_settings_done)) } },
-            text = { ClockStyleGallery(config, onSelect = { style -> update { it.copy(style = style) } }) },
         )
         ClockConfigDialog.CLOCK_APP -> ClockAppPickerDialog(
             ClockAppKind.CLOCK, config.clockPackage,

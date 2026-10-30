@@ -24,6 +24,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.zIndex
 import dev.nikelauncher.R
 import dev.nikelauncher.data.HomeBlock
@@ -60,19 +61,19 @@ internal fun BlockFrame(
     topInsidePx: () -> Int,
     callbacks: FrameCallbacks,
     modifier: Modifier = Modifier,
+    /** How far the content is moved sideways inside the field; the field itself never leaves the screen edges. */
+    contentOffsetDp: Int = 0,
     content: @Composable () -> Unit,
 ) {
     if (!editing) {
-        Box(modifier) { content() }
+        Box(modifier.clipToBounds()) { Box(Modifier.offset(x = contentOffsetDp.dp)) { content() } }
         return
     }
     val current by rememberUpdatedState(callbacks)
     val outline = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
 
     Box(
-        // Held in from the screen edges, so the outline is seen all the way round.
         modifier
-            .padding(horizontal = FrameInset)
             .then(
                 if (takeByBody) Modifier.pointerInput(block) {
                     detectVerticalDragGestures(
@@ -86,7 +87,7 @@ internal fun BlockFrame(
             .border(BorderStroke(if (selected) 2.dp else 1.dp, outline), MaterialTheme.shapes.large),
     ) {
         // The chip straddles the top edge, so its lower half would sit on whatever comes first.
-        Box(Modifier.padding(top = ChipHalfHeight)) { content() }
+        Box(Modifier.padding(top = ChipHalfHeight).clipToBounds()) { Box(Modifier.offset(x = contentOffsetDp.dp)) { content() } }
         if (coverBody) {
             // Nothing inside answers a touch while editing, so the body only selects and moves.
             Box(Modifier.matchParentSize().pointerInput(block) { detectTapGestures(onTap = { current.onSelect() }) })
@@ -112,4 +113,3 @@ internal fun BlockFrame(
 }
 
 private val ChipHalfHeight = 16.dp
-private val FrameInset = 8.dp
