@@ -611,4 +611,7 @@
     <string name="settings_app_list_effect_blur">Blur</string>
     <string name="settings_app_list_effect_strength">Effect strength</string>
     <string name="settings_app_list_grain">Grain</string>
+    <string name="action_uninstall">Uninstall</string>
+    <string name="quick_zone_height">Area height</string>
+    <string name="quick_zone_bottom">Distance from bottom</string>
 </resources>

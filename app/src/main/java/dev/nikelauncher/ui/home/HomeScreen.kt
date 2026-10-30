@@ -155,7 +155,7 @@ fun HomeScreen(
                 .onSizeChanged { scroll.viewportHeight = it.height }
                 .onGloballyPositioned { rootY = it.positionInWindow().y }
                 .then(scroll.dragModifier(enabled = !editMode))
-                .then(scroll.quickLaunchModifier(enabled = settings.quickLaunchEnabled, editMode = editMode))
+                .then(scroll.quickLaunchModifier(enabled = settings.quickLaunchEnabled, editMode = editMode, region = settings.quickLaunchRegion))
                 // Rows, the widget and the edge zones claim their own presses, so only bare
                 // wallpaper reaches this.
                 .pointerInput(editMode) {

@@ -27,14 +27,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import dev.nikelauncher.data.QuickLaunchRegion
 import dev.nikelauncher.data.QuickLaunchSlot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
-
-/** How much of the bottom of the home screen always answers the quick-launch swipes. */
-private const val QUICK_LAUNCH_BOTTOM_FRACTION = 0.2f
 
 /**
  * The home screen's free vertical drag, with a spring at both ends, and the gestures that ride on
@@ -121,18 +119,15 @@ internal class HomeScroll(
     }
 
     /** Sideways swipes in the empty space under the stack, when anything is bound to them. */
-    fun quickLaunchModifier(enabled: Boolean, editMode: Boolean): Modifier =
-        if (!enabled) Modifier else Modifier.pointerInput(editMode, contentHeight) {
+    fun quickLaunchModifier(enabled: Boolean, editMode: Boolean, region: QuickLaunchRegion): Modifier =
+        if (!enabled) Modifier else Modifier.pointerInput(editMode, region) {
             var eligible = false
             var travelled = 0f
             detectHorizontalDragGestures(
                 onDragStart = { start ->
-                    // The empty space under the whole stack, and the bottom of the screen even
-                    // when favorites reach it, for a list too long to leave any space.
-                    eligible = !editMode && (
-                        start.y > offsetY.value + contentHeight ||
-                            start.y > size.height * (1f - QUICK_LAUNCH_BOTTOM_FRACTION)
-                        )
+                    // A band of the screen, whatever the favorites are doing: where the swipe
+                    // works should not depend on how many there are.
+                    eligible = !editMode && region.contains(start.y, size.height.toFloat())
                     travelled = 0f
                 },
                 onDragEnd = {

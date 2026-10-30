@@ -88,6 +88,18 @@ class HomePrefs internal constructor(private val store: DataStore<Preferences>) 
      */
     val allowRotation: Flow<Boolean?> = data.map { it[PrefKeys.ALLOW_ROTATION] }.distinctUntilChanged()
 
+    /** Where on the screen a sideways swipe launches the quick-launch apps. */
+    val quickLaunchRegion: Flow<QuickLaunchRegion> = data.map {
+        QuickLaunchRegion(it[PrefKeys.QUICK_ZONE_BOTTOM] ?: 0, it[PrefKeys.QUICK_ZONE_HEIGHT] ?: 18)
+    }.distinctUntilChanged()
+
+    suspend fun setQuickLaunchRegion(value: QuickLaunchRegion) {
+        store.edit {
+            it[PrefKeys.QUICK_ZONE_BOTTOM] = value.bottom
+            it[PrefKeys.QUICK_ZONE_HEIGHT] = value.height
+        }
+    }
+
     val doubleTapToLock: Flow<Boolean> =
         data.map { it[PrefKeys.DOUBLE_TAP_TO_LOCK] ?: false }.distinctUntilChanged()
 

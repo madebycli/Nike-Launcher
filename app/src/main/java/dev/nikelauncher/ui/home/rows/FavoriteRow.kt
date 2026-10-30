@@ -34,6 +34,10 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.nikelauncher.R
+import androidx.compose.ui.platform.LocalContext
+import dev.nikelauncher.ui.common.requestUninstall
+import dev.nikelauncher.ui.common.toast
+import dev.nikelauncher.NikeApp
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.EntryKind
 import dev.nikelauncher.ui.common.AppIcon
@@ -78,6 +82,7 @@ internal fun FavoriteRow(
     menu: FavoriteMenuActions,
 ) {
     val density = LocalDensity.current
+    val context = LocalContext.current
     var shortcutMenu by remember { mutableStateOf(false) }
     var notificationSheet by remember { mutableStateOf(false) }
     val posted by NotificationPreviewBus.notifications.collectAsState()
@@ -153,6 +158,12 @@ internal fun FavoriteRow(
             // that is not there.
             if (app.kind == EntryKind.APP) {
                 item(stringResource(R.string.action_app_info), menu.onAppInfo, leadingIcon = Icons.Filled.Info)
+                item(
+                    stringResource(R.string.action_uninstall),
+                    { if (!context.requestUninstall(app)) context.toast(R.string.clock_action_unavailable) },
+                    leadingIcon = Icons.Filled.Delete,
+                    destructive = true,
+                )
             }
             // Distinct from Remove below, which only takes it off the home screen: this hands it
             // back to the app that pinned it, and it leaves the launcher entirely.

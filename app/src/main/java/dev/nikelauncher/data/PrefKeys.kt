@@ -106,6 +106,8 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
         val APP_LIST_BACKGROUND_IMAGE = stringPreferencesKey("app_list_background_image")
         val APP_LIST_BACKGROUND_EDGES = booleanPreferencesKey("app_list_background_edges")
         val APP_LIST_GRAIN = intPreferencesKey("app_list_grain")
+        val QUICK_ZONE_BOTTOM = intPreferencesKey("quick_zone_bottom")
+        val QUICK_ZONE_HEIGHT = intPreferencesKey("quick_zone_height")
         val CORNER_BUTTON_KEY = stringPreferencesKey("corner_button_key")
         val AUTO_KEYBOARD = booleanPreferencesKey("auto_keyboard")
         val LAST_LETTER_TO_LINE = booleanPreferencesKey("last_letter_to_line")

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalConfiguration
+import dev.nikelauncher.data.QuickLaunchRegion
 import dev.nikelauncher.data.AppListBackgroundEffect
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.AzStripVisibility
@@ -97,6 +98,7 @@ fun rememberHomeSettings(prefs: Prefs, library: LibraryState, appsByKey: Map<Str
         hideStatusBarAppList = a.hideStatusBarAppList.collectAsState(false).value,
         sortByUsage = prefs.library.sortByUsage.collectAsState(false).value,
         quickLaunchLeft = library.quickLaunchLeftKey?.let { appsByKey[it] },
+        quickLaunchRegion = h.quickLaunchRegion.collectAsState(QuickLaunchRegion()).value,
         quickLaunchRight = library.quickLaunchRightKey?.let { appsByKey[it] },
         dimWallpaperAlpha = a.dimWallpaperAlpha.collectAsState(0.35f).value,
         dimHomeAlpha = a.dimHomeAlpha.collectAsState(0f).value,

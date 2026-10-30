@@ -403,4 +403,7 @@
     <string name="settings_app_list_effect_blur">Weichzeichnen</string>
     <string name="settings_app_list_effect_strength">Effektstärke</string>
     <string name="settings_app_list_grain">Körnung</string>
+    <string name="action_uninstall">Deinstallieren</string>
+    <string name="quick_zone_height">Höhe des Bereichs</string>
+    <string name="quick_zone_bottom">Abstand vom unteren Rand</string>
 </resources>

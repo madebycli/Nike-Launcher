@@ -3,6 +3,7 @@ package dev.nikelauncher.ui.home
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import dev.nikelauncher.data.QuickLaunchRegion
 import dev.nikelauncher.data.AppListBackgroundEffect
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.AzStripVisibility
@@ -70,6 +71,7 @@ data class HomeSettings(
     val sortByUsage: Boolean,
     val quickLaunchLeft: AppInfo?,
     val quickLaunchRight: AppInfo?,
+    val quickLaunchRegion: QuickLaunchRegion,
     val dimWallpaperAlpha: Float,
     val dimHomeAlpha: Float,
     val appListBackgroundEffect: AppListBackgroundEffect,

@@ -146,6 +146,7 @@ import kotlinx.coroutines.flow.first
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import dev.nikelauncher.R
+import dev.nikelauncher.ui.common.toast
 import androidx.compose.ui.res.stringResource
 
 /**
@@ -1605,6 +1606,7 @@ private fun AppRow(
                     leadingIcon = { Icon(Icons.Filled.Info, contentDescription = null) },
                     onClick = { onDismissMenu(); onAppInfo() },
                 )
+                dev.nikelauncher.ui.common.UninstallMenuItem(app, onDismissMenu)
             }
             if (app.kind == EntryKind.PRIVATE_SPACE && app.componentName.className == PRIVATE_SPACE_UNLOCKED_CLASS) {
                 val context = LocalContext.current

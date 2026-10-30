@@ -12,9 +12,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.R
+import dev.nikelauncher.data.QuickLaunchRegion
 import dev.nikelauncher.data.QuickLaunchSlot
 import dev.nikelauncher.data.ShortcutSwipe
 import dev.nikelauncher.ui.kit.settings.ChoiceChips
+import dev.nikelauncher.ui.kit.settings.SettingsSlider
 import dev.nikelauncher.ui.kit.settings.settingsBlock
 import dev.nikelauncher.ui.kit.settings.settingsItem
 import dev.nikelauncher.ui.kit.settings.settingsSwitch
@@ -33,6 +35,9 @@ internal fun gesturesEntries(env: SettingsEnv): List<SettingsEntry> {
     val shortcutSwipe by home.shortcutSwipe.collectAsState(ShortcutSwipe.RIGHT)
     val doubleTap by home.doubleTapToLock.collectAsState(false)
 
+    val region by home.quickLaunchRegion.collectAsState(QuickLaunchRegion())
+    val regionHeightTitle = stringResource(R.string.quick_zone_height)
+    val regionBottomTitle = stringResource(R.string.quick_zone_bottom)
     val none = stringResource(R.string.settings_quick_launch_none)
     return listOf(
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_haptics), haptics, { env.write { env.prefs.strip.setHapticsEnabled(it) } }, value = stringResource(R.string.settings_haptics_detail)), "vibrate"),
@@ -42,6 +47,13 @@ internal fun gesturesEntries(env: SettingsEnv): List<SettingsEntry> {
         }, "swipe shortcuts"),
         SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_quick_launch_left), { env.nav.onQuickLaunchPicker(QuickLaunchSlot.LEFT) }, value = env.quickLaunchLeftLabel ?: none), "swipe launch"),
         SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_quick_launch_right), { env.nav.onQuickLaunchPicker(QuickLaunchSlot.RIGHT) }, value = env.quickLaunchRightLabel ?: none), "swipe launch"),
+        // Only while something is bound to the swipe, since the band has no other use.
+        SettingsEntry(SECTION, settingsBlock(regionHeightTitle, value = "${region.height}%") {
+            SettingsSlider(region.height.toFloat(), QuickLaunchRegion.HEIGHT_RANGE.first.toFloat()..QuickLaunchRegion.HEIGHT_RANGE.last.toFloat(), { v -> env.write { home.setQuickLaunchRegion(region.copy(heightPercent = v.toInt())) } })
+        }, "swipe launch band area", visible = env.quickLaunchLeftLabel != null || env.quickLaunchRightLabel != null),
+        SettingsEntry(SECTION, settingsBlock(regionBottomTitle, value = "${region.bottom}%") {
+            SettingsSlider(region.bottom.toFloat(), QuickLaunchRegion.BOTTOM_RANGE.first.toFloat()..QuickLaunchRegion.BOTTOM_RANGE.last.toFloat(), { v -> env.write { home.setQuickLaunchRegion(region.copy(bottomPercent = v.toInt())) } })
+        }, "swipe launch band area", visible = env.quickLaunchLeftLabel != null || env.quickLaunchRightLabel != null),
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_double_tap_lock), doubleTap, { env.write { home.setDoubleTapToLock(it) } }, value = stringResource(R.string.settings_double_tap_lock_detail)), "lock screen"),
         // Switching it on does nothing at all without the permission, so the way to grant it
         // belongs right here rather than in a toast later.
