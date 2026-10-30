@@ -63,7 +63,10 @@
     <string name="toast_enable_accessibility_lock">Enable Nike Launcher in Settings → Accessibility to lock the screen</string>
 
     <!-- Settings -->
-    <string name="settings_title">Nike settings</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_strip">A-Z strip</string>
+    <string name="widget_clock_weather_unit">Unit</string>
+    <string name="widget_clock_agenda_style">Event times</string>
     <string name="settings_section_home">Home screen</string>
     <string name="settings_section_app_list">App list</string>
     <string name="settings_section_gestures">Gestures</string>
@@ -258,6 +261,7 @@
     <string name="settings_dim_color">Dim color</string>
     <string name="settings_dim_color_detail">What the wallpaper is dimmed with. How much is set under Home screen and App list</string>
     <string name="color_from_wallpaper">From your wallpaper</string>
+    <string name="color_hex">Hex code</string>
     <string name="icon_shape">Icon shape</string>
     <string name="icon_shape_detail">Only reshapes adaptive icons; anything older is left as it is</string>
     <string name="icon_shape_system">System</string>

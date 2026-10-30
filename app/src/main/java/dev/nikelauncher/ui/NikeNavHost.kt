@@ -81,7 +81,8 @@ import dev.nikelauncher.ui.settings.FolderAppsScreen
 import dev.nikelauncher.ui.settings.HiddenAppsScreen
 import dev.nikelauncher.ui.theme.DEFAULT_SHADOW_STRENGTH
 import dev.nikelauncher.ui.settings.ManageFavoritesScreen
-import dev.nikelauncher.ui.settings.SettingsScreen
+import dev.nikelauncher.ui.settings.SettingsNav
+import dev.nikelauncher.ui.settings.SettingsRoute
 import dev.nikelauncher.ui.theme.rememberContentColor
 import dev.nikelauncher.widget.ClockWidgetProvider
 import dev.nikelauncher.widget.WidgetPickerActivity
@@ -474,54 +475,6 @@ fun NikeNavHost(
         warmIconCache(context, allApps, iconPackPackage, iconOverrides, listIconPx, iconStyle, priorityKeys)
     }
 
-    // Written through the document picker rather than to a path of our own: the file is the
-    // user's to keep, and this way it lands wherever they keep things without the app asking
-    // for storage it otherwise never needs.
-    val exportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/json")
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch {
-            // Every state but Absent strips, including the ones with no serial to strip by:
-            // an unreadable space is the case most in need of it, and it is the case a strip
-            // keyed on the serial does nothing in.
-            val stripOtherProfiles = privateSpace.stripsOtherProfiles
-            val omittedPrivateSpace = withContext(Dispatchers.IO) {
-                runCatching {
-                    val result = app.prefs.exportJson(stripOtherProfiles)
-                    context.contentResolver.openOutputStream(uri)?.use { it.write(result.json.toByteArray()) }
-                        ?: return@runCatching null
-                    result.omittedPrivateSpace
-                }.getOrNull()
-            }
-            Toast.makeText(
-                context,
-                when (omittedPrivateSpace) {
-                    null -> R.string.settings_backup_failed
-                    true -> R.string.settings_export_done_private_omitted
-                    false -> R.string.settings_export_done
-                },
-                Toast.LENGTH_SHORT,
-            ).show()
-        }
-    }
-    val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch {
-            val text = withContext(Dispatchers.IO) {
-                runCatching {
-                    context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
-                }.getOrNull()
-            }
-            val ok = text != null && app.prefs.importJson(text)
-            Toast.makeText(
-                context,
-                if (ok) R.string.settings_import_done else R.string.settings_backup_failed,
-                Toast.LENGTH_SHORT,
-            ).show()
-        }
-    }
-
     val settings = HomeSettings(
         iconSizeDp = iconSizeDp,
         labelSizeSp = labelSizeSp,
@@ -742,252 +695,18 @@ fun NikeNavHost(
         }
 
         composable("settings") {
-            val iconPacks = remember { app.iconPackRepository.getInstalledIconPacks() }
-            val listenerEnabled = remember(homeIntentTick) { isListenerEnabled(context) }
-            SettingsScreen(
-                hiddenCount = hiddenShownCount,
-                iconPacks = iconPacks,
-                iconPackPackage = iconPackPackage,
-                showAppIcons = showAppIcons,
-                showFavoriteIcons = showFavoriteIcons,
-                onSetShowFavoriteIcons = { scope.launch { app.prefs.appearance.setShowFavoriteIcons(it) } },
-                showListHeaders = showListHeaders,
-                showSettingsRow = showSettingsRow,
-                edgeZoneBandOnly = edgeZoneBandOnly,
-                holdScroll = holdScroll,
-                dimOthersScrubbing = dimOthersScrubbing,
-                markWorkApps = markWorkApps,
-                textShadow = textShadow,
-                textShadowStrength = textShadowStrength,
-                onSetTextShadowStrength = { scope.launch { app.prefs.appearance.setTextShadowStrength(it) } },
-                compactTapArea = compactTapArea,
-                stayAfterPrivateUnlock = stayAfterPrivateUnlock,
-                onSetStayAfterPrivateUnlock = { scope.launch { app.prefs.appList.setStayAfterPrivateUnlock(it) } },
-                onSetCompactTapArea = { scope.launch { app.prefs.appearance.setCompactTapArea(it) } },
-                privateSpaceSection = privateSpaceSection,
-                onSetPrivateSpaceSection = { scope.launch { app.prefs.appList.setPrivateSpaceSection(it) } },
-                foldersInAppList = foldersInAppList,
-                onSetFoldersInAppList = { scope.launch { app.prefs.appList.setFoldersInAppList(it) } },
-                recentSection = recentSection,
-                onSetRecentSection = { scope.launch { app.prefs.appList.setRecentSection(it) } },
-                recentSectionCount = recentSectionCount,
-                onSetRecentSectionCount = { scope.launch { app.prefs.appList.setRecentSectionCount(it) } },
-                onSetTextShadow = { scope.launch { app.prefs.appearance.setTextShadow(it) } },
-                edgeZoneInsetDp = edgeZoneInsetDp,
-                edgeZoneInsetAuto = edgeZoneInsetAuto,
-                onSetEdgeZoneInsetAuto = { scope.launch { app.prefs.strip.setEdgeZoneInsetAuto(it) } },
-                onSetEdgeZoneInsetDp = { scope.launch { app.prefs.strip.setEdgeZoneInsetDp(it) } },
-                onSetMarkWorkApps = { scope.launch { app.prefs.appearance.setMarkWorkApps(it) } },
-                onSetDimOthersScrubbing = { scope.launch { app.prefs.strip.setDimOthersScrubbing(it) } },
-                webSearchFallback = webSearchFallback,
-                onSetWebSearchFallback = { scope.launch { app.prefs.appList.setWebSearchFallback(it) } },
-                swipeUpOpensSearch = swipeUpOpensSearch,
-                onSetSwipeUpOpensSearch = { scope.launch { app.prefs.appList.setSwipeUpOpensSearch(it) } },
-                onSetHoldScroll = { scope.launch { app.prefs.strip.setHoldScroll(it) } },
-                holdScrollSpeed = holdScrollSpeed,
-                onSetHoldScrollSpeed = { scope.launch { app.prefs.strip.setHoldScrollSpeed(it) } },
-                onSetEdgeZoneBandOnly = { scope.launch { app.prefs.strip.setEdgeZoneBandOnly(it) } },
-                onSetShowSettingsRow = { scope.launch { app.prefs.home.setShowSettingsRow(it) } },
-                onSetShowListHeaders = { scope.launch { app.prefs.appList.setShowListHeaders(it) } },
-                notificationBadges = notificationBadges,
-                onSetNotificationBadges = { scope.launch { app.prefs.appList.setNotificationBadges(it) } },
-                notificationPreviews = notificationPreviews,
-                onSetNotificationPreviews = { scope.launch { app.prefs.appList.setNotificationPreviews(it) } },
-                notificationTextSp = notificationTextSp,
-                onSetNotificationTextSp = { scope.launch { app.prefs.appList.setNotificationTextSp(it) } },
-                sectionTopPercent = sectionTopPercent,
-                onSetSectionTopPercent = { scope.launch { app.prefs.appList.setSectionTopPercent(it) } },
-                closeFolderOnLaunch = closeFolderOnLaunch,
-                onSetCloseFolderOnLaunch = { scope.launch { app.prefs.home.setCloseFolderOnLaunch(it) } },
-                favoritesSource = favoritesSource,
-                onSetFavoritesSource = { scope.launch { app.prefs.library.setFavoritesSource(it) } },
-                frequentCount = frequentCount,
-                onSetFrequentCount = { scope.launch { app.prefs.library.setFrequentCount(it) } },
-                // The Settings app rather than whatever happens to sort first: a stable,
-                // recognizable icon to judge a size against on every device.
-                previewApp = remember(allApps) {
-                    val settingsPkg = runCatching {
-                        @Suppress("DEPRECATION")
-                        context.packageManager.resolveActivity(Intent(Settings.ACTION_SETTINGS), 0)
-                            ?.activityInfo?.packageName
-                    }.getOrNull()
-                    allApps.firstOrNull { it.packageName == settingsPkg }
-                        ?: allApps.firstOrNull { it.packageName == "com.android.settings" }
-                        ?: allApps.firstOrNull()
-                },
-                iconSizeDp = iconSizeDp,
-                labelSizeSp = labelSizeSp,
-                itemSpacingDp = itemSpacingDp,
-                font = font,
-                hideStatusBar = hideStatusBar,
-                widgetsStacked = widgetsStacked,
-                hideStatusBarAppList = hideStatusBarAppList,
-                statusBarPeekSeconds = statusBarPeekSeconds,
-                dimWallpaperAlpha = dimWallpaperAlpha,
-                hapticsEnabled = hapticsEnabled,
-                dimHomeAlpha = dimHomeAlpha,
-                showFavoriteLabels = showFavoriteLabels,
-                textColorMode = textColorMode,
-                textColorCustom = textColorCustom,
-                dimColor = dimColor,
-                allowRotation = allowRotation,
-                shortcutSwipe = shortcutSwipe,
-                fontFile = fontFile,
-                iconShape = iconShape,
-                themedIcons = themedIcons,
-                doubleTapToLock = doubleTapToLock,
-                edgeSide = edgeSide,
-                scrubStyle = scrubStyle,
-                scrubBubbleShape = scrubBubbleShape,
-                rippleParams = rippleParams,
-                edgeZoneWidthDp = edgeZoneWidthDp,
-                azStripVisibility = azStripVisibility,
-                showAlphabet = showAlphabet,
-                sortByUsage = sortByUsage,
-                appListSearch = appListSearchEnabled,
-                appListSearchBottom = appListSearchBottom,
-                appListSearchHidden = appListSearchHidden,
-                swipeUpOpensList = swipeUpOpensList,
-                alignment = alignment,
-                appListAlignment = appListAlignment,
-                iconSide = iconSide,
-                nowPlayingEnabled = nowPlayingEnabled,
-                nowPlayingListenerEnabled = listenerEnabled,
-                onSetIconPack = { scope.launch { app.prefs.appearance.setIconPackPackage(it) } },
-                onSetShowAppIcons = { scope.launch { app.prefs.appearance.setShowAppIcons(it) } },
-                onSetIconSize = { scope.launch { app.prefs.appearance.setIconSizeDp(it) } },
-                onSetLabelSize = { scope.launch { app.prefs.appearance.setLabelSizeSp(it) } },
-                onSetItemSpacing = { scope.launch { app.prefs.appearance.setItemSpacingDp(it) } },
-                onSetFont = { scope.launch { app.prefs.appearance.setFont(it) } },
-                onSetHideStatusBar = { scope.launch { app.prefs.appearance.setHideStatusBar(it) } },
-                onSetWidgetsStacked = { scope.launch { app.prefs.home.setWidgetsStacked(it) } },
-                onSetHideStatusBarAppList = { scope.launch { app.prefs.appearance.setHideStatusBarAppList(it) } },
-                onSetStatusBarPeekSeconds = { scope.launch { app.prefs.appearance.setStatusBarPeekSeconds(it) } },
-                onSetDimWallpaper = { scope.launch { app.prefs.appearance.setDimWallpaperAlpha(it) } },
-                onSetHaptics = { scope.launch { app.prefs.strip.setHapticsEnabled(it) } },
-                onSetDimHome = { scope.launch { app.prefs.appearance.setDimHomeAlpha(it) } },
-                onSetShowFavoriteLabels = { scope.launch { app.prefs.appearance.setShowFavoriteLabels(it) } },
-                onSetTextColorMode = { scope.launch { app.prefs.appearance.setTextColorMode(it) } },
-                onSetTextColorCustom = { scope.launch { app.prefs.appearance.setTextColorCustom(it) } },
-                onSetDimColor = { scope.launch { app.prefs.appearance.setDimColor(it) } },
-                onSetAllowRotation = { scope.launch { app.prefs.home.setAllowRotation(it) } },
-                onSetShortcutSwipe = { scope.launch { app.prefs.home.setShortcutSwipe(it) } },
-                        onExportSettings = { exportLauncher.launch("nike-launcher-settings.json") },
-                onImportSettings = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
-                onSetIconShape = { scope.launch { app.prefs.appearance.setIconShape(it); clearIconCache() } },
-                onSetThemedIcons = { scope.launch { app.prefs.appearance.setThemedIcons(it); clearIconCache() } },
-                // Copied in rather than referenced: a document URI is only as durable as the
-                // file behind it, and a font picked from Downloads would break the moment it
-                // was moved or cleaned up.
-                //
-                // A new name every time: the font on screen is mapped from its file, so
-                // writing the next one over it garbled the text until a restart (#110).
-                onPickFontFile = { uri ->
-                    scope.launch {
-                        val path = withContext(Dispatchers.IO) {
-                            runCatching {
-                                val out = java.io.File(context.filesDir, "custom_font_${System.currentTimeMillis()}")
-                                context.contentResolver.openInputStream(uri)?.use { input ->
-                                    out.outputStream().use { input.copyTo(it) }
-                                } ?: return@runCatching null
-                                // Proves it parses before anything starts drawing with it.
-                                runCatching { android.graphics.Typeface.createFromFile(out) }
-                                    .onFailure { out.delete() }.getOrThrow()
-                                context.filesDir.listFiles()
-                                    ?.filter { it.name.startsWith("custom_font") && it != out }
-                                    ?.forEach { it.delete() }
-                                out.absolutePath
-                            }.getOrNull()
-                        }
-                        if (path == null) {
-                            Toast.makeText(context, R.string.font_custom_failed, Toast.LENGTH_SHORT).show()
-                        } else {
-                            app.prefs.appearance.setFontFile(path)
-                            app.prefs.appearance.setFont(AppFont.CUSTOM)
-                        }
-                    }
-                },
-                onSetDoubleTapToLock = { scope.launch { app.prefs.home.setDoubleTapToLock(it) } },
-                onSetEdgeSide = { scope.launch { app.prefs.strip.setEdgeSide(it) } },
-                onSetScrubStyle = { scope.launch { app.prefs.strip.setScrubStyle(it) } },
-                onSetScrubBubbleShape = { scope.launch { app.prefs.strip.setScrubBubbleShape(it) } },
-                onSetRippleParams = { scope.launch { app.prefs.strip.setRippleParams(it) } },
-                onSetEdgeZoneWidth = { scope.launch { app.prefs.strip.setEdgeZoneWidthDp(it) } },
-                onSetAzStripVisibility = { scope.launch { app.prefs.strip.setAzStripVisibility(it) } },
-                onSetShowAlphabet = { scope.launch { app.prefs.strip.setShowAlphabet(it) } },
-                onSetSortByUsage = { scope.launch { app.prefs.library.setSortByUsage(it) } },
-                onSetAppListSearch = { scope.launch { app.prefs.appList.setAppListSearchEnabled(it) } },
-                onSetAppListSearchBottom = { scope.launch { app.prefs.appList.setAppListSearchBottom(it) } },
-                onSetAppListSearchHidden = { scope.launch { app.prefs.appList.setAppListSearchHidden(it) } },
-                onSetSwipeUpOpensList = { scope.launch { app.prefs.home.setSwipeUpOpensList(it) } },
-                quickLaunchLeftLabel = quickLaunchLeftKey?.let { key ->
-                    appsByKey[key]?.let { nameOverrides[it.key] ?: it.label }
-                },
-                quickLaunchRightLabel = quickLaunchRightKey?.let { key ->
-                    appsByKey[key]?.let { nameOverrides[it.key] ?: it.label }
-                },
-                onOpenQuickLaunchPicker = { slot -> navController.navigate("apppicker/" + slot.name) },
-                cornerButtonLabel = when (cornerButtonKey) {
-                    null -> null
-                    EntryKeys.SEARCH -> stringResource(R.string.settings_corner_search)
-                    else -> appsByKey[cornerButtonKey]?.let { nameOverrides[it.key] ?: it.label }
-                },
-                onOpenCornerPicker = { navController.navigate("cornerpicker") },
-                autoKeyboard = autoKeyboard,
-                lastLetterToLine = lastLetterToLine,
-                onSetLastLetterToLine = { scope.launch { app.prefs.appList.setLastLetterToLine(it) } },
-                onSetAutoKeyboard = { scope.launch { app.prefs.appList.setAutoKeyboard(it) } },
-                onSetAlignment = { scope.launch { app.prefs.appearance.setAlignment(it) } },
-                onSetAppListAlignment = { scope.launch { app.prefs.appearance.setAppListAlignment(it) } },
-                onSetIconSide = { scope.launch { app.prefs.appearance.setIconSide(it) } },
-                onSetNowPlayingEnabled = { scope.launch { app.prefs.home.setNowPlayingEnabled(it) } },
-                shadeGestureReady = remember(homeIntentTick) { SystemUi.canExpandShade() },
-                lockGestureReady = remember(homeIntentTick) { SystemUi.canLockScreen() },
-                onOpenAccessibilitySettings = {
-                    context.startActivity(
-                        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
-                },
-                onOpenAppInfo = {
-                    context.startActivity(
-                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                            .setData(Uri.fromParts("package", context.packageName, null))
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
-                },
-                onOpenHiddenApps = { navController.navigate("settings/hidden") },
-                // Asked again whenever the launcher is returned to, since changing it is the
-                // whole point of the row and the answer changes outside this app.
-                isDefaultLauncher = remember(homeIntentTick, settingsTick) {
-                    runCatching {
-                        val home = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
-                        context.packageManager
-                            .resolveActivity(home, PackageManager.MATCH_DEFAULT_ONLY)
-                            ?.activityInfo?.packageName == context.packageName
-                    }.getOrDefault(false)
-                },
-                onOpenHomeSettings = {
-                    settingsTick++
-                    // The system screen, never a silent switch: which launcher runs is the
-                    // user's to say and Android asks them properly.
-                    val opened = runCatching {
-                        context.startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
-                        true
-                    }.getOrDefault(false)
-                    if (!opened) {
-                        runCatching { context.startActivity(Intent(Settings.ACTION_SETTINGS)) }
-                    }
-                },
-                frequentExcludedCount = frequentExcluded.size,
-                frequentExcludedVisible = favoritesSource == FavoritesSource.FREQUENT,
-                onOpenFrequentExcluded = { navController.navigate("settings/frequentexcluded") },
-                onOpenFavorites = { navController.navigate("favorites") },
-                onOpenNotificationSettings = {
-                    context.startActivity(
-                        Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
-                },
+            SettingsRoute(
+                app = app,
+                allApps = allApps,
+                privateSpace = privateSpace,
+                homeTick = homeIntentTick,
+                nav = SettingsNav(
+                    onHiddenApps = { navController.navigate("settings/hidden") },
+                    onFrequentExcluded = { navController.navigate("settings/frequentexcluded") },
+                    onFavorites = { navController.navigate("favorites") },
+                    onQuickLaunchPicker = { slot -> navController.navigate("apppicker/" + slot.name) },
+                    onCornerPicker = { navController.navigate("cornerpicker") },
+                ),
                 onBack = { navController.popBackStack() },
             )
         }

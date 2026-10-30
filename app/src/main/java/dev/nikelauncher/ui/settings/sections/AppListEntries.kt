@@ -1,0 +1,82 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+package dev.nikelauncher.ui.settings.sections
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
+import dev.nikelauncher.R
+import dev.nikelauncher.data.RECENT_SECTION_RANGE
+import dev.nikelauncher.data.SECTION_TOP_RANGE
+import dev.nikelauncher.ui.kit.settings.SettingsSlider
+import dev.nikelauncher.ui.kit.settings.settingsBlock
+import dev.nikelauncher.ui.kit.settings.settingsSwitch
+import dev.nikelauncher.ui.settings.SettingsEntry
+import dev.nikelauncher.ui.settings.SettingsEnv
+import dev.nikelauncher.ui.settings.SettingsSection
+import kotlin.math.roundToInt
+
+private val SECTION = SettingsSection.APP_LIST
+
+@Composable
+internal fun appListEntries(env: SettingsEnv): List<SettingsEntry> {
+    val list = env.prefs.appList
+    val appearance = env.prefs.appearance
+    val library = env.prefs.library
+    val home = env.prefs.home
+    val search by list.appListSearchEnabled.collectAsState(false)
+    val autoKeyboard by list.autoKeyboard.collectAsState(false)
+    val searchBottom by list.appListSearchBottom.collectAsState(false)
+    val searchHidden by list.appListSearchHidden.collectAsState(false)
+    val headers by list.showListHeaders.collectAsState(true)
+    val settingsRow by home.showSettingsRow.collectAsState(true)
+    val sortByUsage by library.sortByUsage.collectAsState(false)
+    val webSearch by list.webSearchFallback.collectAsState(false)
+    val swipeUpList by home.swipeUpOpensList.collectAsState(false)
+    val swipeUpSearch by list.swipeUpOpensSearch.collectAsState(false)
+    val stayPrivate by list.stayAfterPrivateUnlock.collectAsState(false)
+    val privateSection by list.privateSpaceSection.collectAsState(false)
+    val foldersInList by list.foldersInAppList.collectAsState(false)
+    val recent by list.recentSection.collectAsState(false)
+    val recentCount by list.recentSectionCount.collectAsState(5)
+    val markWork by appearance.markWorkApps.collectAsState(true)
+    val lastLetter by list.lastLetterToLine.collectAsState(false)
+    val sectionTop by list.sectionTopPercent.collectAsState(26)
+    val hideStatusBar by appearance.hideStatusBarAppList.collectAsState(false)
+    val dim by appearance.dimWallpaperAlpha.collectAsState(0.35f)
+
+    return listOf(
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_search_bar), search, { env.write { list.setAppListSearchEnabled(it) } }, value = stringResource(R.string.settings_search_bar_detail)), "search"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_auto_keyboard), autoKeyboard, { env.write { list.setAutoKeyboard(it) } }, value = stringResource(R.string.settings_auto_keyboard_detail)), "keyboard search", visible = search),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_search_bar_bottom), searchBottom) { env.write { list.setAppListSearchBottom(it) } }, "search position", visible = search),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_search_hidden), searchHidden, { env.write { list.setAppListSearchHidden(it) } }, value = stringResource(R.string.settings_search_hidden_detail)), "search hidden", visible = search),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_web_search), webSearch, { env.write { list.setWebSearchFallback(it) } }, value = stringResource(R.string.settings_web_search_detail)), "search web browser"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_swipe_up_search), swipeUpSearch, { env.write { list.setSwipeUpOpensSearch(it) } }, value = stringResource(R.string.settings_swipe_up_search_detail)), "swipe up search keyboard", visible = swipeUpList),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_list_headers), headers, { env.write { list.setShowListHeaders(it) } }, value = stringResource(R.string.settings_list_headers_detail)), "letters headings"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_settings_row), settingsRow, { env.write { home.setShowSettingsRow(it) } }, value = stringResource(R.string.settings_settings_row_detail)), "settings shortcut row"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_sort_by_usage), sortByUsage, { env.write { library.setSortByUsage(it) } }, value = stringResource(R.string.settings_sort_by_usage_detail)), "frequent order"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_stay_private_unlock), stayPrivate, { env.write { list.setStayAfterPrivateUnlock(it) } }, value = stringResource(R.string.settings_stay_private_unlock_detail)), "private space unlock stay list"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_private_space_section), privateSection, { env.write { list.setPrivateSpaceSection(it) } }, value = stringResource(R.string.settings_private_space_section_detail)), "private space profile section"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_folders_in_list), foldersInList, { env.write { list.setFoldersInAppList(it) } }, value = stringResource(R.string.settings_folders_in_list_detail)), "folders groups"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_recent_section), recent, { env.write { list.setRecentSection(it) } }, value = stringResource(R.string.settings_recent_section_detail)), "recently installed new apps"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_recent_section_count), value = recentCount.toString()) {
+            SettingsSlider(recentCount.toFloat(), RECENT_SECTION_RANGE.first.toFloat()..RECENT_SECTION_RANGE.last.toFloat(), { env.write { list.setRecentSectionCount(it.toInt()) } })
+        }, "recently installed new apps", visible = recent),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_mark_work_apps), markWork, { env.write { appearance.setMarkWorkApps(it) } }, value = stringResource(R.string.settings_mark_work_apps_detail)), "work profile duplicate apps"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_last_letter), lastLetter, { env.write { list.setLastLetterToLine(it) } }, value = stringResource(R.string.settings_last_letter_detail)), "letter lands end z"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_section_top), value = "$sectionTop%") {
+            SettingsSlider(sectionTop.toFloat(), SECTION_TOP_RANGE.first.toFloat()..SECTION_TOP_RANGE.last.toFloat(), {
+                env.previews.showSection()
+                env.write { list.setSectionTopPercent(it.toInt()) }
+            })
+        }, "letter lands scroll position"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_hide_status_bar_applist), hideStatusBar) { env.write { appearance.setHideStatusBarAppList(it) } }, "status bar"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_dim_applist), value = "${(dim * 100).roundToInt()}%") {
+            SettingsSlider(dim, 0f..0.85f, step = 0.01f, onValueChange = {
+                val next = (it * 100).roundToInt() / 100f
+                env.previews.showDim(next)
+                env.write { appearance.setDimWallpaperAlpha(next) }
+            })
+        }, "dim wallpaper"),
+    )
+}
