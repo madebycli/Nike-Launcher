@@ -293,11 +293,6 @@
     <string name="icon_picker_no_matches">Inga ikoner matchar “%1$s”.</string>
 
     <!-- Welcome -->
-    <string name="welcome_title">Välkommen till Nike</string>
-    <string name="welcome_favorites">Långtryck på bakgrundsbilden för att lägga till favoriter, lägga till en widget eller öppna inställningarna.</string>
-    <string name="welcome_widget">Svep in från någon av skärmens kanter för alla dina appar, och dra längs A-Z-remsan för att hoppa till en bokstav.</string>
-    <string name="welcome_layout">Redigera layout låter dig flytta runt objekt och ange avståndet mellan dem.</string>
-    <string name="welcome_got_it">Uppfattat</string>
 
     <!-- Widgets -->
     <string name="widget_add">Lägg till widget</string>

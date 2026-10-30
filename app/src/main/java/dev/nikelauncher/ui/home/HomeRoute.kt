@@ -105,8 +105,6 @@ fun HomeRoute(
     cornerIsSearch: Boolean,
     typedToSearch: List<TypedKey>,
     onTypedToSearchHandled: (List<TypedKey>) -> Unit,
-    showWelcome: Boolean,
-    onWelcomeDismissed: () -> Unit,
     scrubBandFractions: Pair<Float, Float>?,
     onPeekStatusBar: () -> Unit,
     onAppListVisibleChange: (Boolean) -> Unit,
@@ -346,7 +344,6 @@ fun HomeRoute(
             )
         }
 
-        if (showWelcome) WelcomeDialog(onDismiss = onWelcomeDismissed)
 
         folderPickerFor?.let { target ->
             FolderPickerHost(app, target, folders, appsByKey, data.nameOverrides) { folderPickerFor = null }

@@ -18,6 +18,7 @@ import dev.nikelauncher.data.folderIdFromToken
 import dev.nikelauncher.ui.apps.rememberAppsState
 import dev.nikelauncher.ui.home.HomeData
 import dev.nikelauncher.ui.home.HomeRoute
+import dev.nikelauncher.ui.home.setup.SetupFlow
 import dev.nikelauncher.ui.nav.EnsureDefaultWidget
 import dev.nikelauncher.ui.nav.WarmIconCache
 import dev.nikelauncher.ui.nav.iconPickerDestination
@@ -112,13 +113,6 @@ fun NikeNavHost(
                 onTypedToSearchHandled = onTypedToSearchHandled,
                 // Both flows start at a value that shows nothing, so the dialog can't flash before
                 // the stored answer arrives. A legacy install is stamped 0 and never qualifies.
-                showWelcome = library.layoutDefaultsVersion == 1 && !library.welcomeSeen,
-                onWelcomeDismissed = {
-                    scope.launch {
-                        app.prefs.home.applyNewInstallDefaults()
-                        app.prefs.home.setWelcomeSeen(true)
-                    }
-                },
                 scrubBandFractions = library.scrubBand,
                 onPeekStatusBar = onPeekStatusBar,
                 onAppListVisibleChange = onAppListVisibleChange,
@@ -146,5 +140,16 @@ fun NikeNavHost(
 
         listDestinations(app, nav, apps, library, settings.iconSizeDp)
         iconPickerDestination(app, nav, apps, library, pickFromGallery)
+    }
+
+    // Both flows start at a value that shows nothing, so this can't flash before the stored
+    // answer arrives. A legacy install is stamped 0 and never qualifies.
+    if (library.layoutDefaultsVersion == 1 && !library.welcomeSeen) {
+        SetupFlow(app, apps, library, settings.iconSizeDp) {
+            scope.launch {
+                app.prefs.home.applyNewInstallDefaults()
+                app.prefs.home.setWelcomeSeen(true)
+            }
+        }
     }
 }

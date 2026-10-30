@@ -192,11 +192,6 @@
     <string name="icon_picker_no_matches">Ningún icono coincide con “%1$s”.</string>
 
     <!-- Welcome -->
-    <string name="welcome_title">Te damos la bienvenida a Nike</string>
-    <string name="welcome_favorites">Mantén pulsado el fondo de pantalla para añadir favoritos, un widget o abrir los ajustes.</string>
-    <string name="welcome_widget">Desliza desde cualquiera de los bordes de la pantalla para ver todas tus aplicaciones, y recorre la barra A-Z para saltar a una letra.</string>
-    <string name="welcome_layout">Editar diseño te permite mover las cosas de sitio y ajustar el espaciado.</string>
-    <string name="welcome_got_it">Entendido</string>
 
     <!-- Widgets -->
     <string name="widget_add">Añadir widget</string>

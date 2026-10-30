@@ -190,11 +190,6 @@
     <string name="icon_picker_no_matches">Иконок по запросу “%1$s” не найдено.</string>
 
     <!-- Приветствие -->
-    <string name="welcome_title">Приветствую в Nike</string>
-    <string name="welcome_favorites">Удерживайте по свободному месту чтобы вызвать меню настроек и добавления избранных.</string>
-    <string name="welcome_widget">Проведите пальцем от любого края экрана, чтобы открыть все приложения, и поведите пальцем по алфавитной волне чтобы перейти к нужной букве.</string>
-    <string name="welcome_layout">В режиме редактирования главного экрана вы можете передвигать объекты и настраивать отступы.</string>
-    <string name="welcome_got_it">Понятно!</string>
 
     <!-- Виджеты -->
     <string name="widget_add">Добавить виджет</string>

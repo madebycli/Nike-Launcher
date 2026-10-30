@@ -265,11 +265,6 @@
     <string name="icon_picker_no_matches">Brak ikon pasujących do „%1$s”.</string>
 
     <!-- Welcome -->
-    <string name="welcome_title">Witaj w Victorii</string>
-    <string name="welcome_favorites">Przytrzymaj tapetę, aby dodać ulubione, widżet lub otworzyć ustawienia.</string>
-    <string name="welcome_widget">Przesuń palcem od dowolnej krawędzi ekranu, aby zobaczyć wszystkie aplikacje, i przeciągnij wzdłuż paska A–Z, aby przejść do wybranej litery.</string>
-    <string name="welcome_layout">Edycja układu pozwala przestawiać elementy i zmieniać odstępy.</string>
-    <string name="welcome_got_it">Rozumiem</string>
 
     <!-- Widgets -->
     <string name="widget_add">Dodaj widżet</string>

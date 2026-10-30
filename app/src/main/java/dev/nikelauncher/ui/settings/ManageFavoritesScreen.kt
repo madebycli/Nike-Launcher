@@ -26,7 +26,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import dev.nikelauncher.ui.kit.search.SearchField
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.Folder
@@ -51,6 +56,42 @@ fun ManageFavoritesScreen(
     allApps: List<AppInfo>,
     favoriteKeys: List<String>,
     folders: List<Folder>,
+    privateSpace: PrivateSpace,
+    nameOverrides: Map<String, String>,
+    iconSizeDp: Int,
+    onSetFavorite: (AppInfo, Boolean) -> Unit,
+    onForget: (String) -> Unit,
+    onReorder: (List<String>) -> Unit,
+    onBack: () -> Unit,
+) {
+    val surface = MaterialTheme.colorScheme.surface
+    Scaffold(
+        containerColor = surface,
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.favorites_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = surface),
+            )
+        },
+    ) { padding ->
+        FavoritesChooser(
+            allApps, favoriteKeys, folders, privateSpace, nameOverrides, iconSizeDp,
+            onSetFavorite, onForget, onReorder, Modifier.padding(padding),
+        )
+    }
+}
+
+/** The ticked apps in their home order, then a search over the rest. Shared with the first-run setup. */
+@Composable
+internal fun FavoritesChooser(
+    allApps: List<AppInfo>,
+    favoriteKeys: List<String>,
+    folders: List<Folder>,
     /** So a favorite that lives in a locked private space can be left out of this screen. */
     privateSpace: PrivateSpace,
     nameOverrides: Map<String, String>,
@@ -64,9 +105,8 @@ fun ManageFavoritesScreen(
      */
     onForget: (String) -> Unit,
     onReorder: (List<String>) -> Unit,
-    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val surface = MaterialTheme.colorScheme.surface
     val favorites = favoriteKeys.toSet()
     val appsByKey = remember(allApps) { allApps.associateBy { it.key } }
     val foldersById = remember(folders) { folders.associateBy { it.id } }
@@ -87,106 +127,104 @@ fun ManageFavoritesScreen(
         }
     }
     val shownKeys = remember(favoriteKeys, conceal) { favoriteKeys.filterNot(conceal) }
-
-    Scaffold(
-        containerColor = surface,
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.favorites_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = surface),
-            )
-        },
-    ) { padding ->
-        LazyColumn(
-            contentPadding = PaddingValues(vertical = 8.dp),
-            modifier = Modifier.padding(padding),
-        ) {
-            item {
-                ListSectionLabel(stringResource(R.string.favorites_count, shownKeys.size))
-            }
-
-            item {
-                ReorderableRows(
-                    keys = shownKeys,
-                    // What was left out goes back where it was, by the rule that left it
-                    // out. The screen writes back the whole list it was given, so without this
-                    // the first drag would delete every favorite this screen is hiding.
-                    onReorder = { order -> onReorder(restoreConcealed(favoriteKeys, order, conceal)) },
-                ) { key ->
-                    val folder = folderIdFromToken(key)?.let { foldersById[it] }
-                    val app = appsByKey[key]
-                    when {
-                        folder != null -> {
-                            // A folder is one favorite like any other and moves among them,
-                            // but it is not an app: what it holds is edited in its own screen,
-                            // so there is nothing here to untick.
-                            Icon(
-                                Icons.Filled.Folder,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                            )
-                            Spacer(Modifier.width(16.dp))
-                            Text(
-                                folder.name,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.weight(1f),
-                            )
-                        }
-
-                        app != null -> {
-                            AppIcon(app = app, sizeDp = minOf(iconSizeDp, 44))
-                            Spacer(Modifier.width(16.dp))
-                            Text(
-                                nameOverrides[app.key] ?: app.label,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.weight(1f),
-                            )
-                            Checkbox(checked = true, onCheckedChange = { onSetFavorite(app, false) })
-                        }
-
-                        // Whatever this key was is gone: an app uninstalled, or a shortcut
-                        // its publisher withdrew. Shown rather than skipped so the count
-                        // matches what is listed, and with the same untick as everything
-                        // else, because otherwise it is a row that can never be got rid of.
-                        else -> {
-                            Text(
-                                stringResource(R.string.folder_member_missing),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                                modifier = Modifier.weight(1f),
-                            )
-                            Checkbox(checked = true, onCheckedChange = { onForget(key) })
-                        }
-                    }
-                }
-            }
-
-            item {
-                ListSectionLabel(stringResource(R.string.folder_add_apps))
-            }
-
-            items(allApps.filterNot { it.key in favorites }, key = { it.key }) { app ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onSetFavorite(app, true) }
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    AppIcon(app = app, sizeDp = minOf(iconSizeDp, 44))
-                    Spacer(Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(nameOverrides[app.key] ?: app.label, style = MaterialTheme.typography.bodyLarge)
-                    }
-                    Checkbox(checked = false, onCheckedChange = { onSetFavorite(app, true) })
-                }
-                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
-            }
+    var query by rememberSaveable { mutableStateOf("") }
+    val candidates = remember(allApps, favorites, query, nameOverrides) {
+        allApps.filter { app ->
+            app.key !in favorites &&
+                (query.isBlank() || (nameOverrides[app.key] ?: app.label).contains(query.trim(), ignoreCase = true))
         }
     }
+
+    LazyColumn(
+        contentPadding = PaddingValues(vertical = 8.dp),
+        modifier = modifier,
+    ) {
+        item {
+            ListSectionLabel(stringResource(R.string.favorites_count, shownKeys.size))
+        }
+
+        item {
+            ReorderableRows(
+                keys = shownKeys,
+                // What was left out goes back where it was, by the rule that left it
+                // out. The screen writes back the whole list it was given, so without this
+                // the first drag would delete every favorite this screen is hiding.
+                onReorder = { order -> onReorder(restoreConcealed(favoriteKeys, order, conceal)) },
+            ) { key ->
+                val folder = folderIdFromToken(key)?.let { foldersById[it] }
+                val app = appsByKey[key]
+                when {
+                    folder != null -> {
+                        // A folder is one favorite like any other and moves among them,
+                        // but it is not an app: what it holds is edited in its own screen,
+                        // so there is nothing here to untick.
+                        Icon(
+                            Icons.Filled.Folder,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        )
+                        Spacer(Modifier.width(16.dp))
+                        Text(
+                            folder.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+
+                    app != null -> {
+                        AppIcon(app = app, sizeDp = minOf(iconSizeDp, 44))
+                        Spacer(Modifier.width(16.dp))
+                        Text(
+                            nameOverrides[app.key] ?: app.label,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Checkbox(checked = true, onCheckedChange = { onSetFavorite(app, false) })
+                    }
+
+                    // Whatever this key was is gone: an app uninstalled, or a shortcut
+                    // its publisher withdrew. Shown rather than skipped so the count
+                    // matches what is listed, and with the same untick as everything
+                    // else, because otherwise it is a row that can never be got rid of.
+                    else -> {
+                        Text(
+                            stringResource(R.string.folder_member_missing),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            modifier = Modifier.weight(1f),
+                        )
+                        Checkbox(checked = true, onCheckedChange = { onForget(key) })
+                    }
+                }
+            }
+        }
+
+        item {
+            SearchField(
+                query = query,
+                onQueryChange = { query = it },
+                placeholder = stringResource(R.string.applist_search),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+        }
+
+        items(candidates, key = { it.key }) { app ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onSetFavorite(app, true) }
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AppIcon(app = app, sizeDp = minOf(iconSizeDp, 44))
+                Spacer(Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(nameOverrides[app.key] ?: app.label, style = MaterialTheme.typography.bodyLarge)
+                }
+                Checkbox(checked = false, onCheckedChange = { onSetFavorite(app, true) })
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+        }
+    }
+
 }

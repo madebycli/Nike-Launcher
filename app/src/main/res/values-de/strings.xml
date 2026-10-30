@@ -169,11 +169,6 @@
     <string name="icon_picker_no_matches">Keine Symbole passen zu „%1$s“.</string>
 
     <!-- Welcome -->
-    <string name="welcome_title">Willkommen bei Nike</string>
-    <string name="welcome_favorites">Drücke lange auf das Hintergrundbild, um Favoriten oder ein Widget hinzuzufügen oder die Einstellungen zu öffnen.</string>
-    <string name="welcome_widget">Wische von einem der Bildschirmränder herein, um alle Apps zu sehen, und fahre über die A-Z-Leiste, um zu einem Buchstaben zu springen.</string>
-    <string name="welcome_layout">Mit „Layout bearbeiten“ kannst du Elemente verschieben und die Abstände festlegen.</string>
-    <string name="welcome_got_it">Verstanden</string>
 
     <!-- Widgets -->
     <string name="widget_add">Widget hinzufügen</string>
@@ -190,4 +185,11 @@
     <string name="now_playing_previous">Zurück</string>
     <string name="now_playing_play_pause">Wiedergabe/Pause</string>
     <string name="now_playing_next">Weiter</string>
+    <string name="setup_get_started">Los geht\'s</string>
+    <string name="setup_next">Weiter</string>
+    <string name="setup_step_of">%1$d / %2$d</string>
+    <string name="setup_access">Zugriff</string>
+    <string name="setup_style">Stil</string>
+    <string name="setup_ready">Fertig</string>
+    <string name="setup_calendar">Kalender</string>
 </resources>
