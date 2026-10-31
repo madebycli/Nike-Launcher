@@ -10,6 +10,7 @@ Each walk-through needs a test process of its own, because the preferences store
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.SetupScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.UserFlowScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.MenuMotionScreensTest"
+NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.SearchImeScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.AppScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.HomeScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.HomeLayoutScreensTest"
@@ -84,3 +85,6 @@ notification cancellation occurs. It also exercises corner search and the indepe
 `MenuMotionScreensTest` renders the real widget menu and samples intermediate measured positions
 for the shared settings transition and both search-field origins using the production Material
 specs. These checks prove direction/state under the test clock, not smoothness on a phone.
+
+`SearchImeScreensTest` moves a controlled inset through intermediate values and checks the real
+search field position in both directions. It does not simulate a system keyboard or compositor.

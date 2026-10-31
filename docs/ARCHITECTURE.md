@@ -90,7 +90,7 @@ float keys `corner_position_x/y` are absent for the original corner alignment.
 Choosing a mode writes both keys atomically. `search_button_at_bottom` (boolean, default true) is
 independent of the existing permanent-bar edge. Hidden-app search retains its original meaning.
 The button and corner focus request reveal the field before focusing it; `AppListSearchSlot` uses
-Material slide/fade motion from above. A temporary button search closes when the keyboard has
+Material slide/fade motion from the configured edge. A temporary button search closes when the keyboard has
 been visible, is closed and the query is empty; permanent search bars and nonempty queries remain. No key was renamed or retyped; the optional
 corner, search and setup keys remain supported by typed backup format 2.
 
@@ -264,4 +264,5 @@ Third-party widget host views enforce the system app-widget background radius, c
 the provider background when available. The launcher's own transparent clock is unchanged.
 A visible clock with weather enabled silently checks the configured local provider when its
 cache is missing or stale; provider permission and location checks remain authoritative.
-The bottom search field follows the IME inset directly and enters/exits from below.
+The bottom search field follows the IME inset directly and enters/exits from below. The app-list
+slot owns this transition; the search field itself does not add a second entrance animation.

@@ -3,14 +3,10 @@ package dev.nikelauncher.ui.kit.search
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -42,8 +38,7 @@ import dev.nikelauncher.ui.kit.motion.AppMotion
 /**
  * The app list's search box, drawn against the wallpaper rather than a surface.
  *
- * It comes in with the list instead of being there at the first frame, the outline and a faint
- * fill brighten while it has focus, the magnifier turns into a way back once typing starts, and
+ * The parent owns the field's entrance and exit. The outline and a faint fill brighten while it has focus, the magnifier turns into a way back once typing starts, and
  * the clear button grows in with the first character. All of it on the theme's motion scheme.
  */
 @Composable
@@ -62,18 +57,10 @@ fun SearchPill(
     val border by animateColorAsState(contentColor.copy(alpha = if (focused) 0.85f else 0.3f), colorSpec, label = "searchBorder")
     val fill by animateColorAsState(contentColor.copy(alpha = if (focused) 0.1f else 0f), colorSpec, label = "searchFill")
     val engaged = focused || query.isNotEmpty()
-    val appear = remember { MutableTransitionState(false).apply { targetState = true } }
-    val spatial = AppMotion.size()
-    val offset = AppMotion.offset()
     val effects = AppMotion.effects<Float>()
     val scale = AppMotion.fastSpatial<Float>()
 
-    AnimatedVisibility(
-        visibleState = appear,
-        enter = fadeIn(effects) + slideInVertically(offset) { -it / 2 } + expandVertically(spatial),
-        exit = fadeOut(effects) + shrinkVertically(spatial),
-    ) {
-        OutlinedTextField(
+    OutlinedTextField(
             value = query,
             onValueChange = onQueryChange,
             singleLine = true,
@@ -117,5 +104,4 @@ fun SearchPill(
             ),
             modifier = modifier,
         )
-    }
 }

@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.size
@@ -121,7 +121,7 @@ internal fun AppListSession.Content() {
                                     )
                                 }
                             )
-                            .imePadding()
+                            .windowInsetsPadding(WindowInsets.ime)
                 ) {
                     AppListSearchSlot(searchEnabled && !searchAtBottom, bottom = false) {
                         SearchField(

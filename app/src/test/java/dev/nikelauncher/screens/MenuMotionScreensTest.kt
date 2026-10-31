@@ -14,6 +14,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.ui.applist.AppListSearchSlot
+import dev.nikelauncher.ui.applist.SearchField
+import dev.nikelauncher.data.EdgeSide
+import androidx.compose.ui.graphics.Color
 import dev.nikelauncher.ui.kit.motion.*
 import dev.nikelauncher.ui.theme.NikeTheme
 import dev.nikelauncher.widget.WidgetMenu
@@ -48,7 +51,7 @@ class MenuMotionScreensTest {
                     }) { target -> Box(Modifier.fillMaxSize().testTag("page-$target")) { Text(if (target == 0) "Home" else "Settings", style = MaterialTheme.typography.headlineLarge) } }
                     Column(Modifier.fillMaxSize()) {
                         if (bottom) Spacer(Modifier.weight(1f))
-                        AppListSearchSlot(search, bottom) { TextField("", {}, modifier = Modifier.fillMaxWidth().testTag("search-field")) }
+                        AppListSearchSlot(search, bottom) { SearchField("", {}, Color.Black, EdgeSide.RIGHT, false, 0.dp, {}, atBottom = bottom, modifier = Modifier.fillMaxWidth().testTag("search-field")) }
                     }
                     WidgetMenu(menu, DpOffset(20.dp, 150.dp), 42, actions, {}, { menu = false })
                 }
