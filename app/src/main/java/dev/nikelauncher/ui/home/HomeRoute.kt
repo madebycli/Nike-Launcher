@@ -88,6 +88,8 @@ private val SWIPE_OPEN_DISTANCE = 150.dp
 fun HomeRoute(
     app: NikeApp,
     homeIntentTick: Int,
+    lockResetTick: Int,
+    pagesConfig: WidgetPagesConfig,
     settings: HomeSettings,
     data: HomeData,
     folders: List<Folder>,
@@ -235,7 +237,6 @@ fun HomeRoute(
     // reports how far its gesture reaches and reports nothing with button navigation), the set
     // number otherwise.
     var onSidePage by remember { mutableStateOf(false) }
-    val pagesConfig by app.prefs.pages.config.collectAsState(WidgetPagesConfig())
     val gestureInsets = WindowInsets.systemGestures
     val layoutDirection = LocalLayoutDirection.current
     val insetLeftDp = if (settings.edgeZoneInsetAuto) with(density) { gestureInsets.getLeft(this, layoutDirection).toDp().value.roundToInt() } else settings.edgeZoneInsetDp
@@ -274,6 +275,7 @@ fun HomeRoute(
             HomePagesHost(
                 app = app,
                 homeIntentTick = homeIntentTick,
+                lockResetTick = lockResetTick,
                 gesturesEnabled = !controller.visible && !homeEditMode,
                 config = pagesConfig,
                 onSidePageChanged = { onSidePage = it },

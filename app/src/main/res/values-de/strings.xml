@@ -461,7 +461,7 @@
     <string name="settings_list_headers">Buchstabenüberschriften</string>
     <string name="settings_list_headers_detail">Aus ergibt eine durchgehende Liste. Die A–Z-Leiste springt trotzdem zum Buchstaben</string>
     <string name="settings_notification_badges">Anzahl der Benachrichtigungen an Symbolen</string>
-    <string name="settings_notification_previews">Benachrichtigungstext auf dem Startbildschirm</string>
+    <string name="settings_notification_previews">Benachrichtigungstext</string>
     <string name="settings_notification_previews_detail">Zeigt die neuesten Benachrichtigungen einer App unter ihrem Namen; ein Tippen öffnet sie. Jeder, der auf dein Handy schaut, kann sie lesen. Braucht Zugriff auf Benachrichtigungen</string>
     <string name="settings_notification_text_size">Textgröße der Benachrichtigungen</string>
     <string name="settings_notification_badges_detail">Braucht denselben Benachrichtigungszugriff wie die Wiedergabe. Zählt nur, liest nie, was eine Benachrichtigung sagt. Ein Punkt neben dem Namen, wenn Symbole ausgeblendet sind</string>
@@ -719,4 +719,10 @@
     <string name="search_button_position">Position der Button-Suche</string>
     <string name="search_position_top">Oben</string>
     <string name="search_position_bottom">Unten</string>
+    <string name="notification_app_age">%1$s · %2$s</string>
+    <string name="media_widget_settings">Medien-Widget</string>
+    <string name="media_widget_classic">Klassisch</string>
+    <string name="media_widget_expressive">Expressiv</string>
+    <string name="media_widget_controls">Wiedergabesteuerung</string>
+    <string name="media_widget_progress">Fortschritt</string>
 </resources>

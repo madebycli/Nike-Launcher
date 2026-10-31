@@ -442,7 +442,7 @@
     <string name="settings_mark_work_apps_detail">Приложения из рабочего профиля сообщают об этом после названия, чтобы отличать две копии одного приложения</string>
     <string name="settings_notification_badges">Число уведомлений на значках</string>
     <string name="settings_notification_badges_detail">Нужен тот же доступ к уведомлениям, что и для Воспроизведения. Только считает, никогда не читает содержимое. Точка рядом с названием, когда значки скрыты</string>
-    <string name="settings_notification_previews">Текст уведомлений на главном экране</string>
+    <string name="settings_notification_previews">Текст уведомлений</string>
     <string name="settings_notification_previews_detail">Показывает новейшие уведомления приложения под его названием; касание открывает их. Любой, кто смотрит на ваш телефон, может их прочитать. Нужен доступ к уведомлениям</string>
     <string name="settings_notification_text_size">Размер текста уведомлений</string>
     <string name="settings_private_space_section">Раздел Приватное пространство</string>
@@ -745,5 +745,11 @@
     <string name="search_button_position">Положение поиска по кнопке</string>
     <string name="search_position_top">Сверху</string>
     <string name="search_position_bottom">Снизу</string>
+    <string name="notification_app_age">%1$s · %2$s</string>
+    <string name="media_widget_settings">Медиа-виджет</string>
+    <string name="media_widget_classic">Классический</string>
+    <string name="media_widget_expressive">Экспрессивный</string>
+    <string name="media_widget_controls">Управление воспроизведением</string>
+    <string name="media_widget_progress">Прогресс</string>
 </resources>
 

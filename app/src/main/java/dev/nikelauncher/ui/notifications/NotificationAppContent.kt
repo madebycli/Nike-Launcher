@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.nikelauncher.R
@@ -20,6 +21,7 @@ import dev.nikelauncher.data.IconSide
 import dev.nikelauncher.media.NotificationPreview
 import dev.nikelauncher.ui.common.AppIcon
 import dev.nikelauncher.ui.common.LocalIconConfig
+import dev.nikelauncher.ui.theme.WidgetTextFamily
 import kotlinx.coroutines.delay
 
 /** Grid's flat app/header/message hierarchy, expressed with the stock Material ListItem. */
@@ -49,7 +51,8 @@ internal fun NotificationAppContent(
     val icon: @Composable () -> Unit = {
         if (showIcons)
             Box(
-                Modifier.combinedClickable(
+                Modifier.padding(start = if (iconSide == IconSide.RIGHT) 8.dp else 0.dp,
+                    end = if (iconSide == IconSide.LEFT) 8.dp else 0.dp).combinedClickable(
                     onClickLabel = stringResource(R.string.notification_open),
                     onClick = onLaunch,
                     onLongClick = onLongClick,
@@ -71,26 +74,21 @@ internal fun NotificationAppContent(
         onClick = onOpen,
         onLongClick = onLongClick,
         overlineContent = {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    label,
-                    Modifier.weight(1f)
-                        .combinedClickable(onClick = onLaunch, onLongClick = onLongClick),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = labelSizeSp.sp,
-                )
-                Text(notificationAge(locale, preview.time, now), maxLines = 1)
-            }
-        },
-        content = { Text(preview.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-        supportingContent = {
             Text(
-                preview.messages.lastOrNull()?.text ?: preview.text,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = LocalIconConfig.current.notificationTextSp.sp,
+                stringResource(R.string.notification_app_age, label, notificationAge(locale, preview.time, now)),
+                Modifier.combinedClickable(onClick = onLaunch, onLongClick = onLongClick),
+                maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = labelSizeSp.sp,
+                fontWeight = FontWeight.SemiBold, fontFamily = WidgetTextFamily,
             )
+        },
+        content = {
+            if (preview.title.isNotBlank()) Text(preview.title, maxLines = 1,
+                overflow = TextOverflow.Ellipsis, fontFamily = WidgetTextFamily, fontSize = (labelSizeSp * 14f / 16f).sp)
+        },
+        supportingContent = {
+            val message = preview.messages.lastOrNull()?.text ?: preview.text
+            if (message.isNotBlank()) Text(message, maxLines = 1,
+                overflow = TextOverflow.Ellipsis, fontFamily = WidgetTextFamily, fontSize = (labelSizeSp * 14f / 16f).sp)
         },
         leadingContent = if (iconSide == IconSide.LEFT) icon else expand,
         trailingContent = if (iconSide == IconSide.RIGHT) icon else expand,
@@ -98,8 +96,8 @@ internal fun NotificationAppContent(
             ListItemDefaults.colors(
                 containerColor = Color.Transparent,
                 headlineColor = color,
-                overlineColor = color.copy(alpha = .8f),
-                supportingColor = color.copy(alpha = .75f),
+                overlineColor = color,
+                supportingColor = color,
                 leadingIconColor = color,
                 trailingIconColor = color,
             ),

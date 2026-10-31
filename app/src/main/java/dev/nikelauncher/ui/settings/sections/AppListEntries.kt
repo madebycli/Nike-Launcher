@@ -92,7 +92,6 @@ internal fun appListEntries(env: SettingsEnv): List<SettingsEntry> {
         SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_dim_applist), value = "${(dim * 100).roundToInt()}%", icon = Icons.Filled.Contrast) {
             SettingsSlider(dim, 0f..0.85f, step = 0.01f, onValueChange = {
                 val next = (it * 100).roundToInt() / 100f
-                env.previews.showDim(next)
                 env.write { appearance.setDimWallpaperAlpha(next) }
             })
         }, "dim wallpaper"),

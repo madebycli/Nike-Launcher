@@ -46,7 +46,7 @@ class AppListPrefs internal constructor(private val store: DataStore<Preferences
         data.map { it[PrefKeys.NOTIFICATION_BADGES] ?: false }.distinctUntilChanged()
 
     val notificationPreviews: Flow<Boolean> =
-        data.map { it[PrefKeys.NOTIFICATION_PREVIEWS] ?: false }.distinctUntilChanged()
+        data.map { it[PrefKeys.NOTIFICATION_PREVIEWS] ?: true }.distinctUntilChanged()
 
     val notificationTextSp: Flow<Int> =
         data.map { it[PrefKeys.NOTIFICATION_TEXT_SP] ?: 12 }.distinctUntilChanged()

@@ -84,7 +84,7 @@
     <string name="settings_list_headers">Letter headings</string>
     <string name="settings_list_headers_detail">Off gives one continuous list. The A-Z strip still jumps to the letter</string>
     <string name="settings_notification_badges">Notification count on icons</string>
-    <string name="settings_notification_previews">Notification text on home screen</string>
+    <string name="settings_notification_previews">Notification text</string>
     <string name="settings_notification_previews_detail">Lists an app\'s newest notifications under its name, and tapping one opens it. Anyone looking at your phone can read them. Needs notification access</string>
     <string name="settings_notification_text_size">Notification text size</string>
     <string name="settings_notification_badges_detail">Needs the same notification access Now Playing does. Counts only, never what a notification says. A dot beside the name when icons are hidden</string>
@@ -723,4 +723,10 @@
     <string name="search_button_position">Button search position</string>
     <string name="search_position_top">Top</string>
     <string name="search_position_bottom">Bottom</string>
+    <string name="notification_app_age">%1$s · %2$s</string>
+    <string name="media_widget_settings">Media widget</string>
+    <string name="media_widget_classic">Classic</string>
+    <string name="media_widget_expressive">Expressive</string>
+    <string name="media_widget_controls">Playback controls</string>
+    <string name="media_widget_progress">Progress</string>
 </resources>

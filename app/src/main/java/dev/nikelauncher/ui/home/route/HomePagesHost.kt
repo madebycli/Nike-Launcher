@@ -18,6 +18,7 @@ import dev.nikelauncher.ui.home.pages.WidgetHomePages
 internal fun HomePagesHost(
     app: NikeApp,
     homeIntentTick: Int,
+    lockResetTick: Int,
     gesturesEnabled: Boolean,
     config: WidgetPagesConfig,
     onSidePageChanged: (Boolean) -> Unit,
@@ -29,6 +30,7 @@ internal fun HomePagesHost(
     WidgetHomePages(
         app = app,
         homeIntentTick = homeIntentTick,
+        lockResetSignal = lockResetTick,
         gesturesEnabled = gesturesEnabled,
         config = config,
         gestureExclusions = exclusions,

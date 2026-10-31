@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -15,6 +16,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import dev.nikelauncher.media.MediaWidgetSettingsSheet
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import dev.nikelauncher.R
@@ -49,6 +54,9 @@ internal fun homeEntries(env: SettingsEnv): List<SettingsEntry> {
     val dimHome by appearance.dimHomeAlpha.collectAsState(0f)
     val rotationPref by home.allowRotation.collectAsState(null)
     val rotation = rotationPref ?: (LocalConfiguration.current.smallestScreenWidthDp >= 600)
+    var mediaSettingsOpen by remember { mutableStateOf(false) }
+    if (mediaSettingsOpen) MediaWidgetSettingsSheet { mediaSettingsOpen = false }
+    val nowPlaying by home.nowPlayingEnabled.collectAsState(false)
     val compactTap by appearance.compactTapArea.collectAsState(false)
     val cornerState by env.prefs.corner.settings.collectAsState(null)
     val corner = cornerState
@@ -60,6 +68,8 @@ internal fun homeEntries(env: SettingsEnv): List<SettingsEntry> {
     }
 
     return listOf(
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_now_playing_show), nowPlaying, icon = Icons.Filled.MusicNote) { env.write { home.setNowPlayingEnabled(it) } }, "media music"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.media_widget_settings), { mediaSettingsOpen = true }, icon = Icons.Filled.MusicNote), "media widget style controls progress"),
         SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_favorites_source), icon = Icons.Filled.Star) {
             Column {
                 ChoiceChips(FavoritesSource.entries, source, { stringResource(it.labelRes()) }, { env.write { library.setFavoritesSource(it) } })

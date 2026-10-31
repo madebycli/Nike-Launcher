@@ -436,7 +436,7 @@
     <string name="settings_mark_work_apps_detail">Las apps de un perfil de trabajo lo indican tras su nombre, para distinguir dos copias de la misma app</string>
     <string name="settings_notification_badges">Número de notificaciones en los iconos</string>
     <string name="settings_notification_badges_detail">Requiere el mismo acceso a notificaciones que Reproduciendo. Solo cuenta, nunca lee lo que dice una notificación. Un punto junto al nombre cuando los iconos están ocultos</string>
-    <string name="settings_notification_previews">Texto de notificaciones en la pantalla de inicio</string>
+    <string name="settings_notification_previews">Texto de notificaciones</string>
     <string name="settings_notification_previews_detail">Muestra las notificaciones más recientes de una app bajo su nombre; tocar una la abre. Cualquiera que mire tu teléfono puede leerlas. Requiere acceso a notificaciones</string>
     <string name="settings_notification_text_size">Tamaño del texto de notificaciones</string>
     <string name="settings_private_space_section">Sección Espacio privado</string>
@@ -725,4 +725,10 @@
     <string name="search_button_position">Posición de búsqueda del botón</string>
     <string name="search_position_top">Arriba</string>
     <string name="search_position_bottom">Abajo</string>
+    <string name="notification_app_age">%1$s · %2$s</string>
+    <string name="media_widget_settings">Widget multimedia</string>
+    <string name="media_widget_classic">Clásico</string>
+    <string name="media_widget_expressive">Expresivo</string>
+    <string name="media_widget_controls">Controles de reproducción</string>
+    <string name="media_widget_progress">Progreso</string>
 </resources>

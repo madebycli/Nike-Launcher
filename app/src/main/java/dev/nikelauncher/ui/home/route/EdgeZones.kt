@@ -49,7 +49,7 @@ internal fun BoxScope.EdgeZones(
         val keepOut = cornerButtonBounds?.takeIf { !listOpen }?.let { b ->
             val reach = (insetDp + settings.edgeZoneWidthDp) * density
             val overlaps = if (side == EdgeSide.LEFT) b.left < reach else b.right > view.width - reach
-            if (overlaps) ((view.height - b.top) / density).dp else null
+            if (overlaps) ((view.height - b.top) / density).coerceAtLeast(0f).dp else null
         } ?: 0.dp
         EdgeTouchZone(
             side = side,

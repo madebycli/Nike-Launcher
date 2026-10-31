@@ -13,6 +13,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
 import android.content.Intent
@@ -33,6 +36,7 @@ import dev.nikelauncher.ui.home.HomeSettings
 import kotlinx.coroutines.launch
 
 /** Wires the app list overlay to the preferences, the launcher and the route's controller. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun AppListHost(
     app: NikeApp,
@@ -63,6 +67,13 @@ internal fun AppListHost(
     var searchRequested by remember { mutableStateOf(false) }
     LaunchedEffect(controller.visible, settings.searchDisplayMode) { if (!controller.visible || settings.searchDisplayMode != dev.nikelauncher.data.prefs.SearchDisplayMode.BUTTON) searchRequested = false }
     val floatingSearch = settings.searchDisplayMode == dev.nikelauncher.data.prefs.SearchDisplayMode.BUTTON
+    val imeVisible = WindowInsets.isImeVisible
+    var keyboardSeen by remember { mutableStateOf(false) }
+    LaunchedEffect(controller.visible, searchRequested, imeVisible, controller.query, settings.appListSearch) {
+        if (!controller.visible || !searchRequested || settings.appListSearch) keyboardSeen = false
+        else if (imeVisible) keyboardSeen = true
+        else if (dismissEmptySearch(keyboardSeen, imeVisible, controller.query)) searchRequested = false
+    }
     LaunchedEffect(controller.searchFocusTick) {
         if (controller.visible && controller.searchFocusTick > 0) searchRequested = true
     }

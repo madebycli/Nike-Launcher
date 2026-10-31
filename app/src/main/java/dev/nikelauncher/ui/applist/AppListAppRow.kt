@@ -99,7 +99,7 @@ internal fun AppRow(
                         onNotifications = { notificationsOpen = true },
                     ) {
                         shortcutMenu = true
-                    },
+                    }.padding(horizontal = 20.dp),
                 onOpen = { notificationsOpen = true },
                 onLaunch = onLaunch,
                 onLongClick = {

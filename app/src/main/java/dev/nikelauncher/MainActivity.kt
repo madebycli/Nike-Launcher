@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Build
@@ -16,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowCompat
@@ -41,6 +45,12 @@ class MainActivity : ComponentActivity() {
 
     /** Bumped whenever HOME is pressed while we're already showing, so overlays can close. */
     private var homeIntentTick by mutableStateOf(0)
+    private var lockResetTick by mutableStateOf(0)
+    private val screenOffReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Intent.ACTION_SCREEN_OFF) lockResetTick++
+        }
+    }
 
     /**
      * What the status bar was last asked to be, so it can be asked again if it stopped obeying.
@@ -66,6 +76,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ContextCompat.registerReceiver(this, screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF), ContextCompat.RECEIVER_NOT_EXPORTED)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         allowDrawingBehindTheCutout()
         // Portrait until told otherwise on a phone, free on a tablet: this is a list down the
@@ -148,6 +159,7 @@ class MainActivity : ComponentActivity() {
                     NikeNavHost(
                         app = app,
                         homeIntentTick = homeIntentTick,
+                        lockResetTick = lockResetTick,
                         typedToSearch = typedToSearch,
                         onTypedToSearchHandled = { handled -> typedToSearch = typedToSearch - handled.toSet() },
                         iconPackPackage = iconPackPackage,
@@ -235,6 +247,11 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         // Pressing HOME re-delivers the intent to us; treat it as "go back to the home screen".
         homeIntentTick++
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(screenOffReceiver)
+        super.onDestroy()
     }
 
     override fun onStart() {

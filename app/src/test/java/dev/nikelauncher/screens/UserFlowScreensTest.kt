@@ -3,6 +3,7 @@ package dev.nikelauncher.screens
 
 import android.app.KeyguardManager
 import android.content.ComponentName
+import android.content.Intent
 import android.provider.Settings
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.*
@@ -42,6 +43,7 @@ class UserFlowScreensTest {
             prefs.corner.setTap(CornerAction.SEARCH)
             prefs.home.setShortcutSwipe(ShortcutSwipe.OFF)
             prefs.appList.setNotificationPreviews(true)
+            prefs.pages.setEnabled(WidgetPageSide.LEFT, true)
             prefs.pages.setEnabled(WidgetPageSide.RIGHT, true)
         }
         Settings.Secure.putString(app.contentResolver, "enabled_notification_listeners", ComponentName(app, NowPlayingListenerService::class.java).flattenToString())
@@ -54,6 +56,12 @@ class UserFlowScreensTest {
             rule.waitForIdle()
         }
         fun back() { rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }; rule.waitForIdle() }
+        rule.onRoot().performTouchInput { longClick(Offset(width * .5f, height * .85f)) }
+        rule.onAllNodesWithText(text(R.string.action_open_settings)).onLast().performClick()
+        rule.activity.sendBroadcast(Intent(Intent.ACTION_SCREEN_OFF))
+        rule.waitUntil(5000) { rule.onAllNodesWithText(text(R.string.settings_section_home)).fetchSemanticsNodes().isEmpty() }
+        rule.waitUntil(5000) { rule.onAllNodesWithText("Messages").fetchSemanticsNodes().isNotEmpty() }
+        rule.shoot("flow-home-after-lock")
         rule.onRoot().performTouchInput { longClick(Offset(width * .5f, height * .85f)) }
         rule.onAllNodesWithText(text(R.string.action_open_settings)).onLast().performClick()
         rule.onNodeWithText(text(R.string.settings_section_home)).performClick()

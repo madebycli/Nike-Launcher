@@ -20,6 +20,9 @@ class InteractionPrefsStateTest {
         val prefs = context.prefs
         prefs.replaceBackupValues(emptyMap())
         assertEquals(ShortcutSwipe.OFF, prefs.home.shortcutSwipe.first())
+        assertTrue(prefs.appList.notificationPreviews.first())
+        prefs.appList.setNotificationPreviews(false)
+        assertFalse(Prefs(context).appList.notificationPreviews.first())
         prefs.replaceBackupValues(mapOf("swipe_for_shortcuts" to true))
         assertEquals(ShortcutSwipe.RIGHT, prefs.home.shortcutSwipe.first())
         SearchDisplayMode.entries.forEach { mode ->

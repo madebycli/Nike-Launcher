@@ -90,7 +90,8 @@ float keys `corner_position_x/y` are absent for the original corner alignment.
 Choosing a mode writes both keys atomically. `search_button_at_bottom` (boolean, default true) is
 independent of the existing permanent-bar edge. Hidden-app search retains its original meaning.
 The button and corner focus request reveal the field before focusing it; `AppListSearchSlot` uses
-Material slide/fade motion from the corresponding edge. No key was renamed or retyped; the optional
+Material slide/fade motion from above. A temporary button search closes when the keyboard has
+been visible, is closed and the query is empty; permanent search bars and nonempty queries remain. No key was renamed or retyped; the optional
 corner, search and setup keys remain supported by typed backup format 2.
 
 **Settings navigation shares the kit motion.** `SharedAxis` adapts the full-container forward/back
@@ -238,3 +239,23 @@ whichever app is the current Home.
 - No generated Baseline Profile. Recording and validating one still needs a device.
 - Robolectric verifies real Compose layouts and simulated interactions. Device gesture velocity,
   notification-provider delivery, system-role dialogs, wallpaper and frame timing need phone checks.
+
+The Now Playing visibility control is in Home settings. Adjusting app-list dimming does not
+trigger the home wallpaper preview, so the settings surface stays opaque.
+
+Notification previews default on for eligible apps when no preference has been stored; an explicit
+opt-out remains authoritative. The notification listener permission and existing profile gates still apply.
+
+Notification rows derive their one-line title and message size from the app label, matching the
+reference ratio. The old independent notification-size preference remains stored for backup
+compatibility, but its control is no longer offered.
+
+The media widget has Classic and Expressive styles. Its `media_widget_style`,
+`media_widget_controls`, and `media_widget_progress` preferences are included in the normal
+settings backup. Existing installations default to Classic with controls and without progress.
+The progress indicator uses the active media session's duration and position; it is omitted
+when the session does not provide a usable duration.
+
+The navigation host keeps the loaded widget-page configuration while settings are open, so
+the home page's initial index is known when returning. A screen-off broadcast resets the
+widget pager and unwinds launcher navigation without the usual pop transition.

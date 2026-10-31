@@ -77,7 +77,7 @@
     <string name="settings_list_headers">Bokstavsrubriker</string>
     <string name="settings_list_headers_detail">Av ger en sammanhängande lista. A-Z-remsan hoppar fortfarande till bokstaven.</string>
     <string name="settings_notification_badges">Aviseringsräknare på ikonerna</string>
-    <string name="settings_notification_previews">Aviseringstext på startskärmen</string>
+    <string name="settings_notification_previews">Aviseringstext</string>
     <string name="settings_notification_previews_detail">Listar en apps senaste aviseringar under dess namn, och att trycka på en öppnar den. Vem som helst som tittar på din telefon kan läsa dem. Kräver aviseringsåtkomst.</string>
     <string name="settings_notification_text_size">Aviseringstextens storlek</string>
     <string name="settings_notification_badges_detail">Behöver samma aviseringsåtkomst som Nu spelas gör. Endast räknare, aldrig vad en avisering säger. En prick bredvid namnet när ikonerna är dolda.</string>
@@ -725,4 +725,10 @@
     <string name="search_button_position">Position för knappsökning</string>
     <string name="search_position_top">Överst</string>
     <string name="search_position_bottom">Nederst</string>
+    <string name="notification_app_age">%1$s · %2$s</string>
+    <string name="media_widget_settings">Mediewidget</string>
+    <string name="media_widget_classic">Klassisk</string>
+    <string name="media_widget_expressive">Expressiv</string>
+    <string name="media_widget_controls">Uppspelningskontroller</string>
+    <string name="media_widget_progress">Förlopp</string>
 </resources>

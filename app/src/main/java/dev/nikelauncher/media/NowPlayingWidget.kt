@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.media
 
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.data.prefs.MediaWidgetOptions
+import dev.nikelauncher.data.prefs.MediaWidgetStyle
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
@@ -104,6 +107,7 @@ fun NowPlayingWidget(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val options by (context.applicationContext as NikeApp).prefs.mediaWidget.options.collectAsState(MediaWidgetOptions())
     val lifecycleOwner = LocalLifecycleOwner.current
     var listenerEnabled by remember { mutableStateOf(isListenerEnabled(context)) }
 
@@ -198,7 +202,9 @@ fun NowPlayingWidget(
         runCatching { current.controller.transportControls.stop() }
         NowPlayingBus.update(null)
     }) {
-        Surface(
+        Box(Modifier.fillMaxWidth().height(heightDp.dp)) {
+        if (options.style == MediaWidgetStyle.EXPRESSIVE) ExpressiveMediaCard(current, heightDp, options.controls)
+        else Surface(
             modifier = Modifier.fillMaxWidth().height(heightDp.dp),
             // No scrim: the block sits on the wallpaper like the favorites above it do, so the
             // only thing separating it from them is its own spacing.
@@ -255,7 +261,7 @@ fun NowPlayingWidget(
                         fontSize = artistSp,
                     )
                 } }
-                val controls: @Composable () -> Unit = { Row(
+                val controls: @Composable () -> Unit = { if (options.controls) Row(
                     horizontalArrangement = Arrangement.spacedBy((heightDp * 0.10f).coerceIn(6f, 24f).dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -302,6 +308,8 @@ fun NowPlayingWidget(
                     controls()
                 }
             }
+        }
+        if (options.progress) MediaProgress(current, Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(4.dp))
         }
     }
 }

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +45,7 @@ import kotlinx.coroutines.launch
 fun NikeNavHost(
     app: NikeApp,
     homeIntentTick: Int,
+    lockResetTick: Int,
     typedToSearch: List<TypedKey>,
     onTypedToSearchHandled: (List<TypedKey>) -> Unit,
     iconPackPackage: String?,
@@ -50,6 +55,8 @@ fun NikeNavHost(
     onAppListVisibleChange: (Boolean) -> Unit,
 ) {
     val nav = rememberNavController()
+    val pagesConfig by app.prefs.pages.config.collectAsState(initial = null)
+    var resettingForLock by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     // Before anything the user does can write to the store, so "the store is empty" still means
@@ -91,10 +98,22 @@ fun NikeNavHost(
         if (homeIntentTick > 0 && nav.currentDestination?.route != "home") nav.popBackStack("home", inclusive = false)
     }
 
+    LaunchedEffect(lockResetTick) {
+        if (lockResetTick > 0) {
+            resettingForLock = true
+            if (nav.currentDestination?.route != "home") nav.popBackStack("home", inclusive = false)
+            withFrameNanos { }
+            resettingForLock = false
+        }
+    }
+
     @Composable fun HomeDestination(placing: Boolean = false) {
+            val config = pagesConfig ?: return
             HomeRoute(
                 app = app,
                 homeIntentTick = homeIntentTick,
+                lockResetTick = lockResetTick,
+                pagesConfig = config,
                 cornerPlacement = placing,
                 onCornerPlacementClose = { nav.popBackStack() },
                 settings = settings,
@@ -132,8 +151,8 @@ fun NikeNavHost(
     NavHost(navController = nav, startDestination = "home",
         enterTransition = { sharedAxisEnter(true, spatial, effects) },
         exitTransition = { sharedAxisExit(true, spatial, effects) },
-        popEnterTransition = { sharedAxisEnter(false, spatial, effects) },
-        popExitTransition = { sharedAxisExit(false, spatial, effects) },
+        popEnterTransition = { if (resettingForLock) EnterTransition.None else sharedAxisEnter(false, spatial, effects) },
+        popExitTransition = { if (resettingForLock) ExitTransition.None else sharedAxisExit(false, spatial, effects) },
     ) {
         composable("home") { HomeDestination() }
         composable("corner/place") { HomeDestination(placing = true) }

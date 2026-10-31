@@ -78,7 +78,7 @@ class MenuMotionScreensTest {
         rule.runOnIdle { search = true }; motionFrames()
         val enteringBottom = rule.onNodeWithTag("search-field").getUnclippedBoundsInRoot().top
         rule.mainClock.advanceTimeBy(4000)
-        Assert.assertTrue(enteringBottom > rule.onNodeWithTag("search-field").getUnclippedBoundsInRoot().top)
+        Assert.assertTrue(enteringBottom < rule.onNodeWithTag("search-field").getUnclippedBoundsInRoot().top)
         rule.mainClock.autoAdvance = true
         rule.runOnIdle { search = false; menu = true }
         rule.shoot("widget-expressive-menu-de")

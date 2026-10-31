@@ -548,7 +548,7 @@
     <string name="settings_app_list_tint">Odcień za listą</string>
     <string name="settings_folders_in_list">Foldery na liście aplikacji</string>
     <string name="settings_folders_in_list_detail">Każdy folder pojawia się też pod własną literą. Jego aplikacje zostają również pod swoimi</string>
-    <string name="settings_notification_previews">Tekst powiadomień na ekranie głównym</string>
+    <string name="settings_notification_previews">Tekst powiadomień</string>
     <string name="settings_notification_previews_detail">Pokazuje najnowsze powiadomienia aplikacji pod jej nazwą; dotknięcie otwiera je. Każdy, kto patrzy na twój telefon, może je przeczytać. Wymaga dostępu do powiadomień</string>
     <string name="settings_notification_text_size">Rozmiar tekstu powiadomień</string>
     <string name="settings_ripple_damping">Tłumienie fali</string>
@@ -750,4 +750,10 @@
     <string name="search_button_position">Pozycja wyszukiwania z przycisku</string>
     <string name="search_position_top">U góry</string>
     <string name="search_position_bottom">U dołu</string>
+    <string name="notification_app_age">%1$s · %2$s</string>
+    <string name="media_widget_settings">Widżet multimediów</string>
+    <string name="media_widget_classic">Klasyczny</string>
+    <string name="media_widget_expressive">Ekspresyjny</string>
+    <string name="media_widget_controls">Sterowanie odtwarzaniem</string>
+    <string name="media_widget_progress">Postęp</string>
 </resources>

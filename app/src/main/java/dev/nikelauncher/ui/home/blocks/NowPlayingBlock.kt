@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.R
 import dev.nikelauncher.data.HomeAlignment
+import dev.nikelauncher.media.MediaWidgetSettingsSheet
 import dev.nikelauncher.media.NowPlayingWidget
 import dev.nikelauncher.media.openNowPlayingApp
 import dev.nikelauncher.ui.common.recordTouchPosition
@@ -45,6 +47,7 @@ internal fun NowPlayingBlock(
     val density = LocalDensity.current
     val touch = remember { mutableStateOf(Offset.Zero) }
     var menuExpanded by remember { mutableStateOf(false) }
+    var configure by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(DpOffset.Zero) }
 
     Box(modifier) {
@@ -68,8 +71,10 @@ internal fun NowPlayingBlock(
                 ),
         )
         TouchMenu(expanded = menuExpanded, offset = menuOffset, onDismissRequest = { menuExpanded = false }) {
+            item(stringResource(R.string.widget_change_settings), { menuExpanded = false; configure = true }, leadingIcon = Icons.Filled.Tune)
             item(stringResource(R.string.action_edit_layout), { menuExpanded = false; onEditLayout() }, leadingIcon = Icons.Filled.Edit)
             item(stringResource(R.string.action_open_settings), { menuExpanded = false; onOpenSettings() }, leadingIcon = Icons.Filled.Settings)
         }
+        if (configure) MediaWidgetSettingsSheet { configure = false }
     }
 }

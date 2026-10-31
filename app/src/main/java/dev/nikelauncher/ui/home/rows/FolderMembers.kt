@@ -142,7 +142,7 @@ internal fun FolderContents(
                                     textAlign = alignment.textAlign(),
                                 )
                                 NotificationLines(
-                                    preview, alignment, style.contentColor,
+                                    preview, alignment, style.contentColor, style.labelSizeSp,
                                 )
                             }
                         }

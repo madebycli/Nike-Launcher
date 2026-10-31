@@ -105,7 +105,7 @@ internal fun FavoriteRow(
                         onNotifications = { notificationSheet = true },
                     ) {
                         shortcutMenu = true
-                    },
+                    }.padding(horizontal = (style.sidePaddingDp - 10).coerceAtLeast(0).dp),
                 onOpen = { notificationSheet = true },
                 onLaunch = onLaunch,
                 onLongClick = {
