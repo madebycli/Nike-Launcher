@@ -224,6 +224,7 @@ The app requests **no `INTERNET` permission**. It cannot phone home.
 | Permission | Why | Optional? |
 |---|---|---|
 | `QUERY_ALL_PACKAGES` | A launcher must enumerate every installed app, icon pack and widget provider. Without it `PackageManager` filters almost everything out on Android 11+. | No |
+| `REQUEST_DELETE_PACKAGES` | Lets Android present its confirmation when the user selects Uninstall; the launcher does not silently remove apps. | No |
 | `EXPAND_STATUS_BAR` | Needed by the pre-Android-12 reflection fallback for opening the notification shade. | No |
 | `VIBRATE` | The haptic tick as the finger crosses a letter. Respects the system touch-feedback setting, and can be turned off in Settings. | No |
 | Accessibility service | The only sanctioned way to open the notification shade or lock the screen — neither has a public API. The service ignores every event it receives and reads nothing. | Yes — the swipe-down and double-tap-to-lock gestures simply report that they need it |
@@ -272,3 +273,10 @@ A zero-second hide applies the window's fullscreen policy immediately rather tha
 an animation controller; screen-off and resume reassert the hidden home state before focus.
 The app list clears the fullscreen window flag and retains IME resize/inset behavior while
 still applying its own status-bar preference. Navigation and status bar preferences remain independent.
+
+When the system returns status-bar control after keyguard, and on the user-present broadcast,
+the launcher reasserts a hidden home bar. It does not override visible home, active app-list,
+or explicit peek state. Transient system-owned indicators are outside the app's window.
+
+Icon selection and reset write their preference before popping the icon picker destination;
+the destination's coroutine therefore cannot be cancelled by its own navigation.

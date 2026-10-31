@@ -27,6 +27,7 @@ import dev.nikelauncher.data.AppFont
 import dev.nikelauncher.data.IconShape
 import dev.nikelauncher.media.NowPlayingListenerService
 import dev.nikelauncher.service.StatusBarFader
+import dev.nikelauncher.service.StatusBarControlWatcher
 import dev.nikelauncher.widget.ClockWidgetProvider
 import dev.nikelauncher.ui.NikeNavHost
 import dev.nikelauncher.ui.common.IconConfig
@@ -47,6 +48,7 @@ class MainActivity : ComponentActivity() {
     private var homeIntentTick by mutableStateOf(0)
     private var lockResetTick by mutableStateOf(0)
     private var currentAppListVisible = false
+    private var statusBarWatcher: StatusBarControlWatcher? = null
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Intent.ACTION_SCREEN_OFF) {
@@ -56,6 +58,8 @@ class MainActivity : ComponentActivity() {
                     desiredStatusBarVisible = !hidden
                     StatusBarFader.setVisible(window, visible = !hidden, instant = true)
                 }
+            } else if (intent.action == Intent.ACTION_USER_PRESENT && shouldReassertHiddenHome()) {
+                reassertHiddenHome()
             }
         }
     }
@@ -86,7 +90,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ContextCompat.registerReceiver(this, screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF), ContextCompat.RECEIVER_NOT_EXPORTED)
+        ContextCompat.registerReceiver(this, screenOffReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_USER_PRESENT)
+        }, ContextCompat.RECEIVER_NOT_EXPORTED)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         allowDrawingBehindTheCutout()
         // Start hidden until the stored choice arrives; never draw the wrong visible default.
@@ -254,6 +261,7 @@ class MainActivity : ComponentActivity() {
         // left behind. Asked again only when it is actually wrong: asking for the state it is
         // already in restarts the fade, and a fade out begins by showing the bar in full.
         if (!hasFocus) return
+        attachStatusBarWatcher()
         val want = desiredStatusBarVisible ?: return
         // Returning from the lock screen or another app must not replay a hide animation.
         // The insets can already report hidden while the system still fades the bar out.
@@ -266,8 +274,23 @@ class MainActivity : ComponentActivity() {
         if (actual != want) StatusBarFader.setVisible(window, visible = want, instant = hideStatusBarInstantly)
     }
 
+    private fun shouldReassertHiddenHome(): Boolean =
+        homeStatusBarHidden == true && desiredStatusBarVisible == false && !currentAppListVisible
+
+    private fun reassertHiddenHome() {
+        StatusBarFader.setVisible(window, visible = false, instant = true)
+    }
+
+    private fun attachStatusBarWatcher() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+        val watcher = statusBarWatcher ?: StatusBarControlWatcher(window, ::shouldReassertHiddenHome, ::reassertHiddenHome)
+            .also { statusBarWatcher = it }
+        watcher.attach()
+    }
+
     override fun onResume() {
         super.onResume()
+        attachStatusBarWatcher()
         // Request the hidden state before this window becomes visible again.
         if (desiredStatusBarVisible == false)
             StatusBarFader.setVisible(window, visible = false, instant = true, fullscreenPolicy = !currentAppListVisible)
@@ -280,6 +303,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) statusBarWatcher?.detach()
+        statusBarWatcher = null
         unregisterReceiver(screenOffReceiver)
         super.onDestroy()
     }
@@ -297,6 +322,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) statusBarWatcher?.detach()
         (application as NikeApp).widgetHost.stopListening()
         // The fader holds a static controller for this window; don't outlive the Activity.
         StatusBarFader.release()

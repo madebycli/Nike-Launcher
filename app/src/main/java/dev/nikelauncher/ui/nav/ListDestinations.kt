@@ -163,6 +163,7 @@ internal fun NavGraphBuilder.iconPickerDestination(
             scope.launch {
                 if (folderId != null) app.prefs.library.setFolderIcon(folderId, value)
                 else app.prefs.library.setIconOverride(key, value)
+                nav.popBackStack()
             }
         }
 
@@ -170,13 +171,9 @@ internal fun NavGraphBuilder.iconPickerDestination(
             appLabel = label,
             onPickPackIcon = { packPkg, drawableName ->
                 applyIcon(encodePackOverride(packPkg, drawableName))
-                nav.popBackStack()
             },
             onPickFromGallery = { pickFromGallery(key) },
-            onResetIcon = {
-                applyIcon(null)
-                nav.popBackStack()
-            },
+            onResetIcon = { applyIcon(null) },
             onBack = { nav.popBackStack() },
         )
     }

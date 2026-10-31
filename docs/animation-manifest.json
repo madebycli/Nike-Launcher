@@ -4,7 +4,7 @@
     {
       "name": "status-bar",
       "source": "service/StatusBarFader.kt",
-      "motion": "Zero-second requests use immediate window policy; other changes use the system bar fade. Screen-off and resume restore a hidden bar immediately.",
+      "motion": "Zero-second requests use immediate window policy; other changes use the system bar fade. Screen-off, resume, user-present and status-bar control regain restore a hidden home bar immediately.",
       "verification": "StatusBarFaderTest and StatusBarLifecycleScreensTest; system compositor and unlock must be checked on a device"
     },
     {

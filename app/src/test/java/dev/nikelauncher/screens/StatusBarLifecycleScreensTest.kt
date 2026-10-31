@@ -45,6 +45,12 @@ class StatusBarLifecycleScreensTest {
         rule.activity.sendBroadcast(Intent(Intent.ACTION_SCREEN_OFF))
         rule.waitForIdle()
         Assert.assertNotEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        // The system may expose the bar after the first home frame while finishing keyguard.
+        rule.runOnIdle { StatusBarFader.setVisible(rule.activity.window, visible = true, instant = true) }
+        Assert.assertEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        rule.activity.sendBroadcast(Intent(Intent.ACTION_USER_PRESENT))
+        rule.waitForIdle()
+        Assert.assertNotEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
         rule.activityRule.scenario.recreate()
         pixel9Display(rule.activity)
         rule.waitUntil(5000) { ReflectionHelpers.getField<Boolean>(rule.activity, "statusBarInitialized") }
@@ -53,6 +59,9 @@ class StatusBarLifecycleScreensTest {
         rule.shoot("home-statusbar-after-recreate")
         runBlocking { prefs.appearance.setHideStatusBar(false) }
         rule.waitUntil(5000) { ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible") == true }
+        Assert.assertEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        rule.activity.sendBroadcast(Intent(Intent.ACTION_USER_PRESENT))
+        rule.waitForIdle()
         Assert.assertEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
     @Test fun hiddenAppListDoesNotDisableKeyboardResize() {

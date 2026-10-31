@@ -238,6 +238,7 @@ internal fun FavoriteRow(
                 item(
                     stringResource(R.string.action_uninstall),
                     {
+                        onDismissMenu()
                         if (!context.requestUninstall(app))
                             context.toast(R.string.clock_action_unavailable)
                     },

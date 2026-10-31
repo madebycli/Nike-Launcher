@@ -9,6 +9,8 @@ Each walk-through needs a test process of its own, because the preferences store
 ```bash
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.SetupScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.UserFlowScreensTest"
+NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.UninstallScreensTest"
+NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.EditAppResetScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.StatusBarLifecycleScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.MenuMotionScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.SearchImeScreensTest"
@@ -90,6 +92,12 @@ specs. These checks prove direction/state under the test clock, not smoothness o
 `SearchImeScreensTest` moves a controlled inset through intermediate values and checks the real
 search field position in both directions. It does not simulate a system keyboard or compositor.
 
-`StatusBarLifecycleScreensTest` checks the window fullscreen policy on screen-off and activity
-recreation with different home/app-list settings. Robolectric cannot reproduce the lock screen
+`StatusBarLifecycleScreensTest` checks window fullscreen policy on screen-off, user-present, and
+activity recreation with different home/app-list settings. `StatusBarControlWatcherTest` covers
+status-bar control regain and reentrant callbacks. Robolectric cannot reproduce the lock screen
 compositor, so an actual Pixel unlock remains a device check.
+
+`UninstallScreensTest` invokes both real menu entries and inspects their outgoing intents;
+Robolectric does not render or perform the Android package installer confirmation.
+`EditAppResetScreensTest` resets customized names and icons from both home and app-list menus,
+including persistence across activity recreation.
