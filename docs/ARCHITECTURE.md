@@ -266,3 +266,9 @@ A visible clock with weather enabled silently checks the configured local provid
 cache is missing or stale; provider permission and location checks remain authoritative.
 The bottom search field follows the IME inset directly and enters/exits from below. The app-list
 slot owns this transition; the search field itself does not add a second entrance animation.
+
+The status bar starts hidden while the stored visibility setting is read, then follows that setting.
+A zero-second hide applies the window's fullscreen policy immediately rather than waiting for
+an animation controller; screen-off and resume reassert the hidden home state before focus.
+The app list clears the fullscreen window flag and retains IME resize/inset behavior while
+still applying its own status-bar preference. Navigation and status bar preferences remain independent.

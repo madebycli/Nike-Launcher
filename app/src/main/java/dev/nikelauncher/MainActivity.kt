@@ -46,9 +46,17 @@ class MainActivity : ComponentActivity() {
     /** Bumped whenever HOME is pressed while we're already showing, so overlays can close. */
     private var homeIntentTick by mutableStateOf(0)
     private var lockResetTick by mutableStateOf(0)
+    private var currentAppListVisible = false
     private val screenOffReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == Intent.ACTION_SCREEN_OFF) lockResetTick++
+            if (intent.action == Intent.ACTION_SCREEN_OFF) {
+                lockResetTick++
+                currentAppListVisible = false
+                homeStatusBarHidden?.let { hidden ->
+                    desiredStatusBarVisible = !hidden
+                    StatusBarFader.setVisible(window, visible = !hidden, instant = true)
+                }
+            }
         }
     }
 
@@ -64,6 +72,8 @@ class MainActivity : ComponentActivity() {
 
     /** A peek of 0: the bar is hidden at once rather than faded out. */
     private var hideStatusBarInstantly = false
+    private var homeStatusBarHidden: Boolean? = null
+    private var statusBarInitialized = false
 
     /**
      * Keystrokes taken on the home screen, as a growing list so none is dropped.
@@ -79,6 +89,8 @@ class MainActivity : ComponentActivity() {
         ContextCompat.registerReceiver(this, screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF), ContextCompat.RECEIVER_NOT_EXPORTED)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         allowDrawingBehindTheCutout()
+        // Start hidden until the stored choice arrives; never draw the wrong visible default.
+        StatusBarFader.setVisible(window, visible = false, instant = true)
         // Portrait until told otherwise on a phone, free on a tablet: this is a list down the
         // side of the screen, and a phone sideways has about a third of the height it needs.
         // The setting exists because that is a judgement about a screen rather than about a
@@ -87,30 +99,42 @@ class MainActivity : ComponentActivity() {
         val app = application as NikeApp
 
         setContent {
-            val hideStatusBar by app.prefs.appearance.hideStatusBar.collectAsState(initial = false)
-            val hideStatusBarAppList by app.prefs.appearance.hideStatusBarAppList.collectAsState(initial = false)
-            val peekSeconds by app.prefs.appearance.statusBarPeekSeconds.collectAsState(initial = 5)
+            val hideStatusBar by app.prefs.appearance.hideStatusBar.collectAsState(initial = null)
+            val hideStatusBarAppList by app.prefs.appearance.hideStatusBarAppList.collectAsState(initial = null)
+            val peekSeconds by app.prefs.appearance.statusBarPeekSeconds.collectAsState(initial = -1)
             // A short pull-down peeks the status bar, then it slides away again.
             var statusBarPeek by remember { mutableStateOf(false) }
             // The two surfaces choose separately, so the overlay can keep the bar the home
             // screen hides.
             var appListOpen by remember { mutableStateOf(false) }
             LaunchedEffect(statusBarPeek, peekSeconds) {
-                if (statusBarPeek) {
+                if (statusBarPeek && peekSeconds >= 0) {
                     delay(peekSeconds * 1000L)
                     statusBarPeek = false
                 }
             }
+            LaunchedEffect(lockResetTick) {
+                if (lockResetTick > 0) { statusBarPeek = false; appListOpen = false; currentAppListVisible = false }
+            }
             val hideHere = if (appListOpen) hideStatusBarAppList else hideStatusBar
-            val statusBarVisible = !hideHere || statusBarPeek
+            val statusBarVisible = hideHere?.let { !it || statusBarPeek }
             // Keyed on the answer, not on what went into it. Re-asking for a state the bar is
             // already in restarts the fade, and a fade out begins by holding the bar fully
             // shown — so opening the list with both set to hide flashed it into view.
             // A peek of 0 is someone who wants the bar gone, and a fade is the bar lingering.
-            hideStatusBarInstantly = peekSeconds == 0
-            LaunchedEffect(statusBarVisible) {
-                desiredStatusBarVisible = statusBarVisible
-                StatusBarFader.setVisible(window, visible = statusBarVisible, instant = hideStatusBarInstantly)
+            LaunchedEffect(hideStatusBar, peekSeconds) {
+                homeStatusBarHidden = hideStatusBar
+                hideStatusBarInstantly = peekSeconds == 0
+            }
+            LaunchedEffect(statusBarVisible, peekSeconds, appListOpen) {
+                if (statusBarVisible != null && peekSeconds >= 0) {
+                    val unchanged = desiredStatusBarVisible == statusBarVisible
+                    desiredStatusBarVisible = statusBarVisible
+                    StatusBarFader.setVisible(window, visible = statusBarVisible,
+                        instant = peekSeconds == 0 || !statusBarInitialized || unchanged,
+                        fullscreenPolicy = !appListOpen)
+                    statusBarInitialized = true
+                }
             }
 
             val font by app.prefs.appearance.font.collectAsState(initial = AppFont.GOOGLE_SANS_FLEX)
@@ -165,7 +189,7 @@ class MainActivity : ComponentActivity() {
                         iconPackPackage = iconPackPackage,
                         iconOverrides = iconOverrides,
                         onPeekStatusBar = { if (peekSeconds > 0) statusBarPeek = true },
-                        onAppListVisibleChange = { appListOpen = it },
+                        onAppListVisibleChange = { currentAppListVisible = it; appListOpen = it },
                     )
                 }
             }
@@ -231,16 +255,22 @@ class MainActivity : ComponentActivity() {
         // already in restarts the fade, and a fade out begins by showing the bar in full.
         if (!hasFocus) return
         val want = desiredStatusBarVisible ?: return
-        // Coming back from an app, the system hides the bar again with a fade of its own, and
-        // the insets already read as hidden while it plays. An instant hide cuts that fade
-        // short, and costs nothing when the bar is already gone.
-        if (!want && hideStatusBarInstantly) {
-            StatusBarFader.setVisible(window, visible = false, instant = true)
+        // Returning from the lock screen or another app must not replay a hide animation.
+        // The insets can already report hidden while the system still fades the bar out.
+        if (!want) {
+            StatusBarFader.setVisible(window, visible = false, instant = true, fullscreenPolicy = !currentAppListVisible)
             return
         }
         val actual = ViewCompat.getRootWindowInsets(window.decorView)
             ?.isVisible(WindowInsetsCompat.Type.statusBars()) ?: return
         if (actual != want) StatusBarFader.setVisible(window, visible = want, instant = hideStatusBarInstantly)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Request the hidden state before this window becomes visible again.
+        if (desiredStatusBarVisible == false)
+            StatusBarFader.setVisible(window, visible = false, instant = true, fullscreenPolicy = !currentAppListVisible)
     }
 
     override fun onNewIntent(intent: Intent) {

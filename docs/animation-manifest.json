@@ -2,6 +2,12 @@
   "version": 1,
   "transitions": [
     {
+      "name": "status-bar",
+      "source": "service/StatusBarFader.kt",
+      "motion": "Zero-second requests use immediate window policy; other changes use the system bar fade. Screen-off and resume restore a hidden bar immediately.",
+      "verification": "StatusBarFaderTest and StatusBarLifecycleScreensTest; system compositor and unlock must be checked on a device"
+    },
+    {
       "name": "settings-navigation",
       "source": "ui/kit/motion/SharedAxis.kt",
       "owners": [

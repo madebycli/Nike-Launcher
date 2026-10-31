@@ -9,6 +9,7 @@ Each walk-through needs a test process of its own, because the preferences store
 ```bash
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.SetupScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.UserFlowScreensTest"
+NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.StatusBarLifecycleScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.MenuMotionScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.SearchImeScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.AppScreensTest"
@@ -88,3 +89,7 @@ specs. These checks prove direction/state under the test clock, not smoothness o
 
 `SearchImeScreensTest` moves a controlled inset through intermediate values and checks the real
 search field position in both directions. It does not simulate a system keyboard or compositor.
+
+`StatusBarLifecycleScreensTest` checks the window fullscreen policy on screen-off and activity
+recreation with different home/app-list settings. Robolectric cannot reproduce the lock screen
+compositor, so an actual Pixel unlock remains a device check.
