@@ -19,6 +19,7 @@ NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screen
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.NotificationScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.CornerScreensTest"
 NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.WidgetPagesScreensTest"
+NIKE_SCREENS=1 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.RoundedWidgetScreensTest"
 ./gradlew :app:testDebugUnitTest --tests "dev.nikelauncher.screens.WeatherScreensTest"
 ```
 

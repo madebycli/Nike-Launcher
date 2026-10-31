@@ -32,7 +32,7 @@ class NikeAppWidgetHost(context: Context, hostId: Int) : AppWidgetHost(context, 
     private val ownViews: MutableSet<FontedHostView> = Collections.newSetFromMap(WeakHashMap())
 
     override fun onCreateView(context: Context, appWidgetId: Int, appWidget: AppWidgetProviderInfo?): AppWidgetHostView {
-        if (appWidget?.provider?.packageName != context.packageName) return super.onCreateView(context, appWidgetId, appWidget)
+        if (appWidget?.provider?.packageName != context.packageName) return RoundedWidgetHostView(context)
         return FontedHostView(context).also { ownViews += it }
     }
 

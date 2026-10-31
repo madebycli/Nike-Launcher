@@ -52,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -130,6 +131,7 @@ internal fun WidgetPage(
     AndroidView(
         modifier = Modifier
             .fillMaxSize()
+            .then(if (providerInfo.provider != ClockWidgetProvider.componentName(context)) Modifier.clip(MaterialTheme.shapes.extraLarge) else Modifier)
             .onSizeChanged { size ->
                 slotSizeDp = with(density) { size.width.toDp().value.toInt() to size.height.toDp().value.toInt() }
             }

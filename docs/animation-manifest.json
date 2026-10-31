@@ -14,7 +14,7 @@
     {
       "name": "button-search-field",
       "source": "ui/applist/AppListSearchSlot.kt",
-      "motion": "Material slide/fade from above for both top and bottom search fields",
+      "motion": "Material slide/fade from above for the top field and below for the bottom field; bottom placement follows IME insets",
       "verification": "MenuMotionScreensTest intermediate positions; UserFlowScreensTest real search entry"
     },
     {

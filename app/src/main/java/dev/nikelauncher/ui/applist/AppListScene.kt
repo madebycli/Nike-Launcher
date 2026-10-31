@@ -163,8 +163,7 @@ internal fun AppListSession.Content() {
                             },
                             atBottom = true,
                             modifier =
-                                Modifier.focusRequester(searchFocus)
-                                    .smoothSearchImeJumps(enabled = true),
+                                Modifier.focusRequester(searchFocus),
                         )
                     }
                 }

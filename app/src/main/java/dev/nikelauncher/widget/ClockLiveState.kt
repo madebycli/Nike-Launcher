@@ -102,6 +102,7 @@ fun rememberClockLiveState(
         remember(revision, override, widgetId) {
             override ?: ClockWidgetConfig.read(context, widgetId)
         }
+    RefreshClockWeather(active && loadWeather && config.showWeather, config.weatherPackage)
     val calendarRequested = loadCalendar && (config.showAgenda || requireCalendar)
     val wantsCalendar = active && calendarRequested
     // Access is independent of visibility. A page switch pauses work, not its content.

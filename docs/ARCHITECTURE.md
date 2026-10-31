@@ -259,3 +259,9 @@ when the session does not provide a usable duration.
 The navigation host keeps the loaded widget-page configuration while settings are open, so
 the home page's initial index is known when returning. A screen-off broadcast resets the
 widget pager and unwinds launcher navigation without the usual pop transition.
+
+Third-party widget host views enforce the system app-widget background radius, clipping to
+the provider background when available. The launcher's own transparent clock is unchanged.
+A visible clock with weather enabled silently checks the configured local provider when its
+cache is missing or stale; provider permission and location checks remain authoritative.
+The bottom search field follows the IME inset directly and enters/exits from below.
