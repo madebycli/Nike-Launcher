@@ -280,3 +280,8 @@ or explicit peek state. Transient system-owned indicators are outside the app's 
 
 Icon selection and reset write their preference before popping the icon picker destination;
 the destination's coroutine therefore cannot be cancelled by its own navigation.
+# Search results and system bars
+
+Search results reserve the top status-bar and display-cutout insets even when the app-list status
+bar is hidden. Normal list positioning stays independent of this search-only safe area. Bar control
+restoration uses the active surface's requested visibility; home and app-list preferences stay separate.

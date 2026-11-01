@@ -124,7 +124,7 @@ class MainActivity : ComponentActivity() {
                 if (lockResetTick > 0) { statusBarPeek = false; appListOpen = false; currentAppListVisible = false }
             }
             val hideHere = if (appListOpen) hideStatusBarAppList else hideStatusBar
-            val statusBarVisible = hideHere?.let { !it || statusBarPeek }
+            val statusBarVisible = hideHere?.let { !it || (!appListOpen && statusBarPeek) }
             // Keyed on the answer, not on what went into it. Re-asking for a state the bar is
             // already in restarts the fade, and a fade out begins by holding the bar fully
             // shown — so opening the list with both set to hide flashed it into view.
@@ -281,9 +281,13 @@ class MainActivity : ComponentActivity() {
         StatusBarFader.setVisible(window, visible = false, instant = true)
     }
 
+    private fun reassertHiddenSurface() {
+        StatusBarFader.setVisible(window, visible = false, instant = true, fullscreenPolicy = !currentAppListVisible)
+    }
+
     private fun attachStatusBarWatcher() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
-        val watcher = statusBarWatcher ?: StatusBarControlWatcher(window, ::shouldReassertHiddenHome, ::reassertHiddenHome)
+        val watcher = statusBarWatcher ?: StatusBarControlWatcher(window, { desiredStatusBarVisible == false }, ::reassertHiddenSurface)
             .also { statusBarWatcher = it }
         watcher.attach()
     }

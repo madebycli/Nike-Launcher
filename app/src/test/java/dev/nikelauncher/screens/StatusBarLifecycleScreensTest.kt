@@ -3,13 +3,16 @@ package dev.nikelauncher.screens
 
 import android.content.Intent
 import android.view.WindowManager
+import android.view.WindowInsets
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import dev.nikelauncher.MainActivity
 import dev.nikelauncher.NikeApp
 import dev.nikelauncher.R
 import dev.nikelauncher.data.CornerAction
+import dev.nikelauncher.data.prefs.SearchDisplayMode
 import dev.nikelauncher.service.StatusBarFader
+import dev.nikelauncher.service.StatusBarControlWatcher
 import kotlinx.coroutines.runBlocking
 import org.junit.*
 import org.junit.runner.RunWith
@@ -82,9 +85,47 @@ class StatusBarLifecycleScreensTest {
         rule.waitUntil(5000) { ReflectionHelpers.getField<Boolean>(rule.activity, "currentAppListVisible") }
         rule.waitUntil(5000) { rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN == 0 }
         Assert.assertEquals(false, ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible"))
+        val watcher = ReflectionHelpers.getField<StatusBarControlWatcher>(rule.activity, "statusBarWatcher")
+        rule.runOnIdle {
+            StatusBarFader.setVisible(rule.activity.window, visible = true, instant = true)
+            watcher.onControllableTypesChanged(WindowInsets.Type.statusBars())
+        }
+        Assert.assertEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        Assert.assertEquals(false, ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible"))
         rule.shoot("app-list-statusbar-hidden")
+        runBlocking { app.prefs.appearance.setHideStatusBarAppList(false) }
+        rule.waitUntil(5000) { ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible") == true }
+        rule.runOnIdle { watcher.onControllableTypesChanged(WindowInsets.Type.statusBars()) }
+        Assert.assertEquals(true, ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible"))
+        runBlocking { app.prefs.appearance.setHideStatusBarAppList(true) }
+        rule.waitUntil(5000) { ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible") == false }
         rule.activity.sendBroadcast(Intent(Intent.ACTION_SCREEN_OFF))
         rule.waitUntil(5000) { rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN != 0 }
+    }
+
+    @Test fun searchResultsStayBelowTheTopInsetWithHiddenStatusBar() {
+        val app = rule.activity.application as NikeApp
+        installFakeApps(app)
+        runBlocking {
+            app.prefs.home.setWelcomeSeen(true)
+            app.prefs.appearance.setHideStatusBarAppList(true)
+            app.prefs.appearance.setStatusBarPeekSeconds(0)
+            app.prefs.corner.setEnabled(true)
+            app.prefs.corner.setTap(CornerAction.SEARCH)
+            app.prefs.search.setMode(SearchDisplayMode.BAR)
+            app.prefs.search.setButtonAtBottom(true)
+        }
+        rule.activityRule.scenario.recreate(); pixel9Display(rule.activity)
+        rule.waitUntil(5000) { rule.onAllNodesWithContentDescription(app.getString(R.string.applist_search)).fetchSemanticsNodes().isNotEmpty() }
+        rule.onNodeWithContentDescription(app.getString(R.string.applist_search)).performClick()
+        rule.waitUntil(5000) { rule.onAllNodes(hasSetTextAction()).fetchSemanticsNodes().isNotEmpty() }
+        rule.onNode(hasSetTextAction()).performTextInput("Messages")
+        rule.waitUntil(5000) { rule.onAllNodesWithText("Messages").fetchSemanticsNodes().isNotEmpty() }
+        val top = rule.onAllNodesWithText("Messages").onLast().getUnclippedBoundsInRoot().top.value
+        val insets = rule.activity.window.decorView.rootWindowInsets
+        val insetPx = insets?.getInsetsIgnoringVisibility(WindowInsets.Type.statusBars() or WindowInsets.Type.displayCutout())?.top ?: 0
+        Assert.assertTrue("result=$top inset=$insetPx", top * rule.density.density >= insetPx)
+        rule.shoot("app-list-search-hidden-statusbar")
     }
 
 }

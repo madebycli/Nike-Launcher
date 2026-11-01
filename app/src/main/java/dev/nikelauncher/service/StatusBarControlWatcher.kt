@@ -7,7 +7,7 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.annotation.RequiresApi
 
-/** Reassert the user's hidden home state when the system returns control after keyguard. */
+/** Reassert the active surface's hidden state when the system returns bar control. */
 @RequiresApi(Build.VERSION_CODES.R)
 internal class StatusBarControlWatcher(
     private val window: Window,

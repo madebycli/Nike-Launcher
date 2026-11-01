@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsIgnoringVisibility
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
@@ -113,11 +114,13 @@ internal fun AppListSession.Content() {
                             )
                             .fillMaxSize()
                             .then(
-                                if (statusBarHidden) {
+                                if (statusBarHidden && !searching) {
                                     Modifier
                                 } else {
                                     Modifier.windowInsetsPadding(
                                         WindowInsets.statusBarsIgnoringVisibility
+                                            .union(WindowInsets.displayCutout)
+                                            .only(WindowInsetsSides.Top)
                                     )
                                 }
                             )
