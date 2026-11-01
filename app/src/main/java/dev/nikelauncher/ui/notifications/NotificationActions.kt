@@ -16,7 +16,7 @@ import dev.nikelauncher.ui.kit.menu.Menu
 /** One open action and one overflow, independent of the provider's action count. */
 @Composable
 internal fun NotificationActions(preview: NotificationPreview, controller: NotificationController,
-    onOpen: () -> Unit, onDismiss: () -> Unit, report: (Boolean) -> Unit) {
+    onOpen: () -> Unit, report: (Boolean) -> Unit) {
     var expanded by remember(preview.key) { mutableStateOf(false) }
     Box {
         IconButton(onClick = { expanded = true }) { Icon(Icons.Outlined.MoreVert, stringResource(R.string.settings_more)) }
@@ -35,9 +35,6 @@ internal fun NotificationActions(preview: NotificationPreview, controller: Notif
                 item(action.title, { expanded = false; report(controller.run(preview, action.intent)) },
                     leadingIcon = symbol, leadingImage = if (symbol == null) notificationBitmap(action.icon) else null)
             }
-            gap()
-            item(stringResource(R.string.notification_dismiss), { expanded = false; onDismiss() },
-                leadingIcon = Icons.Outlined.DeleteOutline, destructive = true)
         }
     }
 }

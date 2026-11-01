@@ -32,6 +32,7 @@ internal fun NotificationMessages(key: String, messages: List<PreviewMessage>, o
     }
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val bubbleWidth = maxWidth * .8f - if (named) 36.dp else 0.dp
+        val imageBubbleWidth = maxWidth * .9f - if (named) 36.dp else 0.dp
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             groups.forEach { group ->
                 if (group.stampAbove && group.messages.first().time > 0) {
@@ -51,7 +52,7 @@ internal fun NotificationMessages(key: String, messages: List<PreviewMessage>, o
                         group.messages.forEach { message ->
                             val id = idsByMessage[message] ?: return@forEach
                             androidx.compose.runtime.key(id) {
-                                MessageBubble(message, bubbleWidth, onOpen) { HiddenConversationMessages.hide(key, id) }
+                                MessageBubble(message, if (message.attachment != null) imageBubbleWidth else bubbleWidth, onOpen) { HiddenConversationMessages.hide(key, id) }
                             }
                         }
                         if (group.messages.last().time > 0) {

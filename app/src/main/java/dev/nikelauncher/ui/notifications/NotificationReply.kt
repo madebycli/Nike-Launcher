@@ -47,7 +47,7 @@ internal fun NotificationReply(preview: NotificationPreview, controller: Notific
         }
     }
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (options.size > 1 || option == null) {
+        if (option == null || (options.size > 1 && input?.allowFreeFormInput != true)) {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 options.forEach { choice ->
                     FilterChip(selected = choice.target == chosen, onClick = { chosen = choice.target },
@@ -55,7 +55,7 @@ internal fun NotificationReply(preview: NotificationPreview, controller: Notific
                 }
             }
         }
-        input?.choices?.takeIf { it.isNotEmpty() }?.let { choices ->
+        input?.choices?.takeIf { it.isNotEmpty() && input.allowFreeFormInput.not() }?.let { choices ->
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 choices.forEach { choice -> AssistChip(onClick = { send(choice.toString()) }, label = { Text(choice.toString()) }) }
             }
@@ -66,6 +66,9 @@ internal fun NotificationReply(preview: NotificationPreview, controller: Notific
                 leadingActions()
                 TextField(state = field, inputTransformation = InputTransformation.maxLength(MAX_REPLY),
                     modifier = Modifier.weight(1f), shape = MaterialTheme.shapes.extraLarge,
+                    colors = TextFieldDefaults.colors(focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+                        unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+                        disabledIndicatorColor = androidx.compose.ui.graphics.Color.Transparent),
                     placeholder = { Text(input?.label?.toString()?.takeIf { it.isNotBlank() } ?: stringResource(R.string.notification_reply)) },
                     lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 4))
                 FilledIconButton(onClick = { send(field.text.toString()) }, enabled = canSend) {

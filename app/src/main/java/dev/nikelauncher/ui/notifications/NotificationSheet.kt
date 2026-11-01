@@ -89,7 +89,7 @@ internal fun NotificationSheet(
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main.immediate) { onDismiss() }
         }
     }
-    dev.nikelauncher.ui.kit.sheet.ViewportSheet(onDismiss, sheetState, "notification-panel") {
+    dev.nikelauncher.ui.kit.sheet.ViewportSheet(onDismiss, sheetState, "notification-panel", fillHeight = false) {
         if (!available) {
             Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
                 FilledTonalButton(

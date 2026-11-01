@@ -12,11 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -26,6 +26,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.PaddingValues
 import dev.nikelauncher.R
 import dev.nikelauncher.media.NotificationPreview
 
@@ -39,7 +41,7 @@ internal fun NotificationOverview(
     onClose: () -> Unit,
 ) {
     val context = LocalContext.current
-    Column(Modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.notifications_title), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
             if (notifications.isNotEmpty()) {
@@ -59,11 +61,12 @@ internal fun NotificationOverview(
             return@Column
         }
         val now = remember(notifications) { System.currentTimeMillis() }
-        LazyColumn(Modifier.fillMaxWidth().weight(1f)) {
+        LazyColumn(Modifier.fillMaxWidth().heightIn(max = 600.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(notifications, key = { it.key }) { preview ->
                 NotificationDismissBox(preview, onDismiss) {
+                Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                 Row(
-                    Modifier.fillMaxWidth().clickable { onSelect(preview) }.padding(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                    Modifier.fillMaxWidth().clickable { onSelect(preview) }.padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -79,7 +82,7 @@ internal fun NotificationOverview(
                         if (line.isNotBlank()) {
                             Text(
                                 line,
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
@@ -93,9 +96,7 @@ internal fun NotificationOverview(
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
-                    IconButton(onClick = { onDismiss(preview) }) {
-                        Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.notification_dismiss))
-                    }
+                }
                 }
                 }
             }

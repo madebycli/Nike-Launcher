@@ -30,6 +30,21 @@ class NotificationScreensTest {
         pixel9Display(rule.activity)
     }
     @Test fun light() = walkThrough("notifications", 1f)
+    @Test fun singleNotificationUsesCompactOverview() {
+        val controller = FakeNotificationController(fakeNotifications(rule.activity).take(1))
+        rule.setContent { NikeTheme {
+            dev.nikelauncher.ui.kit.sheet.ViewportSheet({}, rememberModalBottomSheetState(skipPartiallyExpanded = true), "notification-panel", fillHeight = false) {
+                NotificationSheetContent(controller.items, null, controller, {})
+            }
+        } }
+        rule.onNodeWithText("Weekend plans").assertIsDisplayed()
+        val panel = rule.onNodeWithTag("notification-panel").fetchSemanticsNode().boundsInRoot
+        Assert.assertTrue("compact overview: $panel", panel.height < 500f * rule.density.density)
+        rule.shoot("notification-single-compact")
+        rule.onNodeWithText("Weekend plans").performClick()
+        rule.onNodeWithContentDescription(rule.activity.getString(R.string.notification_send)).assertExists()
+        rule.shoot("notification-single-chat")
+    }
     @Test @Config(qualifiers = "de-w411dp-h923dp-night-420dpi")
     fun germanLargeDark() = walkThrough("notifications-de-large-dark", 1.5f)
 
@@ -86,7 +101,9 @@ class NotificationScreensTest {
         rule.onNodeWithContentDescription(text(R.string.settings_more)).performClick()
         rule.onNodeWithText(text(R.string.notification_open)).assertExists()
         rule.shoot("$prefix-actions")
-        rule.onNodeWithText(text(R.string.notification_dismiss)).performClick()
+        rule.onNodeWithText(text(R.string.notification_dismiss)).assertDoesNotExist()
+        rule.onNodeWithContentDescription(text(R.string.action_back)).performClick()
+        rule.onNodeWithText("Planning meeting for next week").performTouchInput { swipeLeft() }
         Assert.assertEquals(2, controller.items.size)
         rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).performClick()
         Assert.assertTrue(controller.items.isEmpty())

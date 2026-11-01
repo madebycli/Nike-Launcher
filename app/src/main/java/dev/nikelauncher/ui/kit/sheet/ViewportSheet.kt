@@ -20,6 +20,7 @@ fun ViewportSheet(
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
     panelTag: String,
+    fillHeight: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
@@ -40,7 +41,8 @@ fun ViewportSheet(
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             Column(
                 Modifier.fillMaxWidth()
-                    .height((maxHeight - safeTop).coerceAtLeast(0.dp))
+                    .then(if (fillHeight) Modifier.height((maxHeight - safeTop).coerceAtLeast(0.dp))
+                        else Modifier.heightIn(max = (maxHeight - safeTop).coerceAtLeast(0.dp)))
                     .testTag(panelTag).semantics { testTagsAsResourceId = true }
             ) {
                 Box(Modifier.fillMaxWidth().height(24.dp), contentAlignment = Alignment.Center) {

@@ -287,3 +287,8 @@ the destination's coroutine therefore cannot be cancelled by its own navigation.
 Search results reserve the top status-bar and display-cutout insets even when the app-list status
 bar is hidden. Normal list positioning stays independent of this search-only safe area. Bar control
 restoration uses the active surface's requested visibility; home and app-list preferences stay separate.
+# Notification panels
+
+Notification overview sheets size to their contents within the safe viewport. Entries use Material
+surfaces and swipe dismissal; details retain a scrollable history and a fixed composer. Free-form
+replies omit suggested chips, while choice-only replies retain their provider-supplied choices.

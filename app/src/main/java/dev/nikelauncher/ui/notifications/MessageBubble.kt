@@ -37,7 +37,8 @@ internal fun MessageBubble(message: PreviewMessage, maxWidth: Dp, onOpen: () -> 
                 modifier = Modifier.combinedClickable(onClick = onOpen, onLongClick = { menu = true })) {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
                     attachmentBitmap(message.attachment)?.let {
-                        Image(it, stringResource(R.string.notification_photo), Modifier.heightIn(max = 160.dp), contentScale = ContentScale.Fit)
+                        Image(it, stringResource(R.string.notification_photo), Modifier.fillMaxWidth()
+                            .heightIn(max = 320.dp).aspectRatio(it.width.toFloat() / it.height), contentScale = ContentScale.Fit)
                     }
                     if (message.text.isNotBlank()) Text(message.text, style = MaterialTheme.typography.bodyLarge)
                 }

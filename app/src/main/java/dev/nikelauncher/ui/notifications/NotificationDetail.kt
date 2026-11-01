@@ -42,8 +42,7 @@ internal fun NotificationDetail(preview: NotificationPreview, controller: Notifi
         if (failed) Text(stringResource(R.string.notification_failed), Modifier.padding(horizontal = 16.dp),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
         NotificationReply(preview, controller, report, Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
-            NotificationActions(preview, controller, open,
-                onDismiss = { if (controller.dismiss(preview)) onBack() else failed = true }, report = report)
+            NotificationActions(preview, controller, open, report = report)
         }
     }
 }

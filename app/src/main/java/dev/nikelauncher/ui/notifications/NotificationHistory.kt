@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -39,6 +40,8 @@ internal fun NotificationHistory(preview: NotificationPreview, modifier: Modifie
             Image(it, null, Modifier.fillMaxWidth().aspectRatio(it.width.toFloat() / it.height).heightIn(max = 300.dp).testTag("notification-picture"), contentScale = ContentScale.Fit)
         }
         if (preview.messages.isNotEmpty()) NotificationMessages(preview.key, preview.messages, onOpen)
-        else if (preview.text.isNotBlank()) Text(preview.text, style = MaterialTheme.typography.bodyLarge)
+        else if (preview.text.isNotBlank()) Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+            Text(preview.text, Modifier.fillMaxWidth().padding(20.dp), style = MaterialTheme.typography.bodyLarge)
+        }
     }
 }
