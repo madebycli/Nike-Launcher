@@ -26,12 +26,12 @@ class StatusBarFaderTest {
         assertEquals(0, window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
 
-    @Test fun hiddenAppListDoesNotKeepFullscreenWindowPolicy() {
+    @Test fun repeatedHiddenRequestKeepsFullscreenWindowPolicy() {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val window = activity.window
         StatusBarFader.setVisible(window, visible = false, instant = true)
-        StatusBarFader.setVisible(window, visible = false, instant = true, fullscreenPolicy = false)
-        assertEquals(0, window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        StatusBarFader.setVisible(window, visible = false, instant = true)
+        assertNotEquals(0, window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
 
     @Test fun animatedRequestReleasesInstantFullscreenPolicy() {

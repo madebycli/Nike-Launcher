@@ -138,8 +138,7 @@ class MainActivity : ComponentActivity() {
                     val unchanged = desiredStatusBarVisible == statusBarVisible
                     desiredStatusBarVisible = statusBarVisible
                     StatusBarFader.setVisible(window, visible = statusBarVisible,
-                        instant = peekSeconds == 0 || !statusBarInitialized || unchanged,
-                        fullscreenPolicy = !appListOpen)
+                        instant = (appListOpen && !statusBarVisible) || peekSeconds == 0 || !statusBarInitialized || unchanged)
                     statusBarInitialized = true
                 }
             }
@@ -266,7 +265,7 @@ class MainActivity : ComponentActivity() {
         // Returning from the lock screen or another app must not replay a hide animation.
         // The insets can already report hidden while the system still fades the bar out.
         if (!want) {
-            StatusBarFader.setVisible(window, visible = false, instant = true, fullscreenPolicy = !currentAppListVisible)
+            StatusBarFader.setVisible(window, visible = false, instant = true)
             return
         }
         val actual = ViewCompat.getRootWindowInsets(window.decorView)
@@ -282,7 +281,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun reassertHiddenSurface() {
-        StatusBarFader.setVisible(window, visible = false, instant = true, fullscreenPolicy = !currentAppListVisible)
+        StatusBarFader.setVisible(window, visible = false, instant = true)
     }
 
     private fun attachStatusBarWatcher() {
@@ -297,7 +296,7 @@ class MainActivity : ComponentActivity() {
         attachStatusBarWatcher()
         // Request the hidden state before this window becomes visible again.
         if (desiredStatusBarVisible == false)
-            StatusBarFader.setVisible(window, visible = false, instant = true, fullscreenPolicy = !currentAppListVisible)
+            StatusBarFader.setVisible(window, visible = false, instant = true)
     }
 
     override fun onNewIntent(intent: Intent) {

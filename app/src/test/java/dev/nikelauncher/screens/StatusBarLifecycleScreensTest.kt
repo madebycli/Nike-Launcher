@@ -67,7 +67,7 @@ class StatusBarLifecycleScreensTest {
         rule.waitForIdle()
         Assert.assertEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
-    @Test fun hiddenAppListDoesNotDisableKeyboardResize() {
+    @Test fun hiddenAppListKeepsFullscreenPolicyUntilPreferenceChanges() {
         val app = rule.activity.application as NikeApp
         runBlocking {
             app.prefs.home.setWelcomeSeen(true)
@@ -83,18 +83,19 @@ class StatusBarLifecycleScreensTest {
         rule.waitUntil(5000) { rule.onAllNodesWithContentDescription(app.getString(R.string.applist_search)).fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithContentDescription(app.getString(R.string.applist_search)).performClick()
         rule.waitUntil(5000) { ReflectionHelpers.getField<Boolean>(rule.activity, "currentAppListVisible") }
-        rule.waitUntil(5000) { rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN == 0 }
+        rule.waitUntil(5000) { rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN != 0 }
         Assert.assertEquals(false, ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible"))
         val watcher = ReflectionHelpers.getField<StatusBarControlWatcher>(rule.activity, "statusBarWatcher")
         rule.runOnIdle {
             StatusBarFader.setVisible(rule.activity.window, visible = true, instant = true)
             watcher.onControllableTypesChanged(WindowInsets.Type.statusBars())
         }
-        Assert.assertEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        Assert.assertNotEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
         Assert.assertEquals(false, ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible"))
         rule.shoot("app-list-statusbar-hidden")
         runBlocking { app.prefs.appearance.setHideStatusBarAppList(false) }
         rule.waitUntil(5000) { ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible") == true }
+        Assert.assertEquals(0, rule.activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_FULLSCREEN)
         rule.runOnIdle { watcher.onControllableTypesChanged(WindowInsets.Type.statusBars()) }
         Assert.assertEquals(true, ReflectionHelpers.getField<Boolean?>(rule.activity, "desiredStatusBarVisible"))
         runBlocking { app.prefs.appearance.setHideStatusBarAppList(true) }

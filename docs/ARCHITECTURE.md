@@ -271,8 +271,10 @@ slot owns this transition; the search field itself does not add a second entranc
 The status bar starts hidden while the stored visibility setting is read, then follows that setting.
 A zero-second hide applies the window's fullscreen policy immediately rather than waiting for
 an animation controller; screen-off and resume reassert the hidden home state before focus.
-The app list clears the fullscreen window flag and retains IME resize/inset behavior while
-still applying its own status-bar preference. Navigation and status bar preferences remain independent.
+The hidden app-list state retains fullscreen window policy instead of clearing it during the
+transition from home. The edge-to-edge search layout uses IME insets for keyboard positioning;
+fullscreen window policy prevents legacy adjustResize and needs an on-device keyboard check.
+Navigation and status bar preferences remain independent.
 
 When the system returns status-bar control after keyguard, and on the user-present broadcast,
 the launcher reasserts a hidden home bar. It does not override visible home, active app-list,

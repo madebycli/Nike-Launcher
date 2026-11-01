@@ -39,12 +39,11 @@ object StatusBarFader {
         window: Window,
         visible: Boolean,
         instant: Boolean = false,
-        fullscreenPolicy: Boolean = true,
         durationMs: Long = if (instant) 0 else if (visible) 220 else 650,
     ) {
         requestedVisible = visible
         if (instant) {
-            setInstantly(window, visible, fullscreenPolicy)
+            setInstantly(window, visible)
             return
         }
         @Suppress("DEPRECATION")
@@ -73,9 +72,9 @@ object StatusBarFader {
 
     /** Update window policy before asking the system to change the bar. */
     @Suppress("DEPRECATION")
-    private fun setInstantly(window: Window, visible: Boolean, fullscreenPolicy: Boolean) {
+    private fun setInstantly(window: Window, visible: Boolean) {
         stopInFlight()
-        if (visible || !fullscreenPolicy) window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (visible) window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         else window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         val insets = WindowInsetsControllerCompat(window, window.decorView)
         if (visible) insets.show(WindowInsetsCompat.Type.statusBars())
