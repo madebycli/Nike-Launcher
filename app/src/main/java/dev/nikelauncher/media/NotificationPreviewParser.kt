@@ -11,10 +11,13 @@ import androidx.core.app.NotificationCompat
 
 /** Read the provider's actual actions, including companion-device/automotive reply actions. */
 internal object NotificationPreviewParser {
+    internal fun eligible(sbn: StatusBarNotification): Boolean =
+        sbn.user == Process.myUserHandle() && sbn.isClearable &&
+            sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY == 0 &&
+            sbn.notification.visibility != Notification.VISIBILITY_SECRET
+
     fun parse(context: Context, sbn: StatusBarNotification): NotificationPreview? {
-        if (sbn.user != Process.myUserHandle() || !sbn.isClearable ||
-            sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY != 0 ||
-            sbn.notification.visibility == Notification.VISIBILITY_SECRET) return null
+        if (!eligible(sbn)) return null
         return runCatching {
             val n = sbn.notification
             fun text(key: String, max: Int = 4096) =

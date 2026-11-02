@@ -342,7 +342,7 @@ fun HomeRoute(
             FolderPickerHost(app, target, folders, appsByKey, data.nameOverrides) { folderPickerFor = null }
         }
 
-        if (!homeEditMode && !bands.editing && controller.query.isEmpty()) ObserveScrubBand(bands) { band ->
+        if (!onSidePage && !homeEditMode && !bands.editing && controller.query.isEmpty()) ObserveScrubBand(bands) { band ->
             EdgeZones(
                 settings = settings,
                 scrub = scrub,

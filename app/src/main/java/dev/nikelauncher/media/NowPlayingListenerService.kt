@@ -165,6 +165,7 @@ class NowPlayingListenerService : NotificationListenerService() {
         if (sbn != null) {
             if (previewsEnabled) NotificationPreviewBus.posted(this, sbn) else NotificationPreviewBus.clear()
         }
+        if (previewsEnabled) refreshPreviews()
         refresh()
     }
 

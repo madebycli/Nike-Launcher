@@ -303,3 +303,13 @@ The new boolean keys are included in the generic preference backup without a mig
 The composer uses equal Material icon-button sizes alongside the Material text field. Grouped
 message surfaces derive their meeting corners from the theme's large and extra-small shapes;
 individual message swipe and reply behavior is unchanged.
+# Notification callback reconciliation
+
+Each posted event is shown immediately when it contains readable content and also triggers a
+background active-notification refresh. Eligible callbacks without content do not permanently
+suppress their key; a full snapshot can provide it. A matching snapshot may fill an empty live
+body, while explicit removals, secret notifications, lock and opt-out still suppress content.
+# Widget-page edge gestures
+
+App-list edge touch zones are present only on the home page, including while swiping between
+pages. Both widget pages retain their own controls and system gestures at either edge.

@@ -138,11 +138,20 @@ object NotificationPreviewBus {
 
     private fun enrichPictures(live: NotificationPreview, snapshot: NotificationPreview) =
         live.copy(
+            text = live.text.ifBlank { snapshot.text.takeIf {
+                live.packageName == snapshot.packageName && live.title == snapshot.title &&
+                    live.contentIntent == snapshot.contentIntent && live.time == snapshot.time
+            }.orEmpty() },
             conversationIcon = live.conversationIcon ?: snapshot.conversationIcon.takeIf {
                 live.packageName == snapshot.packageName && live.title == snapshot.title &&
                     live.contentIntent == snapshot.contentIntent
             },
-            messages = live.messages.map { message ->
+            messages = (live.messages.ifEmpty {
+                snapshot.messages.takeIf {
+                    live.packageName == snapshot.packageName && live.title == snapshot.title &&
+                        live.contentIntent == snapshot.contentIntent && live.time == snapshot.time
+                }.orEmpty()
+            }).map { message ->
                 val matching = snapshot.messages.lastOrNull { it.sender == message.sender &&
                         it.fromSelf == message.fromSelf && it.text == message.text &&
                         it.time == message.time }
@@ -159,7 +168,11 @@ object NotificationPreviewBus {
         }
         val current = mutable.value.filterNot { it.key == notification.key }
         val preview = NotificationPreviewParser.parse(context, notification)
-        if (preview == null) suppress(notification.key)
+        if (preview == null && !NotificationPreviewParser.eligible(notification)) suppress(notification.key)
+        else if (preview == null) {
+            callbackKeys.remove(notification.key)
+            removedKeys.remove(notification.key)
+        }
         else {
             removedKeys.remove(notification.key)
             callbackKeys.add(notification.key)

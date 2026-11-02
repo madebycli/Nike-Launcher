@@ -54,6 +54,7 @@ internal fun AppListSession.ObservePlacement() {
             withFrameNanos {}
         }
 
+        if (scrubRowIndex < 0 || scrubRowIndex >= displayModel.rows.size) return@LaunchedEffect
         listState.scrollToItem(scrubRowIndex)
         highlightRange = scrubRowIndex until end
         gapCeilingPx = Float.MAX_VALUE
