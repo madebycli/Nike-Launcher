@@ -462,6 +462,8 @@
     <string name="settings_list_headers_detail">Aus ergibt eine durchgehende Liste. Die A–Z-Leiste springt trotzdem zum Buchstaben</string>
     <string name="settings_notification_badges">Anzahl der Benachrichtigungen an Symbolen</string>
     <string name="settings_notification_previews">Benachrichtigungstext</string>
+    <string name="settings_notification_previews_home">Text in Favoriten anzeigen</string>
+    <string name="settings_notification_previews_list">Text in der App-Liste anzeigen</string>
     <string name="settings_notification_previews_detail">Zeigt die neuesten Benachrichtigungen einer App unter ihrem Namen; ein Tippen öffnet sie. Jeder, der auf dein Handy schaut, kann sie lesen. Braucht Zugriff auf Benachrichtigungen</string>
     <string name="settings_notification_text_size">Textgröße der Benachrichtigungen</string>
     <string name="settings_notification_badges_detail">Braucht denselben Benachrichtigungszugriff wie die Wiedergabe. Zählt nur, liest nie, was eine Benachrichtigung sagt. Ein Punkt neben dem Namen, wenn Symbole ausgeblendet sind</string>

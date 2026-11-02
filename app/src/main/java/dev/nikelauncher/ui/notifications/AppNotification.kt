@@ -15,8 +15,9 @@ internal fun notificationEligible(app: AppInfo): Boolean = app.kind == EntryKind
 
 /** Same profile and opt-in gates on home, folder members and the app list. */
 @Composable
-internal fun appNotification(app: AppInfo, active: Boolean = true): NotificationPreview? {
-    if (!active || !LocalIconConfig.current.notificationPreviews || !notificationEligible(app)) return null
+internal fun appNotification(app: AppInfo, active: Boolean = true, appList: Boolean = false): NotificationPreview? {
+    val config = LocalIconConfig.current
+    if (!active || !config.notificationPreviews || !(if (appList) config.notificationPreviewsList else config.notificationPreviewsHome) || !notificationEligible(app)) return null
     val posted by NotificationPreviewBus.notifications.collectAsState()
     return posted.firstOrNull { it.packageName == app.packageName }
 }

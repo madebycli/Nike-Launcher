@@ -24,11 +24,15 @@ internal fun notificationEntries(env: SettingsEnv): List<SettingsEntry> {
     val home = env.prefs.home
     val badges by list.notificationBadges.collectAsState(false)
     val previews by list.notificationPreviews.collectAsState(true)
+    val previewsHome by list.notificationPreviewsHome.collectAsState(true)
+    val previewsList by list.notificationPreviewsList.collectAsState(true)
     val nowPlaying by home.nowPlayingEnabled.collectAsState(false)
 
     return listOf(
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_notification_badges), badges, { env.write { list.setNotificationBadges(it) } }, value = stringResource(R.string.settings_notification_badges_detail), icon = Icons.Filled.Notifications), "count badge icons"),
         SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_notification_previews), previews, { env.write { list.setNotificationPreviews(it) } }, icon = Icons.Filled.Notifications), "text message preview home app list"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_notification_previews_home), previewsHome, { env.write { list.setNotificationPreviewsHome(it) } }, icon = Icons.Filled.Notifications), "text favorites home", visible = previews),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_notification_previews_list), previewsList, { env.write { list.setNotificationPreviewsList(it) } }, icon = Icons.Filled.Notifications), "text app list", visible = previews),
         SettingsEntry(
             SECTION,
             settingsItem(

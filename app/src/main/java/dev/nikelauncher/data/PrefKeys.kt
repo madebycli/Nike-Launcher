@@ -100,6 +100,8 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
         val SHOW_LIST_HEADERS = booleanPreferencesKey("show_list_headers")
         val NOTIFICATION_BADGES = booleanPreferencesKey("notification_badges")
         val NOTIFICATION_PREVIEWS = booleanPreferencesKey("notification_previews")
+        val NOTIFICATION_PREVIEWS_HOME = booleanPreferencesKey("notification_previews_home")
+        val NOTIFICATION_PREVIEWS_LIST = booleanPreferencesKey("notification_previews_list")
         val NOTIFICATION_TEXT_SP = intPreferencesKey("notification_text_sp")
         val SECTION_TOP_PERCENT = intPreferencesKey("section_top_percent")
         val CLOSE_FOLDER_ON_LAUNCH = booleanPreferencesKey("close_folder_on_launch")

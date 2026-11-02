@@ -292,3 +292,9 @@ restoration uses the active surface's requested visibility; home and app-list pr
 Notification overview sheets size to their contents within the safe viewport. Entries use Material
 surfaces and swipe dismissal; details retain a scrollable history and a fixed composer. Free-form
 replies omit suggested chips, while choice-only replies retain their provider-supplied choices.
+# Notification preview refresh and placement
+
+The unlocked notification snapshot is retried when a live post or removal changes its revision
+while it is being read. The master text preference continues to control collection and privacy;
+separate home and app-list placement preferences default to enabled, preserving existing settings.
+The new boolean keys are included in the generic preference backup without a migration.

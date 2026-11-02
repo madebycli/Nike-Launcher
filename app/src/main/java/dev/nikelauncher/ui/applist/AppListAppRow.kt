@@ -80,7 +80,7 @@ internal fun AppRow(
     val density = LocalDensity.current
     var shortcutMenu by remember { mutableStateOf(false) }
 
-    val preview = appNotification(app)
+    val preview = appNotification(app, appList = true)
     var notificationsOpen by remember(app.key) { mutableStateOf(false) }
     Box {
         if (preview != null) {

@@ -160,6 +160,8 @@ class MainActivity : ComponentActivity() {
             val themedIcons by app.prefs.appearance.themedIcons.collectAsState(initial = false)
             val notificationBadges by app.prefs.appList.notificationBadges.collectAsState(initial = false)
             val notificationPreviews by app.prefs.appList.notificationPreviews.collectAsState(initial = false)
+            val notificationPreviewsHome by app.prefs.appList.notificationPreviewsHome.collectAsState(initial = true)
+            val notificationPreviewsList by app.prefs.appList.notificationPreviewsList.collectAsState(initial = true)
             val notificationTextSp by app.prefs.appList.notificationTextSp.collectAsState(initial = 12)
             val iconShape by app.prefs.appearance.iconShape.collectAsState(initial = IconShape.SYSTEM)
             val iconConfig = remember(
@@ -169,6 +171,8 @@ class MainActivity : ComponentActivity() {
                 themedIcons,
                 notificationBadges,
                 notificationPreviews,
+                notificationPreviewsHome,
+                notificationPreviewsList,
                 notificationTextSp,
                 iconShape,
             ) {
@@ -179,6 +183,8 @@ class MainActivity : ComponentActivity() {
                     themed = themedIcons,
                     notificationBadges = notificationBadges,
                     notificationPreviews = notificationPreviews,
+                    notificationPreviewsHome = notificationPreviewsHome,
+                    notificationPreviewsList = notificationPreviewsList,
                     notificationTextSp = notificationTextSp,
                     shape = iconShape,
                 )

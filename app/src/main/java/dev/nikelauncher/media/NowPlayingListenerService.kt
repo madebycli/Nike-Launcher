@@ -2,6 +2,7 @@
 package dev.nikelauncher.media
 
 import android.app.Notification
+import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Intent
@@ -23,6 +24,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 
 class NowPlayingListenerService : NotificationListenerService() {
@@ -61,11 +63,15 @@ class NowPlayingListenerService : NotificationListenerService() {
 
     private val previewScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var previewsEnabled = false
+    private var previewRefresh: Job? = null
 
     /** Notification content stays in memory only while the phone is unlocked and the setting is on. */
     private val lockReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == Intent.ACTION_SCREEN_OFF) NotificationPreviewBus.clear() else refreshPreviews()
+            if (intent.action == Intent.ACTION_SCREEN_OFF) {
+                previewRefresh?.cancel()
+                NotificationPreviewBus.clear()
+            } else refreshPreviews()
         }
     }
 
@@ -84,7 +90,7 @@ class NowPlayingListenerService : NotificationListenerService() {
         previewScope.launch {
             (application as NikeApp).prefs.appList.notificationPreviews.collectLatest { enabled ->
                 previewsEnabled = enabled
-                if (enabled) refreshPreviews() else NotificationPreviewBus.clear()
+                if (enabled) refreshPreviews() else { previewRefresh?.cancel(); NotificationPreviewBus.clear() }
             }
         }
     }
@@ -99,11 +105,18 @@ class NowPlayingListenerService : NotificationListenerService() {
     /** Reads everything on the shade again, off the main thread: parsing every app's notification is not cheap. */
     private fun refreshPreviews() {
         if (!previewsEnabled) return
-        val revision = NotificationPreviewBus.revision
-        previewScope.launch {
-            val active = withContext(Dispatchers.IO) { runCatching { activeNotifications }.getOrNull() } ?: return@launch
-            val previews = withContext(Dispatchers.Default) { NotificationPreviewBus.parseSnapshot(this@NowPlayingListenerService, active) }
-            NotificationPreviewBus.updateSnapshotIfUnchanged(this@NowPlayingListenerService, revision, previews)
+        previewRefresh?.cancel()
+        previewRefresh = previewScope.launch {
+            refreshNotificationSnapshot(
+                canRefresh = { previewsEnabled && NotificationPreviewBus.listenerConnected.value &&
+                    getSystemService(KeyguardManager::class.java)?.isDeviceLocked == false },
+                revision = { NotificationPreviewBus.revision },
+                read = {
+                    val active = withContext(Dispatchers.IO) { runCatching { activeNotifications }.getOrNull() }
+                    active?.let { withContext(Dispatchers.Default) { NotificationPreviewBus.parseSnapshot(this@NowPlayingListenerService, it) } }
+                },
+                publish = { revision, previews -> NotificationPreviewBus.updateSnapshotIfUnchanged(this@NowPlayingListenerService, revision, previews) },
+            )
         }
     }
 
@@ -138,6 +151,7 @@ class NowPlayingListenerService : NotificationListenerService() {
 
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
+        previewRefresh?.cancel()
         NotificationCountBus.canceller = null
         NotificationPreviewBus.disconnect()
         runCatching { sessionManager.removeOnActiveSessionsChangedListener(sessionsListener) }

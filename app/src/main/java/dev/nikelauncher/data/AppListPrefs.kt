@@ -48,6 +48,12 @@ class AppListPrefs internal constructor(private val store: DataStore<Preferences
     val notificationPreviews: Flow<Boolean> =
         data.map { it[PrefKeys.NOTIFICATION_PREVIEWS] ?: true }.distinctUntilChanged()
 
+    val notificationPreviewsHome: Flow<Boolean> =
+        data.map { it[PrefKeys.NOTIFICATION_PREVIEWS_HOME] ?: true }.distinctUntilChanged()
+
+    val notificationPreviewsList: Flow<Boolean> =
+        data.map { it[PrefKeys.NOTIFICATION_PREVIEWS_LIST] ?: true }.distinctUntilChanged()
+
     val notificationTextSp: Flow<Int> =
         data.map { it[PrefKeys.NOTIFICATION_TEXT_SP] ?: 12 }.distinctUntilChanged()
 
@@ -193,6 +199,14 @@ class AppListPrefs internal constructor(private val store: DataStore<Preferences
 
     suspend fun setNotificationPreviews(v: Boolean) {
         store.edit { it[PrefKeys.NOTIFICATION_PREVIEWS] = v }
+    }
+
+    suspend fun setNotificationPreviewsHome(v: Boolean) {
+        store.edit { it[PrefKeys.NOTIFICATION_PREVIEWS_HOME] = v }
+    }
+
+    suspend fun setNotificationPreviewsList(v: Boolean) {
+        store.edit { it[PrefKeys.NOTIFICATION_PREVIEWS_LIST] = v }
     }
 
     suspend fun setNotificationTextSp(v: Int) {

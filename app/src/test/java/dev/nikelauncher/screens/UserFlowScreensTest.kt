@@ -88,6 +88,12 @@ class UserFlowScreensTest {
             NotificationPreviewBus.updateSnapshotIfUnchanged(app, NotificationPreviewBus.revision, fakeNotifications(app))
         }
         rule.waitUntil(5000) { rule.onAllNodesWithText("Weekend plans").fetchSemanticsNodes().isNotEmpty() }
+        runBlocking { prefs.appList.setNotificationPreviewsHome(false) }
+        rule.waitUntil(5000) { !runBlocking { prefs.appList.notificationPreviewsHome.first() } }
+        rule.waitForIdle()
+        rule.shoot("flow-home-notification-off")
+        runBlocking { prefs.appList.setNotificationPreviewsHome(true) }
+        rule.waitUntil(5000) { rule.onAllNodesWithText("Weekend plans").fetchSemanticsNodes().isNotEmpty() }
         rule.shoot("flow-home-notification")
         rule.onAllNodesWithText("Weekend plans").onFirst().performTouchInput { longClick() }
         rule.onNodeWithText(text(R.string.action_edit_layout)).assertIsDisplayed()
@@ -106,6 +112,12 @@ class UserFlowScreensTest {
         // Search through the restored corner also reveals a field, rather than only bumping a focus counter.
         rule.onNodeWithContentDescription(text(R.string.applist_search)).performClick()
         rule.waitUntil(5000) { rule.onAllNodes(hasSetTextAction()).fetchSemanticsNodes().isNotEmpty() }
+        runBlocking { prefs.appList.setNotificationPreviewsList(false) }
+        rule.waitForIdle()
+        rule.onAllNodes(hasScrollToIndexAction()).onLast().performScrollToNode(hasText("Messages"))
+        rule.onAllNodesWithText("Messages").onLast().assertIsDisplayed()
+        runBlocking { prefs.appList.setNotificationPreviewsList(true) }
+        rule.waitUntil(5000) { rule.onAllNodesWithText("Weekend plans").fetchSemanticsNodes().isNotEmpty() }
         rule.shoot("flow-search-button-bottom")
         rule.onAllNodesWithText("Camera").onLast().performScrollTo().performTouchInput { longClick() }
         rule.shoot("flow-list-app-menu")

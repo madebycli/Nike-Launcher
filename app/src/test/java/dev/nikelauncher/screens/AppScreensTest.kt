@@ -16,6 +16,9 @@ import dev.nikelauncher.MainActivity
 import dev.nikelauncher.NikeApp
 import dev.nikelauncher.data.CornerColorMode
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.performSemanticsAction
@@ -66,6 +69,18 @@ class AppScreensTest {
             rule.waitUntil(10_000) { rule.onAllNodesWithText(name).fetchSemanticsNodes().isNotEmpty() }
             rule.onAllNodesWithText(name).onFirst().performClick()
             rule.waitForIdle()
+            if (name == "Notifications") {
+                val prefs = (rule.activity.application as NikeApp).prefs.appList
+                rule.onNodeWithText("Show text in favorites").performClick()
+                rule.waitUntil(5000) { !runBlocking { prefs.notificationPreviewsHome.first() } }
+                assertTrue(runBlocking { prefs.notificationPreviewsList.first() })
+                rule.onNodeWithText("Show text in app list").performClick()
+                rule.waitUntil(5000) { !runBlocking { prefs.notificationPreviewsList.first() } }
+                assertFalse(runBlocking { prefs.notificationPreviewsHome.first() })
+                rule.onNodeWithText("Show text in favorites").performClick()
+                rule.onNodeWithText("Show text in app list").performClick()
+                rule.waitUntil(5000) { runBlocking { prefs.notificationPreviewsHome.first() && prefs.notificationPreviewsList.first() } }
+            }
             val tag = "settings-${index + 1}-" + name.lowercase().replace(Regex("[^a-z]+"), "-")
             rule.shoot(tag)
             var page = 2
