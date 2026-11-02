@@ -25,6 +25,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 class NowPlayingListenerService : NotificationListenerService() {
@@ -63,15 +64,22 @@ class NowPlayingListenerService : NotificationListenerService() {
 
     private val previewScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var previewsEnabled = false
+    private var screenIsOff = false
     private var previewRefresh: Job? = null
+    private var unlockRefresh: Job? = null
 
     /** Notification content stays in memory only while the phone is unlocked and the setting is on. */
     private val lockReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Intent.ACTION_SCREEN_OFF) {
+                screenIsOff = true
                 previewRefresh?.cancel()
+                unlockRefresh?.cancel()
                 NotificationPreviewBus.clear()
-            } else refreshPreviews()
+            } else {
+                screenIsOff = false
+                scheduleUnlockedRefresh()
+            }
         }
     }
 
@@ -82,6 +90,7 @@ class NowPlayingListenerService : NotificationListenerService() {
             lockReceiver,
             IntentFilter().apply {
                 addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_SCREEN_ON)
                 addAction(Intent.ACTION_USER_PRESENT)
                 addAction(Intent.ACTION_USER_UNLOCKED)
             },
@@ -90,7 +99,7 @@ class NowPlayingListenerService : NotificationListenerService() {
         previewScope.launch {
             (application as NikeApp).prefs.appList.notificationPreviews.collectLatest { enabled ->
                 previewsEnabled = enabled
-                if (enabled) refreshPreviews() else { previewRefresh?.cancel(); NotificationPreviewBus.clear() }
+                if (enabled) scheduleUnlockedRefresh() else { unlockRefresh?.cancel(); previewRefresh?.cancel(); NotificationPreviewBus.clear() }
             }
         }
     }
@@ -108,7 +117,7 @@ class NowPlayingListenerService : NotificationListenerService() {
         previewRefresh?.cancel()
         previewRefresh = previewScope.launch {
             refreshNotificationSnapshot(
-                canRefresh = { previewsEnabled && NotificationPreviewBus.listenerConnected.value &&
+                canRefresh = { previewsEnabled && !screenIsOff && NotificationPreviewBus.listenerConnected.value &&
                     getSystemService(KeyguardManager::class.java)?.isDeviceLocked == false },
                 revision = { NotificationPreviewBus.revision },
                 read = {
@@ -117,6 +126,23 @@ class NowPlayingListenerService : NotificationListenerService() {
                 },
                 publish = { revision, previews -> NotificationPreviewBus.updateSnapshotIfUnchanged(this@NowPlayingListenerService, revision, previews) },
             )
+        }
+    }
+
+    /** Rebuild cleared previews when Android finishes unlocking and when the launcher regains focus. */
+    private fun scheduleUnlockedRefresh() {
+        if (!previewsEnabled || screenIsOff || !NotificationPreviewBus.listenerConnected.value) return
+        unlockRefresh?.cancel()
+        unlockRefresh = previewScope.launch {
+            repeat(40) {
+                if (!previewsEnabled || screenIsOff || !NotificationPreviewBus.listenerConnected.value) return@launch
+                if (getSystemService(KeyguardManager::class.java)?.isDeviceLocked == false) {
+                    publishCounts()
+                    refreshPreviews()
+                    return@launch
+                }
+                delay(250)
+            }
         }
     }
 
@@ -137,6 +163,7 @@ class NowPlayingListenerService : NotificationListenerService() {
         super.onListenerConnected()
         NotificationCountBus.canceller = { key -> cancelNotification(key) }
         NotificationPreviewBus.connect { key -> cancelNotification(key) }
+        NotificationPreviewBus.refreshRequester = ::scheduleUnlockedRefresh
         publishCounts()
         refreshPreviews()
         sessionManager = getSystemService(MediaSessionManager::class.java)
@@ -152,6 +179,7 @@ class NowPlayingListenerService : NotificationListenerService() {
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
         previewRefresh?.cancel()
+        unlockRefresh?.cancel()
         NotificationCountBus.canceller = null
         NotificationPreviewBus.disconnect()
         runCatching { sessionManager.removeOnActiveSessionsChangedListener(sessionsListener) }
@@ -163,7 +191,7 @@ class NowPlayingListenerService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         // The posted payload is newer than anything a full query would return a moment later.
         if (sbn != null) {
-            if (previewsEnabled) NotificationPreviewBus.posted(this, sbn) else NotificationPreviewBus.clear()
+            if (previewsEnabled && !screenIsOff) NotificationPreviewBus.posted(this, sbn) else NotificationPreviewBus.clear()
         }
         if (previewsEnabled) refreshPreviews()
         refresh()
@@ -223,6 +251,9 @@ class NowPlayingListenerService : NotificationListenerService() {
         }.filterValues { it.isNotEmpty() }
         val before = NotificationCountBus.counts.value.values.sum()
         NotificationCountBus.update(counts, previews)
+        if (previewsEnabled && !screenIsOff && NotificationPreviewBus.listenerConnected.value) {
+            NotificationPreviewBus.publishCountSnapshot(this, active)
+        }
         // A widget is drawn only when something asks. The home screen follows the bus on its
         // own; a RemoteViews cannot, so the total changing is what has to ask for it.
         if (counts.values.sum() != before) ClockWidgetProvider.renderAll(this)

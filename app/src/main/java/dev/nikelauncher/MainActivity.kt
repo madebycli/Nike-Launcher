@@ -266,6 +266,7 @@ class MainActivity : ComponentActivity() {
         // left behind. Asked again only when it is actually wrong: asking for the state it is
         // already in restarts the fade, and a fade out begins by showing the bar in full.
         if (!hasFocus) return
+        dev.nikelauncher.media.NotificationPreviewBus.requestRefresh()
         attachStatusBarWatcher()
         val want = desiredStatusBarVisible ?: return
         // Returning from the lock screen or another app must not replay a hide animation.
@@ -299,6 +300,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        dev.nikelauncher.media.NotificationPreviewBus.requestRefresh()
         attachStatusBarWatcher()
         // Request the hidden state before this window becomes visible again.
         if (desiredStatusBarVisible == false)

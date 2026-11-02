@@ -24,7 +24,7 @@ class NotificationPreviewReconciliationTest {
         NotificationPreviewBus.clear()
         shadowOf(context.getSystemService(KeyguardManager::class.java)).setIsDeviceLocked(false)
     }
-    @After fun cleanup() = NotificationPreviewBus.clear()
+    @After fun cleanup() = NotificationPreviewBus.disconnect()
 
     private fun notification(title: String? = null, body: String? = null, secret: Boolean = false): StatusBarNotification {
         val item = Notification.Builder(context, "test").setSmallIcon(android.R.drawable.ic_dialog_info)
@@ -62,6 +62,44 @@ class NotificationPreviewReconciliationTest {
         assertTrue(NotificationPreviewBus.notifications.value.isEmpty())
         NotificationPreviewBus.posted(context, notification("Alex", "secret", secret = true))
         NotificationPreviewBus.updateSnapshotIfUnchanged(context, NotificationPreviewBus.revision, parsed)
+        assertTrue(NotificationPreviewBus.notifications.value.isEmpty())
+    }
+
+    @Test fun badgeSnapshotImmediatelyPublishesAndUpdatesText() {
+        NotificationPreviewBus.publishCountSnapshot(context, arrayOf(notification("Alex", "Hello")))
+        assertEquals("Hello", NotificationPreviewBus.notifications.value.single().text)
+        val full = NotificationPreviewBus.parseSnapshot(context, arrayOf(notification("Alex", "Hello")))
+        assertTrue(NotificationPreviewBus.updateSnapshotIfUnchanged(context, NotificationPreviewBus.revision, full))
+        assertEquals("Hello", NotificationPreviewBus.notifications.value.single().text)
+        NotificationPreviewBus.publishCountSnapshot(context, arrayOf(notification("Alex", "Updated")))
+        assertEquals("Updated", NotificationPreviewBus.notifications.value.single().text)
+        NotificationPreviewBus.publishCountSnapshot(context, emptyArray())
+        assertTrue(NotificationPreviewBus.notifications.value.isEmpty())
+    }
+
+    @Test fun badgeSnapshotDoesNotExposeSecretOrLockedContent() {
+        NotificationPreviewBus.publishCountSnapshot(context, arrayOf(notification("Alex", "secret", secret = true)))
+        assertTrue(NotificationPreviewBus.notifications.value.isEmpty())
+        shadowOf(context.getSystemService(KeyguardManager::class.java)).setIsDeviceLocked(true)
+        NotificationPreviewBus.publishCountSnapshot(context, arrayOf(notification("Alex", "locked")))
+        assertTrue(NotificationPreviewBus.notifications.value.isEmpty())
+    }
+
+    @Test fun refreshAfterUnlockRestoresTextFromTheBadgeSnapshot() {
+        val active = arrayOf(notification("Alex", "Hello"))
+        NotificationPreviewBus.connect { }
+        NotificationPreviewBus.refreshRequester = { NotificationPreviewBus.publishCountSnapshot(context, active) }
+        NotificationPreviewBus.requestRefresh()
+        assertEquals("Hello", NotificationPreviewBus.notifications.value.single().text)
+        NotificationPreviewBus.clear()
+        shadowOf(context.getSystemService(KeyguardManager::class.java)).setIsDeviceLocked(true)
+        NotificationPreviewBus.requestRefresh()
+        assertTrue(NotificationPreviewBus.notifications.value.isEmpty())
+        shadowOf(context.getSystemService(KeyguardManager::class.java)).setIsDeviceLocked(false)
+        NotificationPreviewBus.requestRefresh()
+        assertEquals("Hello", NotificationPreviewBus.notifications.value.single().text)
+        NotificationPreviewBus.disconnect()
+        NotificationPreviewBus.requestRefresh()
         assertTrue(NotificationPreviewBus.notifications.value.isEmpty())
     }
 }

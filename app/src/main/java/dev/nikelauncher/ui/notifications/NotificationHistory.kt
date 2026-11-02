@@ -41,7 +41,7 @@ internal fun NotificationHistory(preview: NotificationPreview, modifier: Modifie
         }
         if (preview.messages.isNotEmpty()) NotificationMessages(preview.key, preview.messages, onOpen)
         else if (preview.text.isNotBlank()) Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
-            Text(preview.text, Modifier.fillMaxWidth().padding(20.dp), style = MaterialTheme.typography.bodyLarge)
+            Text(preview.text, Modifier.fillMaxWidth().padding(20.dp), style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

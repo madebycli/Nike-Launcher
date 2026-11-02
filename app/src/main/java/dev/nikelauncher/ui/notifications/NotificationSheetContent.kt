@@ -5,7 +5,10 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.runtime.saveable.rememberSaveable
 import dev.nikelauncher.media.NotificationPreview
 import dev.nikelauncher.ui.kit.motion.AppMotion
@@ -24,6 +27,7 @@ internal fun NotificationSheetContent(
     BackHandler(selected != null) { selected = null }
     val effects = AppMotion.effects<Float>()
     val offset = AppMotion.offset()
+    CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(shadow = Shadow.None)) {
     AnimatedContent(
         targetState = selected,
         modifier = Modifier.fillMaxWidth(),
@@ -46,5 +50,6 @@ internal fun NotificationSheetContent(
         } else {
             NotificationDetail(preview, controller, onBack = { selected = null }, onClose = onClose)
         }
+    }
     }
 }

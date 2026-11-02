@@ -313,3 +313,17 @@ body, while explicit removals, secret notifications, lock and opt-out still supp
 
 App-list edge touch zones are present only on the home page, including while swiping between
 pages. Both widget pages retain their own controls and system gestures at either edge.
+# Notification text style
+
+Notification sheet content resets the launcher wallpaper text shadow so sheet text stays crisp
+when opened from either home or the app list. Message text uses the Material body-medium type scale.
+# Badge and notification text synchronization
+
+The active Android snapshot that updates badge counts also seeds unlocked, enabled text previews
+immediately. Rich notification parsing subsequently supplies conversation and reply details;
+secret notifications, other user profiles, lock and opt-out remain excluded from text previews.
+# Notification previews after unlock
+
+Screen-off clears message content. Screen-on, user-present and launcher focus request a new
+active-notification snapshot, waiting briefly for the device to become unlocked. The listener
+stops retries on screen-off, disconnect or opt-out and never restores text while locked.

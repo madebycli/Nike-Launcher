@@ -49,7 +49,7 @@ internal fun MessageBubble(message: PreviewMessage, maxWidth: Dp, first: Boolean
                         Image(it, stringResource(R.string.notification_photo), Modifier.fillMaxWidth()
                             .heightIn(max = 320.dp).aspectRatio(it.width.toFloat() / it.height), contentScale = ContentScale.Fit)
                     }
-                    if (message.text.isNotBlank()) Text(message.text, style = MaterialTheme.typography.bodyLarge)
+                    if (message.text.isNotBlank()) Text(message.text, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }

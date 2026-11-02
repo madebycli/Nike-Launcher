@@ -82,8 +82,8 @@ internal fun NotificationOverview(
                         if (line.isNotBlank()) {
                             Text(
                                 line,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
                             )

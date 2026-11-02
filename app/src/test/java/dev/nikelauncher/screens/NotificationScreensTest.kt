@@ -11,6 +11,12 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.text.TextLayoutResult
 import dev.nikelauncher.R
 import dev.nikelauncher.ui.notifications.NotificationSheetContent
 import dev.nikelauncher.ui.theme.NikeTheme
@@ -30,6 +36,26 @@ class NotificationScreensTest {
         pixel9Display(rule.activity)
     }
     @Test fun light() = walkThrough("notifications", 1f)
+    @Test fun messageTextDoesNotInheritWallpaperShadow() {
+        val controller = FakeNotificationController(fakeNotifications(rule.activity).take(1))
+        rule.setContent { NikeTheme {
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyLarge.copy(
+                shadow = Shadow(Color.Black, Offset(4f, 4f), 12f))) {
+                NotificationSheetContent(controller.items, null, controller, {})
+            }
+        } }
+        fun check(label: String) {
+            val layouts = mutableListOf<TextLayoutResult>()
+            rule.onNodeWithText(label).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+            Assert.assertEquals(14.sp, layouts.single().layoutInput.style.fontSize)
+            val shadow = layouts.single().layoutInput.style.shadow
+            Assert.assertTrue(shadow == null || shadow == Shadow.None)
+        }
+        check("The view from the platform.")
+        rule.onNodeWithText("Weekend plans").performClick()
+        rule.waitUntil(5000) { rule.onAllNodesWithText("Great. See you both there!").fetchSemanticsNodes().isNotEmpty() }
+        check("Great. See you both there!")
+    }
     @Test fun singleNotificationUsesCompactOverview() {
         val controller = FakeNotificationController(fakeNotifications(rule.activity).take(1))
         val chat = controller.items[0]

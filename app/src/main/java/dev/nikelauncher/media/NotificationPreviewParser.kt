@@ -16,6 +16,19 @@ internal object NotificationPreviewParser {
             sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY == 0 &&
             sbn.notification.visibility != Notification.VISIBILITY_SECRET
 
+    /** Lightweight text from the same active notification used for the badge count. */
+    internal fun parseText(sbn: StatusBarNotification): NotificationPreview? {
+        if (!eligible(sbn)) return null
+        return runCatching {
+            val item = sbn.notification
+            val title = item.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty().take(256)
+            val text = item.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString().orEmpty().take(4096)
+            if (title.isBlank() && text.isBlank()) return@runCatching null
+            NotificationPreview(sbn.key, sbn.packageName, title, text, sbn.postTime,
+                emptyList(), emptyList(), item.contentIntent, item.smallIcon)
+        }.getOrNull()
+    }
+
     fun parse(context: Context, sbn: StatusBarNotification): NotificationPreview? {
         if (!eligible(sbn)) return null
         return runCatching {

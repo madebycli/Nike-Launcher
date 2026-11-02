@@ -60,6 +60,7 @@ object NotificationPreviewBus {
     private val callbackKeys = HashSet<String>()
     private val removedKeys = LinkedHashSet<String>()
     private var dismiss: ((String) -> Unit)? = null
+    internal var refreshRequester: (() -> Unit)? = null
     private val connection = MutableStateFlow(false)
     val listenerConnected: StateFlow<Boolean> = connection
 
@@ -70,9 +71,12 @@ object NotificationPreviewBus {
 
     fun disconnect() {
         dismiss = null
+        refreshRequester = null
         connection.value = false
         clear()
     }
+
+    fun requestRefresh() { refreshRequester?.invoke() }
 
     fun clear() {
         HiddenConversationMessages.clear()
@@ -111,6 +115,21 @@ object NotificationPreviewBus {
     internal fun parseSnapshot(context: Context, active: Array<StatusBarNotification>) =
         active.asSequence().sortedByDescending { it.postTime }
             .mapNotNull { NotificationPreviewParser.parse(context, it) }.take(100).toList()
+
+    /** Publish inexpensive text from the very same Android snapshot that supplied badge counts. */
+    internal fun publishCountSnapshot(context: Context, active: Array<StatusBarNotification>) {
+        if (!unlocked(context)) return
+        val current = mutable.value.associateBy { it.key }
+        val quick = active.asSequence().sortedByDescending { it.postTime }
+            .mapNotNull { sbn -> NotificationPreviewParser.parseText(sbn)
+                ?: current[sbn.key]?.takeIf { NotificationPreviewParser.eligible(sbn) } }.take(100).map { incoming ->
+                current[incoming.key]?.takeIf {
+                    it.title == incoming.title && it.text == incoming.text &&
+                        it.time == incoming.time && it.contentIntent == incoming.contentIntent
+                } ?: incoming
+            }.toList()
+        updateSnapshotIfUnchanged(context, revision, quick)
+    }
 
     internal fun updateSnapshotIfUnchanged(
         context: Context, expectedRevision: Long, previews: List<NotificationPreview>,
