@@ -5,7 +5,7 @@ import android.app.RemoteInput
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.input.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -71,8 +71,8 @@ internal fun NotificationReply(preview: NotificationPreview, controller: Notific
                         disabledIndicatorColor = androidx.compose.ui.graphics.Color.Transparent),
                     placeholder = { Text(input?.label?.toString()?.takeIf { it.isNotBlank() } ?: stringResource(R.string.notification_reply)) },
                     lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 4))
-                FilledIconButton(onClick = { send(field.text.toString()) }, enabled = canSend) {
-                    Icon(Icons.AutoMirrored.Rounded.Send, stringResource(R.string.notification_send))
+                FilledIconButton(onClick = { send(field.text.toString()) }, enabled = canSend, modifier = Modifier.size(56.dp)) {
+                    Icon(Icons.AutoMirrored.Outlined.Send, stringResource(R.string.notification_send))
                 }
             }
         }

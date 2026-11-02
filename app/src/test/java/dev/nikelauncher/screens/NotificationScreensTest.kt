@@ -32,6 +32,13 @@ class NotificationScreensTest {
     @Test fun light() = walkThrough("notifications", 1f)
     @Test fun singleNotificationUsesCompactOverview() {
         val controller = FakeNotificationController(fakeNotifications(rule.activity).take(1))
+        val chat = controller.items[0]
+        val outgoing = chat.messages.indexOfFirst { it.fromSelf }
+        if (outgoing >= 0) {
+            val messages = chat.messages.toMutableList()
+            messages.add(outgoing + 1, messages[outgoing].copy(text = "I will see you there."))
+            controller.items[0] = chat.copy(messages = messages)
+        }
         rule.setContent { NikeTheme {
             dev.nikelauncher.ui.kit.sheet.ViewportSheet({}, rememberModalBottomSheetState(skipPartiallyExpanded = true), "notification-panel", fillHeight = false) {
                 NotificationSheetContent(controller.items, null, controller, {})
@@ -43,6 +50,11 @@ class NotificationScreensTest {
         rule.shoot("notification-single-compact")
         rule.onNodeWithText("Weekend plans").performClick()
         rule.onNodeWithContentDescription(rule.activity.getString(R.string.notification_send)).assertExists()
+        val fieldHeight = rule.onNode(hasSetTextAction()).fetchSemanticsNode().boundsInRoot.height
+        val sendHeight = rule.onNodeWithContentDescription(rule.activity.getString(R.string.notification_send)).fetchSemanticsNode().boundsInRoot.height
+        val menuHeight = rule.onNodeWithContentDescription(rule.activity.getString(R.string.settings_more)).fetchSemanticsNode().boundsInRoot.height
+        Assert.assertEquals(fieldHeight, sendHeight, 1f)
+        Assert.assertEquals(fieldHeight, menuHeight, 1f)
         rule.shoot("notification-single-chat")
     }
     @Test @Config(qualifiers = "de-w411dp-h923dp-night-420dpi")

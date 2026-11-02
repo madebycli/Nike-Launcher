@@ -3,10 +3,13 @@ package dev.nikelauncher.ui.notifications
 
 import android.app.Notification
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import dev.nikelauncher.R
@@ -19,7 +22,9 @@ internal fun NotificationActions(preview: NotificationPreview, controller: Notif
     onOpen: () -> Unit, report: (Boolean) -> Unit) {
     var expanded by remember(preview.key) { mutableStateOf(false) }
     Box {
-        IconButton(onClick = { expanded = true }) { Icon(Icons.Outlined.MoreVert, stringResource(R.string.settings_more)) }
+        FilledTonalIconButton(onClick = { expanded = true }, modifier = Modifier.size(56.dp)) {
+            Icon(Icons.Outlined.MoreVert, stringResource(R.string.settings_more))
+        }
         Menu(expanded, onDismissRequest = { expanded = false }) {
             item(stringResource(R.string.notification_open), { expanded = false; onOpen() }, leadingIcon = Icons.Outlined.OpenInNew)
             preview.actions.filter { it.inputs.isEmpty() && it.title.isNotBlank() }.forEach { action ->

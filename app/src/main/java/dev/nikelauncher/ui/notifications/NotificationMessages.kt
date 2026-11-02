@@ -49,10 +49,13 @@ internal fun NotificationMessages(key: String, messages: List<PreviewMessage>, o
                             Text(group.sender, style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        group.messages.forEach { message ->
-                            val id = idsByMessage[message] ?: return@forEach
+                        group.messages.forEachIndexed { index, message ->
+                            val id = idsByMessage[message] ?: return@forEachIndexed
                             androidx.compose.runtime.key(id) {
-                                MessageBubble(message, if (message.attachment != null) imageBubbleWidth else bubbleWidth, onOpen) { HiddenConversationMessages.hide(key, id) }
+                                MessageBubble(message, if (message.attachment != null) imageBubbleWidth else bubbleWidth,
+                                    first = index == 0, last = index == group.messages.lastIndex, onOpen = onOpen) {
+                                    HiddenConversationMessages.hide(key, id)
+                                }
                             }
                         }
                         if (group.messages.last().time > 0) {

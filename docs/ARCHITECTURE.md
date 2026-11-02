@@ -298,3 +298,8 @@ The unlocked notification snapshot is retried when a live post or removal change
 while it is being read. The master text preference continues to control collection and privacy;
 separate home and app-list placement preferences default to enabled, preserving existing settings.
 The new boolean keys are included in the generic preference backup without a migration.
+# Conversation styling
+
+The composer uses equal Material icon-button sizes alongside the Material text field. Grouped
+message surfaces derive their meeting corners from the theme's large and extra-small shapes;
+individual message swipe and reply behavior is unchanged.
