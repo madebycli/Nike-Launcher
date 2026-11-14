@@ -734,4 +734,14 @@
     <string name="home_folder_delete_confirm">¿Eliminar «%1$s»?</string>
     <string name="home_folder_delete_confirm_body">Las apps siguen instaladas. Se eliminan su disposición y sus widgets.</string>
     <string name="notification_age_separator">" · %1$s"</string>
+    <string name="notification_app_and_age">%1$s · %2$s</string>
+    <string name="settings_section_appearance_desc">Iconos, fuente, colores</string>
+    <string name="settings_section_home_desc">Reloj, widgets, barra de estado</string>
+    <string name="settings_section_app_list_desc">Búsqueda, fondo, encabezados</string>
+    <string name="settings_section_strip_desc">Letras en el borde</string>
+    <string name="settings_section_gestures_desc">Deslizar y tocar</string>
+    <string name="settings_section_notifications_desc">Vistas previas y acceso</string>
+    <string name="settings_section_apps_desc">Favoritas, apps ocultas, launcher</string>
+    <string name="settings_section_backup_desc">Exportar y restaurar</string>
+    <string name="settings_section_about_desc">Versión e informe de fallos</string>
 </resources>

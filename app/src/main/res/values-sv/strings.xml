@@ -734,4 +734,14 @@
     <string name="home_folder_delete_confirm">Ta bort ”%1$s”?</string>
     <string name="home_folder_delete_confirm_body">Apparna i den förblir installerade. Dess ordning och widgetar tas bort.</string>
     <string name="notification_age_separator">" · %1$s"</string>
+    <string name="notification_app_and_age">%1$s · %2$s</string>
+    <string name="settings_section_appearance_desc">Ikoner, typsnitt, färger</string>
+    <string name="settings_section_home_desc">Klocka, widgetar, statusfält</string>
+    <string name="settings_section_app_list_desc">Sökning, bakgrund, rubriker</string>
+    <string name="settings_section_strip_desc">Bokstäver längs kanten</string>
+    <string name="settings_section_gestures_desc">Svep och tryck</string>
+    <string name="settings_section_notifications_desc">Förhandsvisning och åtkomst</string>
+    <string name="settings_section_apps_desc">Favoriter, dolda appar, startprogram</string>
+    <string name="settings_section_backup_desc">Exportera och återställ</string>
+    <string name="settings_section_about_desc">Version och kraschrapport</string>
 </resources>

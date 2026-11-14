@@ -142,7 +142,9 @@ class NotificationScreensTest {
         rule.onNodeWithText(text(R.string.notification_dismiss)).assertDoesNotExist()
         rule.onNodeWithContentDescription(text(R.string.action_back)).performClick()
         rule.onNodeWithText("Planning meeting for next week").performTouchInput { swipeLeft() }
-        Assert.assertEquals(2, controller.items.size)
+        // The row slides out and folds away first; the notification is cleared once it has.
+        rule.waitUntil(5000) { controller.items.size == 2 }
+        rule.shoot("$prefix-swiped")
         rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).performClick()
         Assert.assertTrue(controller.items.isEmpty())
         rule.onNodeWithText(text(R.string.notification_none)).assertIsDisplayed()

@@ -759,4 +759,14 @@
     <string name="home_folder_delete_confirm">Usunąć „%1$s”?</string>
     <string name="home_folder_delete_confirm_body">Aplikacje w nim pozostaną zainstalowane. Układ i widżety zostaną usunięte.</string>
     <string name="notification_age_separator">" · %1$s"</string>
+    <string name="notification_app_and_age">%1$s · %2$s</string>
+    <string name="settings_section_appearance_desc">Ikony, czcionka, kolory</string>
+    <string name="settings_section_home_desc">Zegar, widżety, pasek stanu</string>
+    <string name="settings_section_app_list_desc">Wyszukiwanie, tło, nagłówki</string>
+    <string name="settings_section_strip_desc">Litery przy krawędzi</string>
+    <string name="settings_section_gestures_desc">Przesunięcia i dotknięcia</string>
+    <string name="settings_section_notifications_desc">Podgląd i dostęp</string>
+    <string name="settings_section_apps_desc">Ulubione, ukryte aplikacje, launcher</string>
+    <string name="settings_section_backup_desc">Eksport i przywracanie</string>
+    <string name="settings_section_about_desc">Wersja i raport awarii</string>
 </resources>

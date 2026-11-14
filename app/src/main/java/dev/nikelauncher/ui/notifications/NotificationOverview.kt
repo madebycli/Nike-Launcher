@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.notifications
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DeleteSweep
@@ -30,6 +29,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.PaddingValues
 import dev.nikelauncher.R
 import dev.nikelauncher.media.NotificationPreview
+import dev.nikelauncher.ui.kit.motion.AppMotion
+import dev.nikelauncher.ui.kit.orion.orionReveal
+import dev.nikelauncher.ui.kit.orion.orionSpringClick
 
 /** Every notification as a row: who, what, when. A tap opens its page, the cross clears it. */
 @Composable
@@ -61,12 +63,14 @@ internal fun NotificationOverview(
             return@Column
         }
         val now = remember(notifications) { System.currentTimeMillis() }
+        val effects = AppMotion.effects<Float>()
+        val placement = AppMotion.offset()
         LazyColumn(Modifier.fillMaxWidth().heightIn(max = 600.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(notifications, key = { it.key }) { preview ->
-                NotificationDismissBox(preview, onDismiss) {
-                Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+            itemsIndexed(notifications, key = { _, it -> it.key }) { index, preview ->
+                NotificationDismissBox(preview, onDismiss, Modifier.animateItem(fadeInSpec = effects, placementSpec = placement, fadeOutSpec = effects).orionReveal(index)) {
+                Surface(Modifier.orionSpringClick(MaterialTheme.shapes.large) { onSelect(preview) }, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                 Row(
-                    Modifier.fillMaxWidth().clickable { onSelect(preview) }.padding(16.dp),
+                    Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -89,7 +93,7 @@ internal fun NotificationOverview(
                             )
                         }
                         Text(
-                            appLabel(context, preview.packageName) + " · " + messageStamp(context, preview.time, now),
+                            stringResource(R.string.notification_app_and_age, appLabel(context, preview.packageName), messageStamp(context, preview.time, now)),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,

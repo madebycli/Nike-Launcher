@@ -27,6 +27,7 @@ internal fun NotificationSheetContent(
     BackHandler(selected != null) { selected = null }
     val effects = AppMotion.effects<Float>()
     val offset = AppMotion.offset()
+    val size = AppMotion.size()
     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(shadow = Shadow.None)) {
     AnimatedContent(
         targetState = selected,
@@ -34,7 +35,8 @@ internal fun NotificationSheetContent(
         transitionSpec = {
             val forward = targetState != null
             (slideInHorizontally(offset) { if (forward) it / 4 else -it / 4 } + fadeIn(effects)) togetherWith
-                (slideOutHorizontally(offset) { if (forward) -it / 4 else it / 4 } + fadeOut(effects))
+                (slideOutHorizontally(offset) { if (forward) -it / 4 else it / 4 } + fadeOut(effects)) using
+                SizeTransform(clip = false) { _, _ -> size }
         },
         label = "notificationPage",
     ) { key ->

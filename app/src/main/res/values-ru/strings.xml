@@ -754,5 +754,15 @@
     <string name="home_folder_delete_confirm">Удалить «%1$s»?</string>
     <string name="home_folder_delete_confirm_body">Приложения в ней останутся установленными. Её расположение и виджеты удаляются.</string>
     <string name="notification_age_separator">" · %1$s"</string>
+    <string name="notification_app_and_age">%1$s · %2$s</string>
+    <string name="settings_section_appearance_desc">Значки, шрифт, цвета</string>
+    <string name="settings_section_home_desc">Часы, виджеты, строка состояния</string>
+    <string name="settings_section_app_list_desc">Поиск, фон, заголовки</string>
+    <string name="settings_section_strip_desc">Буквы у края</string>
+    <string name="settings_section_gestures_desc">Свайпы и касания</string>
+    <string name="settings_section_notifications_desc">Предпросмотр и доступ</string>
+    <string name="settings_section_apps_desc">Избранное, скрытые приложения, лаунчер</string>
+    <string name="settings_section_backup_desc">Экспорт и восстановление</string>
+    <string name="settings_section_about_desc">Версия и отчёт о сбое</string>
 </resources>
 
