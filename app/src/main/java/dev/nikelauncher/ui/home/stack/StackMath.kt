@@ -8,7 +8,13 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /** One block as the stack sees it: how tall it is and where it is held, if anywhere. */
-internal data class StackBlock(val id: HomeBlock, val heightPx: Int, val pin: BlockPin?)
+internal data class StackBlock(
+    val id: HomeBlock,
+    val heightPx: Int,
+    val pin: BlockPin?,
+    /** The height the pin is worked out from: [heightPx] less what only hangs below (see BlockGrowth). */
+    val anchorHeightPx: Int = heightPx,
+)
 
 internal data class StackPlacement(
     val tops: Map<HomeBlock, Int>,
@@ -53,7 +59,7 @@ internal fun placeStack(blocks: List<StackBlock>, viewportPx: Int, bottomInsetPx
     var contentEnd = 0
     for ((index, block) in blocks.withIndex()) {
         val followingTop = if (index == 0) 0 else previousEnd + gapPx
-        val top = block.pin?.let { fittedTop(pinnedTopPx(it, block.heightPx, viewportPx, bottomInsetPx), block.heightPx, viewportPx, bottomInsetPx) }
+        val top = block.pin?.let { fittedTop(pinnedTopPx(it, block.anchorHeightPx, viewportPx, bottomInsetPx), block.anchorHeightPx, viewportPx, bottomInsetPx) }
             ?: followingTop.coerceAtLeast(0)
         tops[block.id] = top
         previousEnd = top + block.heightPx

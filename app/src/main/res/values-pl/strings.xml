@@ -758,4 +758,5 @@
     <string name="media_widget_progress">Postęp</string>
     <string name="home_folder_delete_confirm">Usunąć „%1$s”?</string>
     <string name="home_folder_delete_confirm_body">Aplikacje w nim pozostaną zainstalowane. Układ i widżety zostaną usunięte.</string>
+    <string name="notification_age_separator">" · %1$s"</string>
 </resources>

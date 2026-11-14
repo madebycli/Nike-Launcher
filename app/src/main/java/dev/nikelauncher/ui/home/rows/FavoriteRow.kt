@@ -48,7 +48,7 @@ import dev.nikelauncher.ui.common.toast
 import dev.nikelauncher.ui.home.edit.DragHandle
 import dev.nikelauncher.ui.home.edit.DragHandleReserve
 import dev.nikelauncher.ui.kit.menu.TouchMenu
-import dev.nikelauncher.ui.notifications.NotificationAppContent
+import dev.nikelauncher.ui.notifications.LabelWithNotification
 import dev.nikelauncher.ui.notifications.NotificationSheet
 import dev.nikelauncher.ui.notifications.appNotification
 
@@ -89,34 +89,7 @@ internal fun FavoriteRow(
     val alignment = style.alignment
 
     Box(Modifier.fillMaxWidth()) {
-        if (preview != null) {
-            NotificationAppContent(
-                app,
-                label,
-                preview,
-                style.contentColor,
-                style.labelSizeSp,
-                style.iconSizeDp,
-                style.iconSide,
-                modifier =
-                    Modifier.fillMaxWidth().recordTouchPosition(touchPosition).swipeForShortcuts(
-                        style.shortcutSwipe,
-                        true,
-                        onNotifications = { notificationSheet = true },
-                    ) {
-                        shortcutMenu = true
-                    }.padding(horizontal = (style.sidePaddingDp - 10).coerceAtLeast(0).dp),
-                onOpen = { notificationSheet = true },
-                onLaunch = onLaunch,
-                onLongClick = {
-                    onOpenMenu(
-                        with(density) {
-                            DpOffset(touchPosition.value.x.toDp(), touchPosition.value.y.toDp())
-                        }
-                    )
-                },
-            )
-        } else {
+        run {
             Row(
                 modifier =
                     Modifier
@@ -138,6 +111,7 @@ internal fun FavoriteRow(
                                     .swipeForShortcuts(
                                         style.shortcutSwipe,
                                         app.kind == EntryKind.APP,
+                                        onNotifications = if (hasNotifications) ({ notificationSheet = true }) else null,
                                     ) {
                                         shortcutMenu = true
                                     }
@@ -167,7 +141,9 @@ internal fun FavoriteRow(
                             top = 4.dp,
                             bottom = 4.dp,
                         ),
-                verticalAlignment = Alignment.CenterVertically,
+                // Top, not centre: the notification lines grow the row downwards only, so the icon
+                // stays exactly where it was before one arrived.
+                verticalAlignment = Alignment.Top,
                 horizontalArrangement = alignment.arrangement(),
             ) {
                 AlignedIconLabel(
@@ -177,7 +153,18 @@ internal fun FavoriteRow(
                     iconWidth = style.iconSizeDp.dp,
                     icon = { AppIcon(app = app, sizeDp = style.iconSizeDp) },
                 ) { labelModifier ->
-                    Column(labelModifier, horizontalAlignment = alignment.columnAlignment()) {
+                    LabelWithNotification(
+                        iconSizeDp = style.iconSizeDp,
+                        alignment = alignment,
+                        preview = preview,
+                        color = style.contentColor,
+                        labelSizeSp = style.labelSizeSp,
+                        onOpenNotifications = { notificationSheet = true },
+                        modifier = labelModifier,
+                        onLongClick = {
+                            onOpenMenu(with(density) { DpOffset(touchPosition.value.x.toDp(), touchPosition.value.y.toDp()) })
+                        },
+                    ) {
                         Text(
                             label,
                             // A shortcut its publisher has switched off is still listed, but

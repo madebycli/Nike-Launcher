@@ -83,41 +83,18 @@ internal fun AppRow(
     val preview = appNotification(app, appList = true)
     var notificationsOpen by remember(app.key) { mutableStateOf(false) }
     Box {
-        if (preview != null) {
-            NotificationAppContent(
-                app,
-                label,
-                preview,
-                contentColor,
-                labelSizeSp,
-                iconSizeDp,
-                iconSide,
-                modifier =
-                    Modifier.fillMaxWidth().recordTouchPosition(touchPosition).swipeForShortcuts(
-                        shortcutSwipe,
-                        true,
-                        onNotifications = { notificationsOpen = true },
-                    ) {
-                        shortcutMenu = true
-                    }.padding(horizontal = 20.dp),
-                onOpen = { notificationsOpen = true },
-                onLaunch = onLaunch,
-                onLongClick = {
-                    onLongPress(
-                        with(density) {
-                            DpOffset(touchPosition.value.x.toDp(), touchPosition.value.y.toDp())
-                        }
-                    )
-                },
-            )
-        } else
+        run {
             Row(
                 modifier =
                     Modifier.fillMaxWidth()
                         // Ahead of the inset, so the long-press menu is still placed against the
                         // whole row rather than 20dp to the left of the finger.
                         .recordTouchPosition(touchPosition)
-                        .swipeForShortcuts(shortcutSwipe, app.kind == EntryKind.APP) {
+                        .swipeForShortcuts(
+                            shortcutSwipe,
+                            app.kind == EntryKind.APP,
+                            onNotifications = if (preview == null) null else ({ notificationsOpen = true }),
+                        ) {
                             shortcutMenu = true
                         }
                         .padding(horizontal = 20.dp)
@@ -146,7 +123,9 @@ internal fun AppRow(
                         // left to tap was thinner than a fingertip.
                         .heightIn(min = MIN_ROW_HEIGHT)
                         .padding(horizontal = 8.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                // Top, not centre: the notification lines grow the row downwards only, so the
+                // icon stays where it was before one arrived.
+                verticalAlignment = if (preview != null) Alignment.Top else Alignment.CenterVertically,
                 horizontalArrangement =
                     when (alignment) {
                         HomeAlignment.LEFT -> Arrangement.Start
@@ -160,6 +139,18 @@ internal fun AppRow(
                 val labelModifier =
                     Modifier.weight(1f, fill = false).textContrastCloud(contentColor)
                 val text: @Composable () -> Unit = {
+                    LabelWithNotification(
+                        iconSizeDp = iconSizeDp,
+                        alignment = alignment,
+                        preview = preview,
+                        color = contentColor,
+                        labelSizeSp = labelSizeSp,
+                        onOpenNotifications = { notificationsOpen = true },
+                        modifier = labelModifier,
+                        onLongClick = {
+                            onLongPress(with(density) { DpOffset(touchPosition.value.x.toDp(), touchPosition.value.y.toDp()) })
+                        },
+                    ) {
                     Text(
                         label,
                         // Dimmed, because a hidden app only ever turns up here through a search
@@ -170,7 +161,6 @@ internal fun AppRow(
                             if (isHidden || app.disabled || app.unavailable) contentColor.copy(alpha = 0.5f)
                             else contentColor,
                         fontSize = labelSizeSp.sp,
-                        modifier = labelModifier,
                         textAlign =
                             when (alignment) {
                                 HomeAlignment.LEFT -> TextAlign.Start
@@ -178,6 +168,7 @@ internal fun AppRow(
                                 HomeAlignment.RIGHT -> TextAlign.End
                             },
                     )
+                    }
                 }
                 // Centerd rows balance the icon with a spacer on the label's far side, so the
                 // text lands on the screen's center line rather than the pair straddling it.
@@ -199,6 +190,7 @@ internal fun AppRow(
                     balance()
                 }
             }
+        }
 
         if (notificationsOpen) NotificationSheet(app, onDismiss = { notificationsOpen = false })
         AppShortcutMenu(app, shortcutMenu) { shortcutMenu = false }

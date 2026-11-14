@@ -38,6 +38,7 @@ import dev.nikelauncher.data.Folder
 import dev.nikelauncher.data.HomeAlignment
 import dev.nikelauncher.media.NowPlayingWidget
 import dev.nikelauncher.media.openNowPlayingApp
+import dev.nikelauncher.ui.notifications.LabelWithNotification
 import dev.nikelauncher.ui.notifications.appNotification
 import dev.nikelauncher.ui.notifications.NotificationSheet
 import dev.nikelauncher.ui.common.AppIcon
@@ -123,7 +124,7 @@ internal fun FolderContents(
                                 },
                             )
                             .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.Top,
                         horizontalArrangement = alignment.arrangement(),
                     ) {
                         val iconDp = (style.iconSizeDp * 0.8f).toInt()
@@ -134,15 +135,24 @@ internal fun FolderContents(
                             iconWidth = iconDp.dp,
                             icon = { AppIcon(app = member, sizeDp = iconDp) },
                         ) { labelModifier ->
-                            Column(labelModifier, horizontalAlignment = alignment.columnAlignment()) {
+                            LabelWithNotification(
+                                iconSizeDp = iconDp,
+                                alignment = alignment,
+                                preview = preview,
+                                color = style.contentColor,
+                                labelSizeSp = style.labelSizeSp,
+                                onOpenNotifications = { notificationOpen = true },
+                                modifier = labelModifier,
+                                onLongClick = {
+                                    menuOffset = with(density) { DpOffset(touch.value.x.toDp(), touch.value.y.toDp()) }
+                                    menuFor = member.key
+                                },
+                            ) {
                                 Text(
                                     actions.displayName(member),
                                     color = if (member.disabled || member.unavailable) style.contentColor.copy(alpha = 0.5f) else style.contentColor,
                                     fontSize = style.labelSizeSp.sp,
                                     textAlign = alignment.textAlign(),
-                                )
-                                NotificationLines(
-                                    preview, alignment, style.contentColor, style.labelSizeSp,
                                 )
                             }
                         }

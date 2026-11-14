@@ -52,6 +52,8 @@ internal fun HomeStack(
     pins: () -> HomePins,
     metrics: StackMetrics,
     gapDp: Int = 12,
+    /** What each block has grown by underneath; the pin holds the block without it. */
+    growthPx: (HomeBlock) -> Int = { 0 },
     content: @Composable () -> Unit,
 ) {
     val density = LocalDensity.current
@@ -64,7 +66,7 @@ internal fun HomeStack(
         }
         val current = pins()
         val blocks = HomeBlock.entries.mapNotNull { id ->
-            placeables[id]?.takeIf { it.height > 0 }?.let { StackBlock(id, it.height, current[id]) }
+            placeables[id]?.takeIf { it.height > 0 }?.let { StackBlock(id, it.height, current[id], (it.height - growthPx(id)).coerceIn(0, it.height)) }
         }
         val viewport = viewportHeightPx().takeIf { it > 0 }
             ?: constraints.maxHeight.takeIf { it != Constraints.Infinity } ?: 0

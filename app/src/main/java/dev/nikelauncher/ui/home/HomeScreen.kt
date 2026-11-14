@@ -58,7 +58,9 @@ import dev.nikelauncher.ui.home.edit.PinEditor
 import dev.nikelauncher.ui.home.edit.SnapGuideOverlay
 import dev.nikelauncher.ui.home.rows.RowStyle
 import dev.nikelauncher.ui.home.rows.wideScreenAlignment
+import dev.nikelauncher.ui.home.stack.BlockGrowth
 import dev.nikelauncher.ui.home.stack.HomeStack
+import dev.nikelauncher.ui.home.stack.LocalBlockGrowth
 import dev.nikelauncher.ui.home.stack.SNAP_DISTANCE_DP
 import dev.nikelauncher.ui.home.stack.StackMetrics
 import dev.nikelauncher.ui.home.stack.homeBlock
@@ -121,6 +123,7 @@ fun HomeScreen(
     val currentData by rememberUpdatedState(data)
     val currentActions by rememberUpdatedState(actions)
     val currentSettings by rememberUpdatedState(settings)
+    val favoritesGrowth = remember { BlockGrowth() }
     val editor = remember(metrics, snapPx) {
         PinEditor(
             metrics = metrics,
@@ -195,6 +198,7 @@ fun HomeScreen(
                     pins = { editor.pins },
                     metrics = metrics,
                     gapDp = settings.blockGapDp,
+                    growthPx = { block -> if (block == HomeBlock.FAVORITES) favoritesGrowth.totalPx else 0 },
                 ) {
                     fun frame(block: HomeBlock) = FrameCallbacks(
                         onSelect = { editor.select(block) },
@@ -271,6 +275,7 @@ fun HomeScreen(
                                 }
                             },
                     ) {
+                        CompositionLocalProvider(LocalBlockGrowth provides favoritesGrowth) {
                         FavoritesBlock(
                             data = data,
                             settings = settings,
@@ -286,6 +291,7 @@ fun HomeScreen(
                                 scroll.followBelow(overflow, topInView)
                             },
                         )
+                        }
                     }
                 }
             }
