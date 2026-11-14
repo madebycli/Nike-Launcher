@@ -2,6 +2,9 @@
 package dev.nikelauncher.data
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -10,7 +13,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.preferencesDataStoreFile
 import dev.nikelauncher.data.backup.BackupValues
 import dev.nikelauncher.data.backup.PendingWidgetRestore
 import dev.nikelauncher.data.backup.RestoreReport
@@ -22,7 +25,29 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-private val Context.dataStore by preferencesDataStore(name = "nike_prefs")
+private const val PREFS_NAME = "nike_prefs"
+
+@Volatile
+private var store: DataStore<Preferences>? = null
+private val storeLock = Any()
+
+/**
+ * The one store for the whole process: two open on the same file is an error.
+ *
+ * Built by hand rather than through the property delegate because recovering from a damaged
+ * file needs to know where the file is. Without a corruption handler a file that does not parse
+ * throws on every read, which for a home app is a crash at every start.
+ */
+private val Context.dataStore: DataStore<Preferences>
+    get() = store ?: synchronized(storeLock) {
+        store ?: applicationContext.let { app ->
+            val file = app.preferencesDataStoreFile(PREFS_NAME)
+            PreferenceDataStoreFactory.create(
+                corruptionHandler = ReplaceFileCorruptionHandler { salvagePreferences(file) },
+                produceFile = { file },
+            )
+        }.also { store = it }
+    }
 
 /** [json] to write out, and whether anything belonging to the private space was left out of it. */
 data class ExportResult(val json: String, val omittedPrivateSpace: Boolean)

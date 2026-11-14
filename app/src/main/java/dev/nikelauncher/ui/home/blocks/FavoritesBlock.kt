@@ -53,7 +53,7 @@ import kotlin.math.abs
 /**
  * The favorites: one row per app or folder, reorderable by a grab handle in edit mode.
  *
- * [onFolderOpened] is told where an opened folder ends up once it has stopped growing, so the
+ * [onFolderOpened] is told where an opened folder is on every frame while it grows, so the
  * screen can move up enough to show all of it.
  */
 @Composable
@@ -104,8 +104,9 @@ internal fun FavoritesBlock(
             val height = reorder.heights[token] ?: return@LaunchedEffect
             if (height == last) still++ else still = 0
             last = height
+            // Told every frame, so the screen moves with the folder rather than after it.
+            reorder.tops[token]?.let { onFolderOpened(it, height) }
         }
-        onFolderOpened(reorder.tops[token] ?: return@LaunchedEffect, last)
     }
 
     val baseIconConfig = LocalIconConfig.current

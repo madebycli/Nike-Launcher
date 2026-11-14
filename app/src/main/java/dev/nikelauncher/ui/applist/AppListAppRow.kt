@@ -167,7 +167,7 @@ internal fun AppRow(
                         // has switched off gets the same treatment, for the same reason: it is
                         // listed, but tapping it only explains why it will not open.
                         color =
-                            if (isHidden || app.disabled) contentColor.copy(alpha = 0.5f)
+                            if (isHidden || app.disabled || app.unavailable) contentColor.copy(alpha = 0.5f)
                             else contentColor,
                         fontSize = labelSizeSp.sp,
                         modifier = labelModifier,

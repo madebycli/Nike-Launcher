@@ -42,6 +42,12 @@ data class AppInfo(
     /** A shortcut its publisher has switched off: still listed, shown dimmed, never started. */
     val disabled: Boolean = false,
     /**
+     * Listed but not able to open right now: paused by an app timer, or in a work profile that is
+     * switched off. Greyed out like the stock launcher does, and still tappable, because the
+     * system's own answer to the tap is what explains it (Victoria Launcher #141).
+     */
+    val unavailable: Boolean = false,
+    /**
      * From a work profile, so it can say so.
      *
      * The system badges the icon already, but this is a list of names where an icon is small
@@ -79,3 +85,6 @@ data class AppInfo(
 
     val packageName: String get() = componentName.packageName
 }
+/** Paused by an app timer, which suspends the package until the next day. */
+internal fun android.content.pm.LauncherActivityInfo.isSuspended(): Boolean =
+    (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_SUSPENDED) != 0

@@ -9,6 +9,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalContext
 import dev.nikelauncher.NikeApp
 import dev.nikelauncher.R
+import dev.nikelauncher.data.Folder
 import dev.nikelauncher.data.AppInfo
 import dev.nikelauncher.data.BlockPin
 import dev.nikelauncher.data.FavoritesSource
@@ -39,6 +40,8 @@ internal class HomeRouteHooks(
     val controller: AppListController,
     val bands: BandEditing,
     val onMoveToFolder: (AppInfo) -> Unit,
+    /** Asks before deleting; the dialog does the deleting. */
+    val onDeleteFolder: (Folder) -> Unit,
     val setCornerBounds: (Rect?) -> Unit,
     val onEditModeBand: () -> Unit,
     val onPeekStatusBar: () -> Unit,
@@ -89,11 +92,7 @@ internal fun rememberHomeActions(
                 onRename = { folder, name -> scope.launch { library.upsertFolder(folder.copy(name = name)) } },
                 onChangeIcon = { hooks.onNavigate(iconPickerRoute(folderToken(it.id))) },
                 onResetIcon = { folder -> scope.launch { library.setFolderIcon(folder.id, null) } },
-                onDelete = { folder ->
-                    // Its widgets go with it, released so their apps stop updating them.
-                    folder.widgets.forEach { runCatching { app.widgetHost.deleteAppWidgetId(it.id) } }
-                    scope.launch { library.deleteFolder(folder.id) }
-                },
+                onDelete = hooks.onDeleteFolder,
                 onManage = { hooks.onNavigate("folder/" + it.id) },
                 onRemoveFromHome = if (!settings.foldersInAppList) null else { folder ->
                     scope.launch { library.removeFavorite(folderToken(folder.id)) }

@@ -171,6 +171,8 @@ fun rememberAppsState(app: NikeApp): AppsState {
             override fun onPackageChanged(packageName: String?, user: UserHandle?) = state.refresh()
             override fun onPackagesAvailable(names: Array<out String>?, user: UserHandle?, replacing: Boolean) = state.refresh()
             override fun onPackagesUnavailable(names: Array<out String>?, user: UserHandle?, replacing: Boolean) = state.refresh()
+            override fun onPackagesSuspended(names: Array<out String>?, user: UserHandle?) = state.refresh()
+            override fun onPackagesUnsuspended(names: Array<out String>?, user: UserHandle?) = state.refresh()
             // A shortcut can be added, renamed, re-iconed or switched off while we are showing it.
             override fun onShortcutsChanged(packageName: String, shortcuts: MutableList<ShortcutInfo>, user: UserHandle) = state.refresh()
         }

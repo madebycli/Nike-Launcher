@@ -2,6 +2,7 @@
 package dev.nikelauncher.widget
 
 import android.appwidget.AppWidgetHostView
+import android.app.ActivityOptions
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.Intent
@@ -179,13 +180,27 @@ class WidgetPickerActivity : ComponentActivity() {
 
     private fun launchConfiguration(id: Int) {
         val started = runCatching {
-            widgetHost.startAppWidgetConfigureActivityForResult(this, id, 0, REQUEST_CONFIGURE, null)
+            widgetHost.startAppWidgetConfigureActivityForResult(this, id, 0, REQUEST_CONFIGURE, configureOptions())
             true
         }.getOrDefault(false)
         if (!started) {
             Toast.makeText(this, R.string.widget_unavailable, Toast.LENGTH_SHORT).show()
             if (reconfiguring) cancel() else finishWithWidgetId(id)
         }
+    }
+
+    /**
+     * Lets the setup screen open on the strength of this screen being in front (Victoria Launcher #138).
+     *
+     * The host starts it through a sender the system made, and from Android 14 being in front is
+     * only lent to such a sender when asked. Without asking, the start is quietly blocked: nothing
+     * opens, the result comes back canceled, and the widget is thrown away.
+     */
+    private fun configureOptions(): Bundle? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return null
+        return ActivityOptions.makeBasic()
+            .setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)
+            .toBundle()
     }
 
     /** Android 12 let a widget say its configure screen is optional; those can skip it. */

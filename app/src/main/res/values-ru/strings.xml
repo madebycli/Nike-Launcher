@@ -751,5 +751,7 @@
     <string name="media_widget_expressive">Экспрессивный</string>
     <string name="media_widget_controls">Управление воспроизведением</string>
     <string name="media_widget_progress">Прогресс</string>
+    <string name="home_folder_delete_confirm">Удалить «%1$s»?</string>
+    <string name="home_folder_delete_confirm_body">Приложения в ней останутся установленными. Её расположение и виджеты удаляются.</string>
 </resources>
 

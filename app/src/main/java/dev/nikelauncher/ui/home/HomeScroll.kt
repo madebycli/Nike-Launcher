@@ -180,6 +180,20 @@ internal class HomeScroll(
         settleAt((offsetY - minOf(overflow, topInView)).coerceIn(minOffset, 0f))
     }
 
+    /**
+     * The same move made at once, for following a folder frame by frame as it opens: the stack
+     * moves with it rather than after it, so a finger coming down on one of its apps the moment
+     * it looks done lands where it aimed (Victoria Launcher #142).
+     */
+    fun followBelow(overflow: Float, topInView: Float) {
+        if (overflow <= 0f) return
+        val target = (offsetY - minOf(overflow, topInView)).coerceIn(minOffset, 0f)
+        if (target != offsetY) {
+            settling?.cancel()
+            offsetY = target
+        }
+    }
+
 }
 
 @Composable

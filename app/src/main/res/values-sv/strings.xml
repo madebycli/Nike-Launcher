@@ -731,4 +731,6 @@
     <string name="media_widget_expressive">Expressiv</string>
     <string name="media_widget_controls">Uppspelningskontroller</string>
     <string name="media_widget_progress">Förlopp</string>
+    <string name="home_folder_delete_confirm">Ta bort ”%1$s”?</string>
+    <string name="home_folder_delete_confirm_body">Apparna i den förblir installerade. Dess ordning och widgetar tas bort.</string>
 </resources>

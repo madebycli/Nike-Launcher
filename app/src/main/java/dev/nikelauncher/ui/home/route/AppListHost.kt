@@ -52,6 +52,7 @@ internal fun AppListHost(
     insetLiveDp: Int,
     onMoveToFolder: (AppInfo) -> Unit,
     onToggleFolder: (Folder) -> Unit,
+    onDeleteFolder: (Folder) -> Unit,
     launchEntry: (AppInfo) -> Boolean,
     onNavigate: (String) -> Unit,
 ) {
@@ -121,11 +122,7 @@ internal fun AppListHost(
             onMoveToFolder = { appInfo -> controller.close(); onMoveToFolder(appInfo) },
             onToggleFolder = onToggleFolder,
             onManageFolder = { folder -> controller.close(); onNavigate("folder/" + folder.id) },
-            onDeleteFolder = { folder ->
-                // Its widgets go with it, released so their apps stop updating them.
-                folder.widgets.forEach { runCatching { app.widgetHost.deleteAppWidgetId(it.id) } }
-                scope.launch { library.deleteFolder(folder.id) }
-            },
+            onDeleteFolder = onDeleteFolder,
             onSetFolderOnHome = { folder, onHome ->
                 scope.launch { if (onHome) library.addFavorite(folderToken(folder.id)) else library.removeFavorite(folderToken(folder.id)) }
             },

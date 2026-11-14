@@ -57,6 +57,7 @@ import dev.nikelauncher.ui.home.route.AppListController
 import dev.nikelauncher.ui.home.route.HomePagesHost
 import dev.nikelauncher.ui.home.route.WallpaperLayers
 import dev.nikelauncher.ui.home.route.AppListHost
+import dev.nikelauncher.ui.home.route.FolderDeleteDialog
 import dev.nikelauncher.ui.home.route.BandEditing
 import dev.nikelauncher.ui.home.route.EdgeGestureExclusion
 import dev.nikelauncher.ui.home.route.EdgeZones
@@ -120,6 +121,7 @@ fun HomeRoute(
     var cornerButtonBounds by remember { mutableStateOf<Rect?>(null) }
     var homeEditMode by remember { mutableStateOf(false) }
     var folderPickerFor by remember { mutableStateOf<AppInfo?>(null) }
+    var folderToDelete by remember { mutableStateOf<Folder?>(null) }
     var listOpenFolders by remember { mutableStateOf(setOf<String>()) }
 
     val models = rememberListModels(app, settings, appsByKey, hiddenApps, data.nameOverrides, launchCounts, folders, listOpenFolders)
@@ -178,6 +180,7 @@ fun HomeRoute(
             controller = controller,
             bands = bands,
             onMoveToFolder = { folderPickerFor = it },
+            onDeleteFolder = { folderToDelete = it },
             setCornerBounds = { cornerButtonBounds = it },
             onEditModeBand = bands::start,
             onPeekStatusBar = onPeekStatusBar,
@@ -326,6 +329,7 @@ fun HomeRoute(
                     EdgeSide.BOTH -> maxOf(insetLeftDp, insetRightDp)
                 },
                 onMoveToFolder = { folderPickerFor = it },
+                onDeleteFolder = { folderToDelete = it },
                 onToggleFolder = { folder ->
                     listOpenFolders = if (folder.id in listOpenFolders) listOpenFolders - folder.id else listOpenFolders + folder.id
                 },
@@ -338,6 +342,7 @@ fun HomeRoute(
         HomeBandOverlays(settings, bands, scrub, listModel.letters, controller.visible, homeEditMode, viewportHeightPx,
             onReset = { bands.live = null; scope.launch { app.prefs.strip.clearScrubBand() } })
 
+        folderToDelete?.let { folder -> FolderDeleteDialog(app, folder) { folderToDelete = null } }
         folderPickerFor?.let { target ->
             FolderPickerHost(app, target, folders, appsByKey, data.nameOverrides) { folderPickerFor = null }
         }

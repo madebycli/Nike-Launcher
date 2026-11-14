@@ -103,9 +103,9 @@ class AppRepository(
             .flatMap { user ->
                 val serial = listableSerial(user, mainUser) ?: return@flatMap emptyList()
                 val work = isWorkProfile(user, mainUser)
+                val profileOff = work && quietMode(user) == true // see AppInfo.unavailable
                 val privateProfile = userType(user) == USER_TYPE_PROFILE_PRIVATE
-                // One call for the lot: asking per package turns a list build into
-                // hundreds of round trips to the package manager.
+                // One call for the lot: per package would be hundreds of package-manager round trips.
                 val installTimes = installTimes()
                 // Asking about a profile we are not the launcher for throws rather than
                 // returning nothing, and one inaccessible profile must not lose the rest.
@@ -121,6 +121,7 @@ class AppRepository(
                             work = work,
                             privateProfile = privateProfile,
                             installedAt = installTimes[info.componentName.packageName] ?: 0L,
+                            unavailable = profileOff || info.isSuspended(),
                         )
                     }
             }

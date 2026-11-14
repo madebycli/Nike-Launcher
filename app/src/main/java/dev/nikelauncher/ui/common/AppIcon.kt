@@ -259,6 +259,10 @@ fun AppIcon(app: AppInfo, sizeDp: Int, modifier: Modifier = Modifier) {
                 bitmap = bitmap,
                 contentDescription = app.label,
                 modifier = Modifier.size(sizeDp.dp),
+                // Greyed at draw time rather than in the bitmap, so the cached icon is the same
+                // one before and after the app comes back.
+                colorFilter = if (app.unavailable) GreyedOut else null,
+                alpha = if (app.unavailable) 0.6f else 1f,
             )
         }
         if (badge > 0) NotificationBadge(badge, sizeDp, Modifier.align(Alignment.TopEnd))
@@ -355,3 +359,7 @@ private fun resolveDrawable(
                 nikeApp.appRepository.loadIcon(app)
             }
         }
+
+private val GreyedOut = androidx.compose.ui.graphics.ColorFilter.colorMatrix(
+    androidx.compose.ui.graphics.ColorMatrix().apply { setToSaturation(0f) },
+)

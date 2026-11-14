@@ -137,7 +137,7 @@ internal fun FolderContents(
                             Column(labelModifier, horizontalAlignment = alignment.columnAlignment()) {
                                 Text(
                                     actions.displayName(member),
-                                    color = if (member.disabled) style.contentColor.copy(alpha = 0.5f) else style.contentColor,
+                                    color = if (member.disabled || member.unavailable) style.contentColor.copy(alpha = 0.5f) else style.contentColor,
                                     fontSize = style.labelSizeSp.sp,
                                     textAlign = alignment.textAlign(),
                                 )

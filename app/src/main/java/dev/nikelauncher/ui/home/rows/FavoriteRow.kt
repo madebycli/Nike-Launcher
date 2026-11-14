@@ -184,7 +184,7 @@ internal fun FavoriteRow(
                             // tapping
                             // it only explains why it will not open.
                             color =
-                                if (app.disabled) style.contentColor.copy(alpha = 0.5f)
+                                if (app.disabled || app.unavailable) style.contentColor.copy(alpha = 0.5f)
                                 else style.contentColor,
                             fontSize = style.labelSizeSp.sp,
                             textAlign = alignment.textAlign(),

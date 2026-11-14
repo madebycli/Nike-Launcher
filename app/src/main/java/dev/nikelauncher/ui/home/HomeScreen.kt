@@ -283,7 +283,7 @@ fun HomeScreen(
                             onFolderOpened = { top, height ->
                                 val topInView = top - rootY
                                 val overflow = topInView + height - (scroll.viewportHeight - bottomInsetPx)
-                                scope.launch { scroll.revealBelow(overflow, topInView) }
+                                scroll.followBelow(overflow, topInView)
                             },
                         )
                     }
