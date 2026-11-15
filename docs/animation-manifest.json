@@ -33,12 +33,14 @@
       "name": "notification-sheet",
       "source": "ui/kit/sheet/ViewportSheet.kt",
       "owners": [
+        "ui/kit/motion/AppMotion.kt",
+        "ui/kit/motion/BackPeek.kt",
         "ui/notifications/NotificationSheet.kt",
         "ui/notifications/NotificationSheetContent.kt",
         "widget/ClockOverviewSheet.kt"
       ],
-      "motion": "Stock ModalBottomSheet shared with calendar/weather; explicit close hides before removing owner. When the last notification goes, the sheet closes at once and keeps its last rows while it slides away, so it never folds to an empty page first; a sheet opened empty stays open.",
-      "verification": "NotificationScreensTest light/dark/large text; NotificationSheetBehaviourTest clear-all and opened-empty; WeatherScreensTest shared viewport; UserFlowScreensTest actual sheet entry"
+      "motion": "Stock ModalBottomSheet shared with calendar/weather; explicit close hides before removing owner. The sheet's height has one driver, animateContentSize on Material's standard spatial spring (no overshoot); the page change takes its size at once, so two springs never restart each other. A notification's page and a weather sub-page follow a held back gesture (up to a tenth smaller, 8 dp toward the far edge, a card with a soft shadow), spring back when it is cancelled and change page when it is let go. When the last notification goes, the sheet closes at once and keeps its last rows while it slides away; a sheet opened empty stays open.",
+      "verification": "NotificationSheetMotionTest frame-by-frame height (one push, no late settle, no overshoot); NotificationBackGestureTest held, cancelled and finished gesture; NotificationSheetBehaviourTest clear-all and opened-empty; NotificationScreensTest light/dark/large text; WeatherScreensTest; UserFlowScreensTest. The weather sub-page gesture runs in the sheet's own window and is not driven by a test; feel on a device is not measured here."
     },
     {
       "name": "corner-button-press",

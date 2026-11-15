@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.notifications
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
+import androidx.compose.animation.core.snap
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LocalTextStyle
@@ -12,6 +12,9 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.runtime.saveable.rememberSaveable
 import dev.nikelauncher.media.NotificationPreview
 import dev.nikelauncher.ui.kit.motion.AppMotion
+import dev.nikelauncher.ui.kit.motion.backPeek
+import dev.nikelauncher.ui.kit.motion.rememberBackPeek
+import androidx.compose.foundation.layout.Box
 import kotlinx.coroutines.delay
 
 private const val EMPTY_CLOSE_DELAY_MS = 700L
@@ -27,7 +30,8 @@ internal fun NotificationSheetContent(
     var selected by rememberSaveable { mutableStateOf(initialKey) }
     val current = notifications.firstOrNull { it.key == selected }
     LaunchedEffect(current == null) { if (current == null) selected = null }
-    BackHandler(selected != null) { selected = null }
+    val peek = rememberBackPeek(enabled = selected != null) { selected = null }
+    val pageShape = MaterialTheme.shapes.extraLarge
     // Clearing the last notification closes the sheet at once. The rows it had are kept on screen while it
     // slides away, so the sheet does not shrink to an empty page first. One opened empty stays open.
     // A copy, so a list the caller keeps changing in place cannot empty what is held for the slide-out.
@@ -42,7 +46,6 @@ internal fun NotificationSheetContent(
     val shown = if (items.isEmpty() && hadAny) lastShown else items
     val effects = AppMotion.effects<Float>()
     val offset = AppMotion.offset()
-    val size = AppMotion.size()
     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(shadow = Shadow.None)) {
     AnimatedContent(
         targetState = selected,
@@ -51,7 +54,9 @@ internal fun NotificationSheetContent(
             val forward = targetState != null
             (slideInHorizontally(offset) { if (forward) it / 4 else -it / 4 } + fadeIn(effects)) togetherWith
                 (slideOutHorizontally(offset) { if (forward) -it / 4 else it / 4 } + fadeOut(effects)) using
-                SizeTransform(clip = false) { _, _ -> size }
+                // The sheet around this animates its own height. A second size spring here would restart that
+                // one every frame and show as a second push and a late settle, so the page size is taken at once.
+                SizeTransform(clip = false) { _, _ -> snap() }
         },
         label = "notificationPage",
     ) { key ->
@@ -64,7 +69,9 @@ internal fun NotificationSheetContent(
                 onClearAll = { notifications.toList().forEach { controller.dismiss(it) } },
             )
         } else {
-            NotificationDetail(preview, controller, onBack = { selected = null }, onClose = onClose)
+            Box(Modifier.backPeek(peek, pageShape, MaterialTheme.colorScheme.surfaceContainerLow)) {
+                NotificationDetail(preview, controller, onBack = { selected = null }, onClose = onClose)
+            }
         }
     }
     }

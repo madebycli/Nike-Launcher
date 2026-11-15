@@ -5,7 +5,6 @@ import android.Manifest
 import android.appwidget.AppWidgetManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.nikelauncher.R
 import dev.nikelauncher.ui.kit.motion.AppMotion
+import dev.nikelauncher.ui.kit.motion.backPeek
+import dev.nikelauncher.ui.kit.motion.rememberBackPeek
 import dev.nikelauncher.ui.theme.NikeTheme
 import kotlinx.coroutines.launch
 
@@ -99,7 +100,7 @@ fun ClockOverviewSheet(
             }
     }
     dev.nikelauncher.ui.kit.sheet.ViewportSheet(onDismiss, sheetState, "clock-overview-panel") {
-        BackHandler(enabled = mode == "weather" && shownPage != WeatherPage.OVERVIEW) {
+        val peek = rememberBackPeek(enabled = mode == "weather" && shownPage != WeatherPage.OVERVIEW) {
             weatherPage = WeatherPage.OVERVIEW
         }
         // Back (on a weather sub-page) and the title, nothing more: the sheet closes by its handle like
@@ -143,7 +144,7 @@ fun ClockOverviewSheet(
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             }
         }
-        Box(Modifier.fillMaxWidth().weight(1f)) {
+        Box(Modifier.fillMaxWidth().weight(1f).backPeek(peek, MaterialTheme.shapes.extraLarge, MaterialTheme.colorScheme.surfaceContainerLow)) {
             if (mode == "weather")
                 WeatherOverview(
                     state = state,

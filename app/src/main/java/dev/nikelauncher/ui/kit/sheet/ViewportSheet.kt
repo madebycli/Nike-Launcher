@@ -50,8 +50,9 @@ fun ViewportSheet(
                 Modifier.fillMaxWidth()
                     .then(if (fillHeight) Modifier.height((maxHeight - safeTop).coerceAtLeast(0.dp))
                         else Modifier.heightIn(max = (maxHeight - safeTop).coerceAtLeast(0.dp)))
-                    .animateContentSize(AppMotion.size())
+                    // Tagged outside the size animation, so the panel's bounds are the height that is on screen.
                     .testTag(panelTag).semantics { testTagsAsResourceId = true }
+                    .animateContentSize(AppMotion.size())
             ) {
                 Box(Modifier.fillMaxWidth().height(24.dp), contentAlignment = Alignment.Center) {
                     BottomSheetDefaults.DragHandle(Modifier.wrapContentHeight(unbounded = true))
