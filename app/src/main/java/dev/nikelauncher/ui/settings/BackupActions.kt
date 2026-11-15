@@ -40,7 +40,8 @@ fun rememberBackupActions(app: NikeApp, privateSpace: PrivateSpace): BackupActio
             val omittedPrivateSpace = withContext(Dispatchers.IO) {
                 runCatching {
                     val result = app.prefs.exportJson(stripOtherProfiles)
-                    context.contentResolver.openOutputStream(uri)?.use { it.write(result.json.toByteArray()) }
+                    // "wt": replacing a longer file must not leave its tail behind, or the restore reads damaged JSON.
+                    context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(result.json.toByteArray()) }
                         ?: return@runCatching null
                     result.omittedPrivateSpace
                 }.getOrNull()

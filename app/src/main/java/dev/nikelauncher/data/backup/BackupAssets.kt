@@ -84,19 +84,27 @@ internal fun validateAsset(context: Context, bytes: ByteArray, kind: String) {
 }
 
 /** Swaps every file reference in [values] for what [replace] returns, given the reference and its kind. */
-internal fun rewriteAssets(values: MutableMap<String, Any>, replace: (String, String) -> String) {
-    (values[PREF_FONT_FILE] as? String)?.let { values[PREF_FONT_FILE] = replace(it, ASSET_FONT) }
-    (values[PREF_BACKGROUND_IMAGE] as? String)?.takeIf { it.isNotBlank() }?.let { values[PREF_BACKGROUND_IMAGE] = replace(it, ASSET_IMAGE) }
+internal fun rewriteAssets(values: MutableMap<String, Any>, replace: (String, String) -> String?) {
+    (values[PREF_FONT_FILE] as? String)?.let { path ->
+        replace(path, ASSET_FONT)?.let { values[PREF_FONT_FILE] = it } ?: values.remove(PREF_FONT_FILE)
+    }
+    (values[PREF_BACKGROUND_IMAGE] as? String)?.takeIf { it.isNotBlank() }?.let { image ->
+        replace(image, ASSET_IMAGE)?.let { values[PREF_BACKGROUND_IMAGE] = it } ?: values.remove(PREF_BACKGROUND_IMAGE)
+    }
     (values[PREF_ICON_OVERRIDES] as? String)?.let { raw ->
         val icons = JSONObject(raw)
-        icons.keys().forEach { key -> icons.put(key, replace(icons.getString(key), ASSET_IMAGE)) }
+        icons.keys().asSequence().toList().forEach { key ->
+            replace(icons.getString(key), ASSET_IMAGE)?.let { icons.put(key, it) } ?: icons.remove(key)
+        }
         values[PREF_ICON_OVERRIDES] = icons.toString()
     }
     (values[PREF_FOLDERS] as? String)?.let { raw ->
         val folders = JSONArray(raw)
         for (index in 0 until folders.length()) {
             val folder = folders.getJSONObject(index)
-            folder.optString("icon").takeIf { it.isNotBlank() }?.let { folder.put("icon", replace(it, ASSET_IMAGE)) }
+            folder.optString("icon").takeIf { it.isNotBlank() }?.let { icon ->
+                replace(icon, ASSET_IMAGE)?.let { folder.put("icon", it) } ?: folder.remove("icon")
+            }
         }
         values[PREF_FOLDERS] = folders.toString()
     }

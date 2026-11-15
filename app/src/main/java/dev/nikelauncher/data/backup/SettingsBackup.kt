@@ -36,14 +36,14 @@ class SettingsBackup(private val context: Context, private val prefs: Prefs) {
     private val host get() = (context.applicationContext as NikeApp).widgetHost
     private val clock get() = ClockWidgetProvider.componentName(context)
 
-    suspend fun export(): ExportResult = withContext(Dispatchers.IO) {
+    suspend fun export(stripOtherProfiles: Boolean = true): ExportResult = withContext(Dispatchers.IO) {
         operations.withLock {
             val stored = prefs.storedValues()
             val values = linkedMapOf<String, Any>()
             var omitted = false
             stored.forEach { (name, raw) ->
                 if (name == BackupValues.PENDING_WIDGETS) return@forEach
-                val value = stripPrivateSpaceFromExport(name, raw, true)
+                val value = stripPrivateSpaceFromExport(name, raw, stripOtherProfiles)
                 if (value != raw) omitted = true
                 if (value != null) values[name] = value
             }
@@ -80,11 +80,15 @@ class SettingsBackup(private val context: Context, private val prefs: Prefs) {
         }
     }
 
-    /** Reads every file the values point at into [JSONObject]s keyed by hash, and points the values at those. */
+    /**
+     * Reads every file the values point at into [JSONObject]s keyed by hash, and points the values at those.
+     * A file that can no longer be read (a picture whose grant Android has since taken back, a font that was
+     * deleted) is left out with the setting that points at it, instead of failing the whole backup.
+     */
     private fun collectAssets(values: MutableMap<String, Any>): Map<String, JSONObject> {
         val assets = linkedMapOf<String, JSONObject>()
         var assetBytes = 0
-        rewriteAssets(values) { original, kind ->
+        rewriteAssets(values) { original, kind -> runCatching {
             val uri = if (kind == ASSET_FONT) Uri.fromFile(File(original)) else Uri.parse(original)
             require(uri.scheme == "content" || uri.scheme == "file")
             if (uri.scheme == "file") {
@@ -101,7 +105,7 @@ class SettingsBackup(private val context: Context, private val prefs: Prefs) {
             assets[id] = JSONObject().put("id", id).put("kind", kind)
                 .put("data", Base64.encodeToString(bytes, Base64.NO_WRAP))
             "backup-asset:$id"
-        }
+        }.getOrNull() }
         return assets
     }
 

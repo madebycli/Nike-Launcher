@@ -77,7 +77,7 @@ class Prefs(private val context: Context) {
 
     /** The backup, with the widgets and files it needs: see [SettingsBackup]. */
     @Suppress("UNUSED_PARAMETER")
-    suspend fun exportJson(stripOtherProfiles: Boolean): ExportResult = SettingsBackup(context, this).export()
+    suspend fun exportJson(stripOtherProfiles: Boolean): ExportResult = SettingsBackup(context, this).export(stripOtherProfiles)
 
     /** Replaces everything with the backup in [text]; null when it is not one of ours or is damaged. */
     suspend fun importJson(text: String): RestoreReport? = SettingsBackup(context, this).restore(text)
