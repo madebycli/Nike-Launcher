@@ -215,7 +215,7 @@ fun HomeScreen(
                             selected = HomeBlock.WIDGET in editor.selection,
                             takeByBody = true,
                             coverBody = true,
-                            topInsidePx = { metrics.top(HomeBlock.WIDGET) },
+                            topInsidePx = { metrics.roomAbove(HomeBlock.WIDGET) },
                             callbacks = frame(HomeBlock.WIDGET),
                             modifier = Modifier.homeBlock(HomeBlock.WIDGET),
                         ) {
@@ -239,7 +239,7 @@ fun HomeScreen(
                             selected = HomeBlock.NOW_PLAYING in editor.selection,
                             takeByBody = true,
                             coverBody = true,
-                            topInsidePx = { metrics.top(HomeBlock.NOW_PLAYING) },
+                            topInsidePx = { metrics.roomAbove(HomeBlock.NOW_PLAYING) },
                             callbacks = frame(HomeBlock.NOW_PLAYING),
                             modifier = Modifier.homeBlock(HomeBlock.NOW_PLAYING),
                         ) {
@@ -263,7 +263,7 @@ fun HomeScreen(
                         selected = HomeBlock.FAVORITES in editor.selection,
                         takeByBody = false,
                         coverBody = false,
-                        topInsidePx = { metrics.top(HomeBlock.FAVORITES) },
+                        topInsidePx = { metrics.roomAbove(HomeBlock.FAVORITES) },
                         callbacks = frame(HomeBlock.FAVORITES),
                         modifier = Modifier
                             .homeBlock(HomeBlock.FAVORITES)

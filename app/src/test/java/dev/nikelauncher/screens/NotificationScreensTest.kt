@@ -95,12 +95,13 @@ class NotificationScreensTest {
 
     private fun walkThrough(prefix: String, fontScale: Float) {
         val controller = FakeNotificationController(fakeNotifications(rule.activity))
+        var closed = 0
         rule.setContent {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale)) {
                 NikeTheme {
                     dev.nikelauncher.ui.kit.sheet.ViewportSheet({}, rememberModalBottomSheetState(skipPartiallyExpanded = true), "notification-panel") {
-                        NotificationSheetContent(controller.items, null, controller, {})
+                        NotificationSheetContent(controller.items, null, controller, { closed++ })
                     }
                 }
             }
@@ -154,8 +155,9 @@ class NotificationScreensTest {
         rule.shoot("$prefix-swiped")
         rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).performClick()
         Assert.assertTrue(controller.items.isEmpty())
-        rule.onNodeWithText(text(R.string.notification_none)).assertIsDisplayed()
-        rule.onNodeWithContentDescription(text(R.string.notification_clear_all)).assertDoesNotExist()
-        rule.shoot("$prefix-empty")
+        // Clearing everything closes the sheet at once; the empty page is never shown on the way out.
+        rule.waitForIdle()
+        Assert.assertEquals(1, closed)
+        rule.onNodeWithText(text(R.string.notification_none)).assertDoesNotExist()
     }
 }

@@ -24,9 +24,12 @@ class AppNotificationTest {
         assertFalse(notificationEligible(app.copy(user = org.robolectric.util.ReflectionHelpers.callConstructor(UserHandle::class.java, org.robolectric.util.ReflectionHelpers.ClassParameter.from(Int::class.javaPrimitiveType, 10)))))
         assertFalse(notificationEligible(app.copy(kind = EntryKind.SHORTCUT)))
     }
-    @Test fun `compact age handles future minutes hours and days with platform localization`() {
+    @Test fun `compact age reads now under a minute, then minutes hours and days, platform localized`() {
         val now = 200_000_000L
-        assertEquals("0 min", notificationAge(Locale.US, now + 60_000, now))
+        assertEquals("now", notificationAge(Locale.US, now + 60_000, now))
+        assertEquals("now", notificationAge(Locale.US, now - 59_000, now))
+        assertEquals("jetzt", notificationAge(Locale.GERMAN, now - 59_000, now))
+        assertEquals("1 min", notificationAge(Locale.US, now - 60_000, now))
         assertEquals("59 min", notificationAge(Locale.US, now - 59 * 60_000, now))
         assertEquals("1 hr", notificationAge(Locale.US, now - 60 * 60_000, now))
         assertEquals("1 day", notificationAge(Locale.US, now - 1440 * 60_000, now))

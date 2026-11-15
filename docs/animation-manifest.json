@@ -33,11 +33,22 @@
       "name": "notification-sheet",
       "source": "ui/kit/sheet/ViewportSheet.kt",
       "owners": [
-        "widget/ClockOverviewSheet.kt",
-        "ui/notifications/NotificationSheet.kt"
+        "ui/notifications/NotificationSheet.kt",
+        "ui/notifications/NotificationSheetContent.kt",
+        "widget/ClockOverviewSheet.kt"
       ],
-      "motion": "Stock ModalBottomSheet shared with calendar/weather; explicit close hides before removing owner",
-      "verification": "NotificationScreensTest light/dark/large text; WeatherScreensTest shared viewport; UserFlowScreensTest actual sheet entry"
+      "motion": "Stock ModalBottomSheet shared with calendar/weather; explicit close hides before removing owner. When the last notification goes, the sheet closes at once and keeps its last rows while it slides away, so it never folds to an empty page first; a sheet opened empty stays open.",
+      "verification": "NotificationScreensTest light/dark/large text; NotificationSheetBehaviourTest clear-all and opened-empty; WeatherScreensTest shared viewport; UserFlowScreensTest actual sheet entry"
+    },
+    {
+      "name": "corner-button-press",
+      "source": "ui/home/corner/CornerButton.kt",
+      "owners": [
+        "ui/home/corner/CornerShapes.kt",
+        "ui/home/corner/CornerButtonFace.kt"
+      ],
+      "motion": "Stock ripple, clipped to the button's own outline (circle or squircle) so it never spills into the square around it",
+      "verification": "Compiles against the shared outline used by the face; the ripple itself must be checked on a device"
     }
   ]
 }

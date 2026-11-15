@@ -30,14 +30,16 @@ internal fun NotificationSheetContent(
     BackHandler(selected != null) { selected = null }
     // Clearing the last notification closes the sheet at once. The rows it had are kept on screen while it
     // slides away, so the sheet does not shrink to an empty page first. One opened empty stays open.
-    var hadAny by remember { mutableStateOf(notifications.isNotEmpty()) }
-    var lastShown by remember { mutableStateOf(notifications) }
-    LaunchedEffect(notifications) { if (notifications.isNotEmpty()) lastShown = notifications }
-    LaunchedEffect(notifications.isEmpty()) {
-        if (notifications.isNotEmpty()) hadAny = true
+    // A copy, so a list the caller keeps changing in place cannot empty what is held for the slide-out.
+    val items = notifications.toList()
+    var hadAny by remember { mutableStateOf(items.isNotEmpty()) }
+    var lastShown by remember { mutableStateOf(items) }
+    LaunchedEffect(items) { if (items.isNotEmpty()) lastShown = items }
+    LaunchedEffect(items.isEmpty()) {
+        if (items.isNotEmpty()) hadAny = true
         else if (hadAny) onClose()
     }
-    val shown = if (notifications.isEmpty() && hadAny) lastShown else notifications
+    val shown = if (items.isEmpty() && hadAny) lastShown else items
     val effects = AppMotion.effects<Float>()
     val offset = AppMotion.offset()
     val size = AppMotion.size()

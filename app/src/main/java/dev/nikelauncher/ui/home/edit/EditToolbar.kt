@@ -1,6 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 package dev.nikelauncher.ui.home.edit
 
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -62,21 +70,26 @@ internal fun EditToolbar(visible: Boolean, actions: EditToolbarActions, modifier
                 }
             },
         ) {
-            IconButton(onClick = actions.onSettings) { Icon(Icons.Filled.Tune, stringResource(R.string.edit_layout_settings)) }
-            IconButton(onClick = actions.onSelectAll) { Icon(Icons.Filled.SelectAll, stringResource(R.string.edit_select_all)) }
-            actions.onAddWidget?.let { add -> IconButton(onClick = add) { Icon(Icons.Filled.Add, stringResource(R.string.widget_add)) } }
-            actions.onSmaller?.let {
-                IconButton(onClick = it) { Icon(Icons.Filled.ZoomOut, contentDescription = stringResource(R.string.settings_less)) }
-            }
-            actions.onLarger?.let {
-                IconButton(onClick = it) { Icon(Icons.Filled.ZoomIn, contentDescription = stringResource(R.string.settings_more)) }
-            }
-            actions.onBandRange?.let {
-                IconButton(onClick = it) { Icon(Icons.Filled.Height, contentDescription = stringResource(R.string.handle_az_range)) }
-            }
-            actions.onReset?.let {
-                IconButton(onClick = it) { Icon(Icons.Filled.RestartAlt, contentDescription = stringResource(R.string.edit_block_reset)) }
-            }
+            ToolbarAction(Icons.Filled.Tune, stringResource(R.string.edit_layout_settings), actions.onSettings)
+            ToolbarAction(Icons.Filled.SelectAll, stringResource(R.string.edit_select_all), actions.onSelectAll)
+            actions.onAddWidget?.let { ToolbarAction(Icons.Filled.Add, stringResource(R.string.widget_add), it) }
+            actions.onSmaller?.let { ToolbarAction(Icons.Filled.ZoomOut, stringResource(R.string.settings_less), it) }
+            actions.onLarger?.let { ToolbarAction(Icons.Filled.ZoomIn, stringResource(R.string.settings_more), it) }
+            actions.onBandRange?.let { ToolbarAction(Icons.Filled.Height, stringResource(R.string.handle_az_range), it) }
+            actions.onReset?.let { ToolbarAction(Icons.Filled.RestartAlt, stringResource(R.string.edit_block_reset), it) }
         }
+    }
+}
+
+/** An icon action whose name shows on a long press, the platform's way to name an icon without a caption. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ToolbarAction(icon: ImageVector, label: String, onClick: () -> Unit) {
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+        tooltip = { PlainTooltip { Text(label) } },
+        state = rememberTooltipState(),
+    ) {
+        IconButton(onClick = onClick) { Icon(icon, contentDescription = label) }
     }
 }

@@ -75,6 +75,22 @@ class WeatherScreensTest {
         }
     }
 
+    /** The chart's metric is a toggle: picking wind switches it on and conditions off. */
+    @Test fun metricTogglesSwitch() {
+        val now = Instant.parse("2026-10-30T12:22:00Z")
+        rule.setContent {
+            val context = LocalContext.current
+            val state = ClockLiveState(ClockWidgetConfig.read(context, 1), now, null, snapshot(now), null, null)
+            NikeTheme { ClockOverviewSheet(1, "weather", {}, liveStateOverride = state) }
+        }
+        val wind = rule.activity.getString(R.string.weather_wind_chart)
+        val conditions = rule.activity.getString(R.string.weather_conditions)
+        rule.onAllNodesWithText(conditions)[0].assertIsOn()
+        rule.onAllNodesWithText(wind)[0].assertIsOff().performClick()
+        rule.onAllNodesWithText(wind)[0].assertIsOn()
+        rule.onAllNodesWithText(conditions)[0].assertIsOff()
+    }
+
     /** The agenda: today with two events, an all-day one tomorrow, and the add button. */
     @Test fun agenda() {
         val now = Instant.parse("2026-10-30T09:15:00Z")

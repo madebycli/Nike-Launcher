@@ -88,7 +88,7 @@ internal fun BlockFrame(
             )
             .border(BorderStroke(if (selected) 2.dp else 1.dp, outline), MaterialTheme.shapes.large),
     ) {
-        // The chip straddles the top edge, so its lower half would sit on whatever comes first.
+        // The chip sits above the frame as its tab where there is room, so it never covers the first row.
         Box(Modifier.clipToBounds()) { Box(Modifier.offset(x = contentOffsetDp.dp)) { content() } }
         if (coverBody) {
             // Nothing inside answers a touch while editing, so the body only selects and moves.
@@ -100,13 +100,13 @@ internal fun BlockFrame(
             colors = FilterChipDefaults.filterChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
             label = { Text(stringResource(block.label())) },
             leadingIcon = { Icon(Icons.Filled.DragHandle, contentDescription = null) },
-            // Straddles the top edge where there is room above, and sits inside where there is not.
+            // A tab above the frame where the space up to the block above allows it, and only as far up as it does.
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(start = 12.dp)
                 .testTag("home-select-${block.name}")
                 .zIndex(2f)
-                .offset { IntOffset(0, -minOf(ChipHalfHeight.roundToPx(), topInsidePx())) }
+                .offset { IntOffset(0, -minOf(ChipLift.roundToPx(), topInsidePx().coerceAtLeast(0))) }
                 .pointerInput(block) {
                     detectVerticalDragGestures(
                         onDragStart = { current.onDragStart() },
@@ -118,4 +118,5 @@ internal fun BlockFrame(
     }
 }
 
-private val ChipHalfHeight = 16.dp
+/** A filter chip's height and a small gap, so the tab clears the frame's top edge. */
+private val ChipLift = 36.dp

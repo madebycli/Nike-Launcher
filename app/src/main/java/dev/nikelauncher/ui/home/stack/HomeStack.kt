@@ -32,6 +32,15 @@ internal class StackMetrics {
 
     fun top(block: HomeBlock) = tops[block.ordinal]
     fun height(block: HomeBlock) = heights[block.ordinal]
+
+    /** Free space between a block's top and the nearest block that ends above it, or the field's top. */
+    fun roomAbove(block: HomeBlock): Int {
+        val top = tops[block.ordinal]
+        val above = HomeBlock.entries
+            .filter { it != block && heights[it.ordinal] > 0 && tops[it.ordinal] + heights[it.ordinal] <= top }
+            .maxOfOrNull { tops[it.ordinal] + heights[it.ordinal] } ?: 0
+        return top - above
+    }
 }
 
 /** Marks a child as one of the blocks. Anything else in the stack is ignored. */
