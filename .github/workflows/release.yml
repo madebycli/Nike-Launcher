@@ -3,12 +3,16 @@ name: Release
 on:
   push:
     tags: ['v*']
+    # A commit on a work branch whose message carries [preview] publishes a preview
+    # release; the tag is created on GitHub by this workflow, not pushed by hand.
+    branches: ['claude/**']
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[preview]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +58,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          asset="nike-launcher-${GITHUB_REF_NAME}.apk"
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            tag="$GITHUB_REF_NAME"
+          else
+            version_name=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts)
+            tag="v${version_name}-preview.${GITHUB_RUN_NUMBER}"
+          fi
+          asset="nike-launcher-${tag}.apk"
           cp app/build/outputs/apk/release/app-release.apk "$asset"
 
           version_code=$(grep -oP 'versionCode\s*=\s*\K\d+' app/build.gradle.kts)
@@ -63,17 +73,17 @@ jobs:
           # A tag with a suffix (v0.1.0-preview.1) is a preview: published as a pre-release,
           # so it never shows up as the latest stable version.
           pre=""
-          case "$GITHUB_REF_NAME" in *-*) pre="--prerelease" ;; esac
+          case "$tag" in *-*) pre="--prerelease" ;; esac
 
           # Idempotent on purpose. GitHub has delivered the same tag push twice, and the
           # second run then failed on "a release with the same tag name already exists" —
           # a red cross against a release that had in fact gone out perfectly well.
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "$asset" --clobber
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$asset" --clobber
           elif [ -f "$notes" ]; then
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" $pre \
+            gh release create "$tag" --title "$tag" --target "$GITHUB_SHA" $pre \
               --notes-file "$notes" "$asset"
           else
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" $pre \
+            gh release create "$tag" --title "$tag" --target "$GITHUB_SHA" $pre \
               --generate-notes "$asset"
           fi
