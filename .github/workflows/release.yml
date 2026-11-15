@@ -60,15 +60,20 @@ jobs:
           version_code=$(grep -oP 'versionCode\s*=\s*\K\d+' app/build.gradle.kts)
           notes="fastlane/metadata/android/en-US/changelogs/${version_code}.txt"
 
+          # A tag with a suffix (v0.1.0-preview.1) is a preview: published as a pre-release,
+          # so it never shows up as the latest stable version.
+          pre=""
+          case "$GITHUB_REF_NAME" in *-*) pre="--prerelease" ;; esac
+
           # Idempotent on purpose. GitHub has delivered the same tag push twice, and the
           # second run then failed on "a release with the same tag name already exists" —
           # a red cross against a release that had in fact gone out perfectly well.
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
             gh release upload "$GITHUB_REF_NAME" "$asset" --clobber
           elif [ -f "$notes" ]; then
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" \
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" $pre \
               --notes-file "$notes" "$asset"
           else
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" \
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" $pre \
               --generate-notes "$asset"
           fi
