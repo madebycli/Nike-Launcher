@@ -31,7 +31,7 @@ internal fun MessageBubble(message: PreviewMessage, maxWidth: Dp, first: Boolean
     Box {
         SwipeToDismissBox(state, backgroundContent = {},
             modifier = Modifier.widthIn(max = maxWidth).semantics { dismiss { onHide(); true } }) {
-            val large = MaterialTheme.shapes.large
+            val large = MaterialTheme.shapes.extraLarge
             val small = MaterialTheme.shapes.extraSmall
             val shape = if (message.fromSelf) large.copy(
                 topEnd = if (first) large.topEnd else small.topEnd,
@@ -41,10 +41,10 @@ internal fun MessageBubble(message: PreviewMessage, maxWidth: Dp, first: Boolean
                 bottomStart = if (last) large.bottomStart else small.bottomStart,
             )
             Surface(shape = shape,
-                color = if (message.fromSelf) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
-                contentColor = if (message.fromSelf) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                color = if (message.fromSelf) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = if (message.fromSelf) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.combinedClickable(onClick = onOpen, onLongClick = { menu = true })) {
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+                Column(Modifier.padding(horizontal = 18.dp, vertical = 12.dp)) {
                     attachmentBitmap(message.attachment)?.let {
                         Image(it, stringResource(R.string.notification_photo), Modifier.fillMaxWidth()
                             .heightIn(max = 320.dp).aspectRatio(it.width.toFloat() / it.height), contentScale = ContentScale.Fit)

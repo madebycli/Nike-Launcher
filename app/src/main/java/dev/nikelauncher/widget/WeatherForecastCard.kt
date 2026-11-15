@@ -18,6 +18,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -37,7 +42,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun ForecastCard(
     title: String, icon: ImageVector, points: List<ForecastPoint>, config: ClockWidgetConfig,
@@ -59,19 +64,24 @@ internal fun ForecastCard(
                 Spacer(Modifier.width(10.dp))
                 Text(title, Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
                 if (onDetails != null)
-                    TextButton(onClick = onDetails, enabled = points.isNotEmpty(), modifier = detailsTag?.let { Modifier.testTag(it) } ?: Modifier) { Text(stringResource(R.string.weather_details)) }
+                    FilledTonalIconButton(onClick = onDetails, enabled = points.isNotEmpty(),
+                        modifier = detailsTag?.let { Modifier.testTag(it) } ?: Modifier) {
+                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, stringResource(R.string.weather_details))
+                    }
             }
             if (points.isEmpty()) ForecastUnavailable()
             else {
                 if (options.size > 1) {
                     FlowRow(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         options.forEach { m ->
-                            FilterChip(selected = active == m, onClick = { metric = m },
-                                label = { Text(stringResource(when (m) {
+                            ToggleButton(checked = active == m, onCheckedChange = { metric = m },
+                                shapes = ToggleButtonDefaults.shapesFor(ToggleButtonDefaults.MinHeight)) {
+                                Text(stringResource(when (m) {
                                     ForecastMetric.TEMPERATURE -> R.string.weather_conditions
                                     ForecastMetric.WIND -> R.string.weather_wind_chart
                                     ForecastMetric.AIR -> R.string.weather_air_quality
-                                })) })
+                                }))
+                            }
                         }
                     }
                 }

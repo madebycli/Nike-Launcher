@@ -28,12 +28,16 @@ internal fun NotificationSheetContent(
     val current = notifications.firstOrNull { it.key == selected }
     LaunchedEffect(current == null) { if (current == null) selected = null }
     BackHandler(selected != null) { selected = null }
-    // Clearing the last notification closes the sheet once the row has folded away; one opened empty stays open.
+    // Clearing the last notification closes the sheet at once. The rows it had are kept on screen while it
+    // slides away, so the sheet does not shrink to an empty page first. One opened empty stays open.
     var hadAny by remember { mutableStateOf(notifications.isNotEmpty()) }
+    var lastShown by remember { mutableStateOf(notifications) }
+    LaunchedEffect(notifications) { if (notifications.isNotEmpty()) lastShown = notifications }
     LaunchedEffect(notifications.isEmpty()) {
         if (notifications.isNotEmpty()) hadAny = true
-        else if (hadAny) { delay(EMPTY_CLOSE_DELAY_MS); onClose() }
+        else if (hadAny) onClose()
     }
+    val shown = if (notifications.isEmpty() && hadAny) lastShown else notifications
     val effects = AppMotion.effects<Float>()
     val offset = AppMotion.offset()
     val size = AppMotion.size()
@@ -49,10 +53,10 @@ internal fun NotificationSheetContent(
         },
         label = "notificationPage",
     ) { key ->
-        val preview = notifications.firstOrNull { it.key == key }
+        val preview = shown.firstOrNull { it.key == key }
         if (preview == null) {
             NotificationOverview(
-                notifications = notifications,
+                notifications = shown,
                 onSelect = { selected = it.key },
                 onDismiss = { controller.dismiss(it) },
                 onClearAll = { notifications.toList().forEach { controller.dismiss(it) } },

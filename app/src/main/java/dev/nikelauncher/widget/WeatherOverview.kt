@@ -115,7 +115,7 @@ internal fun WeatherOverview(
                     Modifier.fillMaxSize().testTag("weather-overview-list"), state = rootScroll,
                     contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    item("current") { CurrentWeather(state, connection) }
+                    item("current") { CurrentWeather(state, connection, onOpenApp, canOpen = c.weatherPackage != null) }
                     item("daily") {
                         ForecastCard(stringResource(R.string.clock_weather_daily), Icons.Outlined.CalendarMonth,
                             dayPoints, c, rootDaysScroll, "weather-open-daily",
@@ -272,18 +272,11 @@ internal fun WeatherOverview(
                 }
             }
         }
-        if (c.weatherPackage != null) {
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
-            TextButton(onClick = onOpenApp,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
-                Text(stringResource(R.string.clock_weather_open_app))
-            }
-        }
     }
 }
 
 @Composable
-private fun CurrentWeather(state: ClockLiveState, connection: BreezyWeatherConnection) {
+private fun CurrentWeather(state: ClockLiveState, connection: BreezyWeatherConnection, onOpenApp: () -> Unit, canOpen: Boolean) {
     val w = state.weather
     val c = state.config
     val current = state.weatherReading ?: w?.let { ClockWidgetWeather.Reading(it.tempK, it.condition) }
@@ -318,6 +311,9 @@ private fun CurrentWeather(state: ClockLiveState, connection: BreezyWeatherConne
                 Text(if (updated != null) stringResource(R.string.weather_place_and_update, place, updated) else place,
                     Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
+                if (canOpen) IconButton(onClick = onOpenApp) {
+                    Icon(Icons.Outlined.OpenInNew, stringResource(R.string.clock_weather_open_app))
+                }
                 if (c.weatherPackage != null || connection.result != null &&
                     connection.result != BreezyWeatherProvider.Result.Unsupported) {
                     IconButton(onClick = connection.refresh, enabled = !connection.loading,
@@ -327,18 +323,28 @@ private fun CurrentWeather(state: ClockLiveState, connection: BreezyWeatherConne
                 }
             }
             if (connection.result is BreezyWeatherProvider.Result.PermissionRequired) {
-                TextButton(onClick = connection.connect, modifier = Modifier.testTag("weather-breezy-connect")) {
-                    Icon(Icons.Outlined.Link, null, Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.weather_breezy_connect))
-                }
+                WeatherActionRow(stringResource(R.string.weather_breezy_connect), Icons.Outlined.Link, connection.connect,
+                    Modifier.testTag("weather-breezy-connect"))
             }
             connection.error?.let { reason ->
-                TextButton(onClick = connection.openApp) {
-                    Text(stringResource(if (reason == BreezyWeatherProvider.Reason.LOCATION_AMBIGUOUS ||
-                        reason == BreezyWeatherProvider.Reason.NO_LOCATIONS)
-                        R.string.weather_breezy_location else R.string.weather_breezy_unavailable))
-                }
+                WeatherActionRow(stringResource(if (reason == BreezyWeatherProvider.Reason.LOCATION_AMBIGUOUS ||
+                    reason == BreezyWeatherProvider.Reason.NO_LOCATIONS)
+                    R.string.weather_breezy_location else R.string.weather_breezy_unavailable),
+                    Icons.Outlined.Info, connection.openApp)
             }
     }
+}
+
+/** One quiet line that acts: a single segmented row in the same family as the notification list. */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun WeatherActionRow(text: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    SegmentedListItem(
+        onClick = onClick,
+        shapes = ListItemDefaults.segmentedShapes(0, 1),
+        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = modifier,
+        leadingContent = { Icon(icon, null) },
+        content = { Text(text, style = MaterialTheme.typography.bodyLarge) },
+    )
 }

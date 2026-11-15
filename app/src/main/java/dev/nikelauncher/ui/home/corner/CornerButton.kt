@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.IntOffset
 import dev.nikelauncher.data.CornerPosition
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -125,6 +124,7 @@ internal fun BoxScope.CornerButton(
                         CustomAccessibilityAction(swipeLabel) { perform(settings.swipe); true },
                     )
                 }
+                .clip(settings.shape.outline())
                 .combinedClickable(
                     indication = ripple(),
                     interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },

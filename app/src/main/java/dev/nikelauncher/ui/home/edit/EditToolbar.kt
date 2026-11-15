@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Height
 import androidx.compose.material.icons.filled.Tune
@@ -64,10 +66,10 @@ internal fun EditToolbar(visible: Boolean, actions: EditToolbarActions, modifier
             IconButton(onClick = actions.onSelectAll) { Icon(Icons.Filled.SelectAll, stringResource(R.string.edit_select_all)) }
             actions.onAddWidget?.let { add -> IconButton(onClick = add) { Icon(Icons.Filled.Add, stringResource(R.string.widget_add)) } }
             actions.onSmaller?.let {
-                IconButton(onClick = it) { Icon(Icons.Filled.Remove, contentDescription = stringResource(R.string.settings_less)) }
+                IconButton(onClick = it) { Icon(Icons.Filled.ZoomOut, contentDescription = stringResource(R.string.settings_less)) }
             }
             actions.onLarger?.let {
-                IconButton(onClick = it) { Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.settings_more)) }
+                IconButton(onClick = it) { Icon(Icons.Filled.ZoomIn, contentDescription = stringResource(R.string.settings_more)) }
             }
             actions.onBandRange?.let {
                 IconButton(onClick = it) { Icon(Icons.Filled.Height, contentDescription = stringResource(R.string.handle_az_range)) }

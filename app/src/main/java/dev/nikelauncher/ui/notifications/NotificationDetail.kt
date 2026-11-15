@@ -40,8 +40,12 @@ internal fun NotificationDetail(preview: NotificationPreview, controller: Notifi
         // Back and the name, nothing more: the sheet closes by its handle like every other one.
         Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 4.dp, end = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back)) }
-            Text(title, Modifier.weight(1f).padding(start = 8.dp), style = MaterialTheme.typography.titleLarge,
-                maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Column(Modifier.weight(1f).padding(start = 8.dp)) {
+                Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                val app = appLabel(context, preview.packageName)
+                if (app != title) Text(app, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
         }
         NotificationHistory(preview, outgoing, Modifier.weight(1f), open)
         if (failed) Text(stringResource(R.string.notification_failed), Modifier.padding(horizontal = 16.dp),

@@ -40,7 +40,7 @@ internal fun NotificationHistory(preview: NotificationPreview, outgoing: List<Ou
             programmatic = false
         }
     }
-    Column(modifier.fillMaxWidth().heightIn(min = 120.dp).verticalScroll(scroll).padding(horizontal = 12.dp),
+    Column(modifier.fillMaxWidth().heightIn(min = 120.dp).testTag("conversation-history").verticalScroll(scroll).padding(horizontal = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
         notificationBitmap(preview.picture, 1024)?.let {
             Image(it, null, Modifier.fillMaxWidth().aspectRatio(it.width.toFloat() / it.height).heightIn(max = 300.dp).testTag("notification-picture"), contentScale = ContentScale.Fit)

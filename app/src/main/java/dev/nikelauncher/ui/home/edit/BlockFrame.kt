@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material3.FilterChip
@@ -101,7 +102,8 @@ internal fun BlockFrame(
             leadingIcon = { Icon(Icons.Filled.DragHandle, contentDescription = null) },
             // Straddles the top edge where there is room above, and sits inside where there is not.
             modifier = Modifier
-                .align(Alignment.TopCenter)
+                .align(Alignment.TopStart)
+                .padding(start = 12.dp)
                 .testTag("home-select-${block.name}")
                 .zIndex(2f)
                 .offset { IntOffset(0, -minOf(ChipHalfHeight.roundToPx(), topInsidePx())) }

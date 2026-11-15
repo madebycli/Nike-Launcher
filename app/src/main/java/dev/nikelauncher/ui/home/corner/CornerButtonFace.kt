@@ -7,15 +7,12 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Rocket
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -88,7 +85,7 @@ internal fun CornerButtonFace(
     val foreground by animateColorAsState(iconColor, label = "cornerIcon")
     Surface(
         modifier = modifier.size(sizeDp.dp),
-        shape = if (shape == CornerShape.SQUIRCLE) MaterialShapes.Square.toShape() else CircleShape,
+        shape = shape.outline(),
         color = container,
         contentColor = foreground,
         border = if (outline) BorderStroke(1.dp, foreground.copy(alpha = .65f)) else null,

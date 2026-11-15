@@ -2,6 +2,7 @@
 package dev.nikelauncher.ui.notifications
 
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -100,20 +102,23 @@ private fun NotificationSummary(
             onLongClick = onLongClick,
         ),
         horizontalAlignment = alignment.columnAlignment(),
+        verticalArrangement = Arrangement.spacedBy(1.dp),
     ) {
-        // Title and age apart, so a long title is what gets cut and the age always stays readable.
+        // The same full colour as the name above, so the lines read as part of the row. Title and age share
+        // the first line in semibold; the title is what gets cut, the age always stays whole.
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (preview.title.isNotBlank()) {
-                Text(preview.title, Modifier.weight(1f, fill = false), color = color.copy(alpha = 0.85f),
-                    fontFamily = WidgetTextFamily, fontSize = size, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(stringResource(R.string.notification_age_separator, age), color = color.copy(alpha = 0.6f),
+                Text(preview.title, Modifier.weight(1f, fill = false), color = color,
+                    fontFamily = WidgetTextFamily, fontWeight = FontWeight.SemiBold, fontSize = size,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(stringResource(R.string.notification_age_separator, age), color = color,
                     fontFamily = WidgetTextFamily, fontSize = size, maxLines = 1)
             } else {
-                Text(age, color = color.copy(alpha = 0.6f), fontFamily = WidgetTextFamily, fontSize = size, maxLines = 1)
+                Text(age, color = color, fontFamily = WidgetTextFamily, fontSize = size, maxLines = 1)
             }
         }
         if (message.isNotBlank()) {
-            Text(message, color = color.copy(alpha = 0.7f), fontFamily = WidgetTextFamily, fontSize = size,
+            Text(message, color = color, fontFamily = WidgetTextFamily, fontSize = size,
                 maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = alignment.textAlign())
         }
     }
