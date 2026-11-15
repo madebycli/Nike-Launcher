@@ -24,6 +24,13 @@ internal fun NotificationDetail(preview: NotificationPreview, controller: Notifi
     LaunchedEffect(failed) { if (failed) { delay(4000); failed = false } }
     val report: (Boolean) -> Unit = { ok -> if (!ok) failed = true }
     val title = preview.title.ifBlank { appLabel(context, preview.packageName) }
+    // Replies shown at once, each until the app echoes it back into the conversation.
+    val outgoing = remember(preview.key) { mutableStateListOf<OutgoingReply>() }
+    var sentCount by remember(preview.key) { mutableLongStateOf(0L) }
+    LaunchedEffect(preview.messages) {
+        val waiting = stillPending(outgoing.toList(), preview.messages)
+        if (waiting.size != outgoing.size) { outgoing.clear(); outgoing.addAll(waiting) }
+    }
     val open = {
         val destination = preview.contentIntent
         val opened = if (destination != null) controller.open(preview, destination) else controller.launchApp(preview.packageName)
@@ -36,10 +43,12 @@ internal fun NotificationDetail(preview: NotificationPreview, controller: Notifi
             Text(title, Modifier.weight(1f).padding(start = 8.dp), style = MaterialTheme.typography.titleLarge,
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        NotificationHistory(preview, Modifier.weight(1f), open)
+        NotificationHistory(preview, outgoing, Modifier.weight(1f), open)
         if (failed) Text(stringResource(R.string.notification_failed), Modifier.padding(horizontal = 16.dp),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-        NotificationReply(preview, controller, report, Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
+        NotificationReply(preview, controller, report, onSent = { text ->
+            outgoing.add(OutgoingReply(++sentCount, text, ownEchoes(preview.messages, text)))
+        }, Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
             NotificationActions(preview, controller, open, report = report)
         }
     }

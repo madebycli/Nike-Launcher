@@ -2,12 +2,7 @@
 package dev.nikelauncher.ui.settings
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -22,8 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import dev.nikelauncher.R
 import dev.nikelauncher.data.EdgeSide
-import dev.nikelauncher.ui.kit.motion.AppMotion
-import dev.nikelauncher.ui.kit.orion.OrionSharedScreen
 import dev.nikelauncher.ui.settings.sections.aboutEntries
 import dev.nikelauncher.ui.settings.sections.appListEntries
 import dev.nikelauncher.ui.settings.sections.appearanceEntries
@@ -50,9 +43,7 @@ fun SettingsScreen(env: SettingsEnv, onBack: () -> Unit, modifier: Modifier = Mo
     var openName by rememberSaveable { mutableStateOf<String?>(null) }
     var query by rememberSaveable { mutableStateOf("") }
     val open = openName?.let { name -> SettingsSection.entries.firstOrNull { it.name == name } }
-    BackHandler(enabled = open != null || query.isNotBlank()) {
-        if (open != null) openName = null else query = ""
-    }
+    BackHandler(enabled = open == null && query.isNotBlank()) { query = "" }
 
     val entries =
         (appearanceEntries(env) +
@@ -81,24 +72,15 @@ fun SettingsScreen(env: SettingsEnv, onBack: () -> Unit, modifier: Modifier = Mo
         val results = remember(entries, query) {
             if (query.isBlank()) emptyList() else entries.filter { it.matches(query) }.groupBy { it.section }.toList()
         }
-        val effects = AppMotion.effects<Float>()
-        SharedTransitionLayout {
-            AnimatedContent(
-                targetState = open,
-                // The tile and its page share bounds (see orionSharedBounds); the rest only cross-fades.
-                transitionSpec = { fadeIn(effects) togetherWith fadeOut(effects) },
-                label = "settingsSection",
-            ) { target ->
-                OrionSharedScreen(this@SharedTransitionLayout, this@AnimatedContent) {
-                    if (target == null) {
-                        SettingsHub(query, { query = it }, results, { openName = it.name }, onBack, container)
-                    } else {
-                        val rows = remember(entries, target) { entries.filter { it.section == target } }
-                        SettingsSectionPage(target, rows, { openName = null }, container)
-                    }
-                }
-            }
-        }
+        SettingsNavigation(
+            open = open,
+            onClose = { openName = null },
+            hub = { SettingsHub(query, { query = it }, results, { openName = it.name }, onBack, container) },
+            page = { section ->
+                val rows = remember(entries, section) { entries.filter { it.section == section } }
+                SettingsSectionPage(section, rows, { openName = null }, container)
+            },
+        )
         PreviewOverlays(env.previews, edgeSide, edgeWidth, sectionTop)
     }
 }

@@ -3,27 +3,26 @@ package dev.nikelauncher.ui.notifications
 
 import android.app.Notification
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Icon
-import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import dev.nikelauncher.R
 import dev.nikelauncher.media.NotificationPreview
 import dev.nikelauncher.ui.kit.menu.Menu
 
-/** One open action and one overflow, independent of the provider's action count. */
+/** The notification's own actions behind one quiet overflow icon, independent of how many the app offers. */
 @Composable
 internal fun NotificationActions(preview: NotificationPreview, controller: NotificationController,
     onOpen: () -> Unit, report: (Boolean) -> Unit) {
     var expanded by remember(preview.key) { mutableStateOf(false) }
     Box {
-        FilledTonalIconButton(onClick = { expanded = true }, modifier = Modifier.size(56.dp)) {
-            Icon(Icons.Outlined.MoreVert, stringResource(R.string.settings_more))
+        IconButton(onClick = { expanded = true }) {
+            Icon(Icons.Outlined.MoreVert, stringResource(R.string.settings_more), tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Menu(expanded, onDismissRequest = { expanded = false }) {
             item(stringResource(R.string.notification_open), { expanded = false; onOpen() }, leadingIcon = Icons.Outlined.OpenInNew)

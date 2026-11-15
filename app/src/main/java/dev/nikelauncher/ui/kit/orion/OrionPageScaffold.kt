@@ -19,7 +19,10 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Icon
@@ -42,7 +45,7 @@ val LocalPageAccent = compositionLocalOf<Color?> { null }
 
 /**
  * A settings page as Orion and iris lay it out: it opens on a tinted [OrionPageHero] with back above the icon, and
- * everything scrolls together, hero included. [content] follows inside a 16dp gutter.
+ * everything scrolls together, hero included. [content] follows inside a 16dp gutter as one block.
  */
 @Composable
 fun OrionPageScaffold(
@@ -54,15 +57,16 @@ fun OrionPageScaffold(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.surface,
-    content: LazyListScope.() -> Unit,
+    listState: LazyListState = rememberLazyListState(),
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val statusBar = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val navigation = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     CompositionLocalProvider(LocalPageAccent provides accent) {
         LazyColumn(
             modifier.fillMaxSize().background(containerColor).imePadding(),
+            state = listState,
             contentPadding = PaddingValues(bottom = navigation + 40.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item(key = "hero", contentType = "hero") {
                 OrionPageHero(icon, title, desc, accent, shape, background = containerColor) {
@@ -74,7 +78,12 @@ fun OrionPageScaffold(
                     }
                 }
             }
-            content()
+            // One block, revealed once when the page opens (iris): scrolling down never fades rows in late.
+            item(key = "content", contentType = "content") {
+                Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).orionReveal(1), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    content()
+                }
+            }
         }
     }
 }

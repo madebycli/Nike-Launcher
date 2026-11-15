@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import dev.nikelauncher.media.HiddenConversationMessages
 import dev.nikelauncher.media.PreviewMessage
 import dev.nikelauncher.media.messageIds
+import dev.nikelauncher.ui.kit.orion.OrionMessageEntrance
 
 /** Consecutive messages share one author, avatar and timestamp, retaining provider order. */
 @Composable
@@ -22,6 +23,8 @@ internal fun NotificationMessages(key: String, messages: List<PreviewMessage>, o
     val now = remember(messages) { System.currentTimeMillis() }
     val hidden by HiddenConversationMessages.values.collectAsState()
     val ids = remember(messages) { messageIds(messages) }
+    // What was there when the page opened just appears; what arrives while it is open springs up.
+    val opened = remember(key) { ids.toSet() }
     val visible = messages.filterIndexed { index, _ -> ids[index] !in hidden[key].orEmpty() }
     val groups = remember(visible) { groupMessages(visible) }
     val named = visible.filter { !it.fromSelf }.map { it.sender }.distinct().size > 1
@@ -52,9 +55,12 @@ internal fun NotificationMessages(key: String, messages: List<PreviewMessage>, o
                         group.messages.forEachIndexed { index, message ->
                             val id = idsByMessage[message] ?: return@forEachIndexed
                             androidx.compose.runtime.key(id) {
-                                MessageBubble(message, if (message.attachment != null) imageBubbleWidth else bubbleWidth,
-                                    first = index == 0, last = index == group.messages.lastIndex, onOpen = onOpen) {
-                                    HiddenConversationMessages.hide(key, id)
+                                // Own replies already sprang up as they were sent; their echo replaces them in place.
+                                OrionMessageEntrance(message.fromSelf, animate = !message.fromSelf && id !in opened) {
+                                    MessageBubble(message, if (message.attachment != null) imageBubbleWidth else bubbleWidth,
+                                        first = index == 0, last = index == group.messages.lastIndex, onOpen = onOpen) {
+                                        HiddenConversationMessages.hide(key, id)
+                                    }
                                 }
                             }
                         }

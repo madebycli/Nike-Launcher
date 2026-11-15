@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -29,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import dev.nikelauncher.R
 import dev.nikelauncher.ui.kit.orion.OrionBento
 import dev.nikelauncher.ui.kit.orion.OrionPageScaffold
-import dev.nikelauncher.ui.kit.orion.orionReveal
 import dev.nikelauncher.ui.kit.search.SearchField
 import dev.nikelauncher.ui.kit.settings.SettingsGroup
 import dev.nikelauncher.ui.kit.settings.SettingsSectionLabel
@@ -64,34 +62,24 @@ internal fun SettingsHub(
         onBack = onBack,
         containerColor = containerColor,
     ) {
-        item(key = "search") {
-            SearchField(query, onQueryChange, stringResource(R.string.settings_search), Modifier.padding(horizontal = 16.dp))
-        }
+        SearchField(query, onQueryChange, stringResource(R.string.settings_search))
         if (query.isBlank()) {
-            HubGroups.forEachIndexed { index, (label, sections) ->
-                item(key = "group-$label") {
-                    Column(Modifier.padding(horizontal = 16.dp).orionReveal(index + 1), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        SettingsSectionLabel(stringResource(label))
-                        Bento(sections, onOpen)
-                    }
-                }
+            HubGroups.forEach { (label, sections) ->
+                SettingsSectionLabel(stringResource(label))
+                Bento(sections, onOpen)
             }
         } else {
-            items(results, key = { it.first.name }) { (section, group) ->
-                Column(Modifier.padding(horizontal = 16.dp)) {
-                    SettingsSectionLabel(stringResource(section.labelRes))
-                    SettingsGroup(group.map { it.row })
-                }
+            results.forEach { (section, group) ->
+                SettingsSectionLabel(stringResource(section.labelRes))
+                SettingsGroup(group.map { it.row })
             }
             if (results.isEmpty()) {
-                item(key = "none") {
-                    Text(
-                        stringResource(R.string.settings_search_none),
-                        Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                Text(
+                    stringResource(R.string.settings_search_none),
+                    Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }

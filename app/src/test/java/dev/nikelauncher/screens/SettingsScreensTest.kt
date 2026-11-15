@@ -20,6 +20,10 @@ import dev.nikelauncher.ui.settings.SettingsEntry
 import dev.nikelauncher.ui.settings.SettingsHub
 import dev.nikelauncher.ui.settings.SettingsSection
 import dev.nikelauncher.ui.settings.SettingsSectionPage
+import dev.nikelauncher.ui.settings.SettingsNavigation
+import androidx.activity.BackEventCompat
+import androidx.compose.ui.test.performScrollTo
+import org.junit.Assert
 import dev.nikelauncher.ui.theme.NikeTheme
 import org.junit.Assume
 import org.junit.Before
@@ -72,5 +76,44 @@ class SettingsScreensTest {
         rule.onNodeWithText("Icon pack").assertIsDisplayed()
         rule.mainClock.advanceTimeBy(2_000)
         rule.shoot("$prefix-page")
+    }
+
+    /** Opening a section far down the hub and going back: the page shrinks into its tile, and the hub is where it was. */
+    @Test fun backReturnsToTheTile() {
+        var open by mutableStateOf<SettingsSection?>(null)
+        rule.setContent {
+            NikeTheme {
+                SettingsNavigation(
+                    open = open,
+                    onClose = { open = null },
+                    hub = { SettingsHub("", {}, emptyList(), { open = it }, {}, MaterialTheme.colorScheme.surface) },
+                    page = { section -> SettingsSectionPage(section, emptyList(), { open = null }, MaterialTheme.colorScheme.surface) },
+                )
+            }
+        }
+        rule.mainClock.advanceTimeBy(2_000)
+        rule.onNodeWithTag("settings-tile-ABOUT").performScrollTo().performClick()
+        rule.mainClock.advanceTimeBy(2_000)
+        rule.onNodeWithTag("settings-tile-ABOUT").assertDoesNotExist()
+        val dispatcher = rule.activity.onBackPressedDispatcher
+        // A held back gesture, half way: the page is part way back into its tile.
+        rule.runOnIdle { dispatcher.dispatchOnBackStarted(BackEventCompat(0f, 1200f, 0f, BackEventCompat.EDGE_LEFT)) }
+        rule.runOnIdle { dispatcher.dispatchOnBackProgressed(BackEventCompat(300f, 1200f, .5f, BackEventCompat.EDGE_LEFT)) }
+        rule.mainClock.advanceTimeBy(500)
+        rule.shoot("settings-back-gesture-half")
+        // Let go: the hub is back, scrolled where it was, with the tile on screen.
+        rule.runOnIdle { dispatcher.onBackPressed() }
+        rule.mainClock.advanceTimeBy(2_000)
+        Assert.assertNull(open)
+        rule.onNodeWithTag("settings-tile-ABOUT").assertIsDisplayed()
+        rule.shoot("settings-back-returned")
+        // A gesture drawn back leaves the page open.
+        rule.onNodeWithTag("settings-tile-BACKUP").performClick()
+        rule.mainClock.advanceTimeBy(2_000)
+        rule.runOnIdle { dispatcher.dispatchOnBackStarted(BackEventCompat(0f, 1200f, 0f, BackEventCompat.EDGE_LEFT)) }
+        rule.runOnIdle { dispatcher.dispatchOnBackProgressed(BackEventCompat(200f, 1200f, .3f, BackEventCompat.EDGE_LEFT)) }
+        rule.runOnIdle { dispatcher.dispatchOnBackCancelled() }
+        rule.mainClock.advanceTimeBy(2_000)
+        Assert.assertEquals(SettingsSection.BACKUP, open)
     }
 }

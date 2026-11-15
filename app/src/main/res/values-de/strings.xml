@@ -731,6 +731,7 @@
     <string name="home_folder_delete_confirm_body">Die Apps darin bleiben installiert. Anordnung und Widgets werden entfernt.</string>
     <string name="notification_age_separator">" · %1$s"</string>
     <string name="notification_app_and_age">%1$s · %2$s</string>
+    <string name="notification_sent">Gesendet</string>
     <string name="weather_place_and_update">%1$s · %2$s</string>
     <string name="settings_section_appearance_desc">Symbole, Schrift, Farben</string>
     <string name="settings_section_home_desc">Uhr, Widgets, Statusleiste</string>

@@ -75,12 +75,19 @@ class NotificationScreensTest {
         Assert.assertTrue("compact overview: $panel", panel.height < 500f * rule.density.density)
         rule.shoot("notification-single-compact")
         rule.onNodeWithText("Weekend plans").performClick()
-        rule.onNodeWithContentDescription(rule.activity.getString(R.string.notification_send)).assertExists()
-        val fieldHeight = rule.onNode(hasSetTextAction()).fetchSemanticsNode().boundsInRoot.height
-        val sendHeight = rule.onNodeWithContentDescription(rule.activity.getString(R.string.notification_send)).fetchSemanticsNode().boundsInRoot.height
-        val menuHeight = rule.onNodeWithContentDescription(rule.activity.getString(R.string.settings_more)).fetchSemanticsNode().boundsInRoot.height
-        Assert.assertEquals(fieldHeight, sendHeight, 1f)
-        Assert.assertEquals(fieldHeight, menuHeight, 1f)
+        val send = rule.activity.getString(R.string.notification_send)
+        // Nothing to send, no send button; the overflow sits inside the composer.
+        rule.onNodeWithContentDescription(send).assertDoesNotExist()
+        rule.onNodeWithContentDescription(rule.activity.getString(R.string.settings_more)).assertIsDisplayed()
+        rule.shoot("notification-single-chat-empty")
+        rule.onNode(hasSetTextAction()).performTextReplacement("On my way")
+        rule.onNodeWithContentDescription(send).assertIsDisplayed()
+        Assert.assertEquals(56f * rule.density.density, rule.onNodeWithContentDescription(send).fetchSemanticsNode().boundsInRoot.height, 1f)
+        rule.onNodeWithContentDescription(send).performClick()
+        // The reply shows at once as the reader's own bubble, and the field is empty again.
+        rule.onNodeWithText("On my way").assertIsDisplayed()
+        rule.onNodeWithText(rule.activity.getString(R.string.notification_sent)).assertIsDisplayed()
+        rule.onNodeWithContentDescription(send).assertDoesNotExist()
         rule.shoot("notification-single-chat")
     }
     @Test @Config(qualifiers = "de-w411dp-h923dp-night-420dpi")
