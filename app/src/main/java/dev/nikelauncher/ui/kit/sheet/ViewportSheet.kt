@@ -32,6 +32,8 @@ fun ViewportSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         sheetMaxWidth = 640.dp,
+        // Orion's sheet surface: one step below the rows on it, so grouped rows read as raised.
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         dragHandle = null,
         contentWindowInsets = {
             WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)

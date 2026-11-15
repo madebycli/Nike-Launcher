@@ -2,13 +2,17 @@
 package dev.nikelauncher.widget
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,16 +24,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import dev.nikelauncher.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-/** Original agenda layout, extracted from ClockOverviewSheet before the calendar redesign. */
+/**
+ * The agenda in Orion's vocabulary: each day is a section title (the date, then how far away it is), its events one
+ * segmented group with the calendar's colour leading each row. Today always shows, with a way to add an event to it.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun CalendarOverview(
     state: ClockLiveState,
@@ -49,111 +57,96 @@ internal fun CalendarOverview(
     LazyColumn(
         modifier.fillMaxSize().testTag("calendar-agenda-list"),
         state = scroll,
-        contentPadding = PaddingValues(bottom = 24.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
         for (date in dates) {
             item("day:$date", contentType = "date") {
                 Row(
-                    Modifier.testTag("calendar-day-$date")
-                        .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 8.dp)
-                        .semantics { heading() },
-                    verticalAlignment = Alignment.CenterVertically,
+                    Modifier.testTag("calendar-day-$date").fillMaxWidth()
+                        .padding(start = 8.dp, top = 16.dp, bottom = 6.dp)
+                        .semantics(mergeDescendants = true) { heading() },
+                    verticalAlignment = Alignment.Bottom,
                 ) {
-                    Text(AgendaText.date(context, date), fontSize = 16.sp)
+                    Text(AgendaText.date(context, date), style = MaterialTheme.typography.titleSmallEmphasized,
+                        color = MaterialTheme.colorScheme.primary)
                     Text(
                         AgendaText.relative(
                             context,
                             AgendaRules.relative(date.atStartOfDay(zone).toInstant(), state.now, zone, true),
                         ),
                         Modifier.padding(start = 8.dp),
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
             val entries = segments[date].orEmpty()
-            for (segment in entries) {
+            entries.forEachIndexed { index, segment ->
                 item(segment.key, contentType = "event") {
-                    CalendarEventRow(
-                        segment, state.now, state.config,
-                        onClick = { onOpenEvent(segment.event) },
-                    )
+                    CalendarEventRow(segment, index, entries.size, state.now, state.config) { onOpenEvent(segment.event) }
                 }
             }
             if (date == today && entries.isEmpty()) {
                 item("empty:$date", contentType = "empty") {
                     Text(
                         stringResource(R.string.clock_no_events),
-                        Modifier.padding(start = 52.dp, end = 16.dp, bottom = 8.dp),
+                        Modifier.padding(start = 8.dp, bottom = 4.dp),
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 14.sp,
                     )
                 }
             }
             if (date == today) {
                 item("insert:$date", contentType = "insert") {
-                    NewCalendarEventRow { onNewEvent(date) }
+                    FilledTonalButton(
+                        onClick = { onNewEvent(date) },
+                        modifier = Modifier.padding(top = 8.dp).testTag("calendar-new-event"),
+                        shapes = ButtonDefaults.shapes(),
+                    ) {
+                        Icon(Icons.Outlined.Add, null, Modifier.size(ButtonDefaults.IconSize))
+                        Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                        Text(stringResource(R.string.clock_new_event))
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-private fun NewCalendarEventRow(onClick: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().testTag("calendar-new-event")
-            .clickable(onClick = onClick)
-            .heightIn(min = 48.dp)
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(Icons.Outlined.Add, null, Modifier.size(24.dp))
-        Text(
-            stringResource(R.string.clock_new_event),
-            Modifier.padding(start = 12.dp),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-        )
-    }
-}
-
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun CalendarEventRow(
     segment: CalendarSegment,
+    index: Int,
+    count: Int,
     now: Instant,
     config: ClockWidgetConfig,
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
     val event = segment.event
+    val suffix = if (segment.count > 1) " (${segment.index + 1}/${segment.count})" else ""
+    val detail = if (event.allDay) stringResource(R.string.clock_all_day)
+        else AgendaText.details(context, segment, now, config.hourFormat)
+    val supporting = listOf(detail, event.location).filter { it.isNotBlank() }
     val openLabel = stringResource(R.string.calendar_open_event)
-    Row(
-        Modifier.fillMaxWidth().testTag("calendar-event-${segment.key}")
-            .clickable(onClickLabel = openLabel, onClick = onClick)
-            .height(IntrinsicSize.Min)
-            .heightIn(min = 48.dp)
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-    ) {
-        Box(Modifier.width(24.dp).fillMaxHeight(), contentAlignment = Alignment.Center) {
+    SegmentedListItem(
+        onClick = onClick,
+        shapes = ListItemDefaults.segmentedShapes(index, count),
+        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier = Modifier.testTag("calendar-event-${segment.key}")
+            .semantics { onClick(label = openLabel) { onClick(); true } },
+        leadingContent = {
             Box(
-                Modifier.width(6.dp).fillMaxHeight()
+                Modifier.size(width = 6.dp, height = 36.dp)
                     .testTag("calendar-color-${segment.key}")
                     .background(Color(event.color), MaterialTheme.shapes.extraSmall),
             )
-        }
-        Column(
-            Modifier.padding(start = 12.dp).weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            val suffix = if (segment.count > 1) " (${segment.index + 1}/${segment.count})" else ""
-            Text(event.title + suffix, fontSize = 16.sp)
-            val detail = if (event.allDay) stringResource(R.string.clock_all_day)
-                else AgendaText.details(context, segment, now, config.hourFormat)
-            if (detail.isNotBlank())
-                Text(detail, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            if (event.location.isNotBlank())
-                Text(event.location, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
+        },
+        supportingContent = if (supporting.isNotEmpty()) ({
+            Column { supporting.forEach { Text(it, maxLines = 2, overflow = TextOverflow.Ellipsis) } }
+        }) else null,
+        content = { Text(event.title + suffix, maxLines = 2, overflow = TextOverflow.Ellipsis) },
+    )
 }

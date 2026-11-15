@@ -50,12 +50,13 @@ class UserFlowScreensTest {
         shadowOf(app.getSystemService(KeyguardManager::class.java)).setIsDeviceLocked(false)
         rule.activityRule.scenario.recreate(); pixel9Display(rule.activity); rule.waitForIdle()
         fun text(id: Int) = app.getString(id)
+        fun back() { rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }; rule.waitForIdle() }
+        // The sheet has no close button: it is pulled down by its top edge, as a person closes it.
         fun closeSheet() {
-            rule.onAllNodesWithContentDescription(text(R.string.action_close)).onLast().performClick()
+            rule.onNodeWithTag("notification-panel").performTouchInput { swipe(Offset(centerX, 8f), Offset(centerX, height * 1.5f), 300) }
             rule.waitUntil(5000) { rule.onAllNodesWithTag("notification-panel").fetchSemanticsNodes().isEmpty() }
             rule.waitForIdle()
         }
-        fun back() { rule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }; rule.waitForIdle() }
         rule.onRoot().performTouchInput { longClick(Offset(width * .5f, height * .85f)) }
         rule.onAllNodesWithText(text(R.string.action_open_settings)).onLast().performClick()
         rule.activity.sendBroadcast(Intent(Intent.ACTION_SCREEN_OFF))

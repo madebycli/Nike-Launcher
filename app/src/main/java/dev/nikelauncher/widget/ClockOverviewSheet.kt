@@ -11,6 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -101,13 +102,16 @@ fun ClockOverviewSheet(
         BackHandler(enabled = mode == "weather" && shownPage != WeatherPage.OVERVIEW) {
             weatherPage = WeatherPage.OVERVIEW
         }
+        // Back (on a weather sub-page) and the title, nothing more: the sheet closes by its handle like
+        // the notification sheet. The title lines up with the notification sheet's in both states.
+        val subPage = mode == "weather" && shownPage != WeatherPage.OVERVIEW
+        val titleStart by animateDpAsState(if (subPage) 8.dp else 20.dp, AppMotion.spatial(), label = "clock-title-start")
         Row(
-            Modifier.fillMaxWidth().padding(start = 12.dp, end = 8.dp, top = 0.dp, bottom = 8.dp),
+            Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 4.dp, end = 24.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Spacer(Modifier.width(8.dp))
             AnimatedVisibility(
-                visible = mode == "weather" && shownPage != WeatherPage.OVERVIEW,
+                visible = subPage,
                 enter = expandHorizontally(AppMotion.spatial()) + fadeIn(AppMotion.effects()),
                 exit = shrinkHorizontally(AppMotion.spatial()) + fadeOut(AppMotion.effects()),
             ) {
@@ -129,16 +133,14 @@ fun ClockOverviewSheet(
             val headingSpec = AppMotion.effects<Float>()
             AnimatedContent(
                 targetState = heading,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).padding(start = titleStart),
                 transitionSpec = {
                     (fadeIn(headingSpec) togetherWith fadeOut(headingSpec)).using(null)
                 },
                 label = "clock-overview-heading",
             ) { title ->
-                Text(stringResource(title), style = MaterialTheme.typography.titleLarge)
-            }
-            IconButton(onClick = { closeThen {} }) {
-                Icon(Icons.Outlined.Close, stringResource(R.string.clock_close))
+                Text(stringResource(title), style = MaterialTheme.typography.titleLarge, maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             }
         }
         Box(Modifier.fillMaxWidth().weight(1f)) {

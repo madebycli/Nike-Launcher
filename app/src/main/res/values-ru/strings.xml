@@ -755,6 +755,7 @@
     <string name="home_folder_delete_confirm_body">Приложения в ней останутся установленными. Её расположение и виджеты удаляются.</string>
     <string name="notification_age_separator">" · %1$s"</string>
     <string name="notification_app_and_age">%1$s · %2$s</string>
+    <string name="weather_place_and_update">%1$s · %2$s</string>
     <string name="settings_section_appearance_desc">Значки, шрифт, цвета</string>
     <string name="settings_section_home_desc">Часы, виджеты, строка состояния</string>
     <string name="settings_section_app_list_desc">Поиск, фон, заголовки</string>
@@ -764,5 +765,10 @@
     <string name="settings_section_apps_desc">Избранное, скрытые приложения, лаунчер</string>
     <string name="settings_section_backup_desc">Экспорт и восстановление</string>
     <string name="settings_section_about_desc">Версия и отчёт о сбое</string>
+    <string name="settings_group_look">Внешний вид</string>
+    <string name="settings_group_handling">Управление</string>
+    <string name="settings_group_data">Данные</string>
+    <string name="settings_group_background">Фон</string>
+    <string name="settings_group_search">Поиск</string>
 </resources>
 

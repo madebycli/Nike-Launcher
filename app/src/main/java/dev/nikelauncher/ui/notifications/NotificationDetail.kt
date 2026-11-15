@@ -4,7 +4,6 @@ package dev.nikelauncher.ui.notifications
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,12 +30,11 @@ internal fun NotificationDetail(preview: NotificationPreview, controller: Notifi
         if (opened) onClose() else failed = true
     }
     Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        // Back and the name, nothing more: the sheet closes by its handle like every other one.
+        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 4.dp, end = 24.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back)) }
-            SenderAvatar(title, preview.conversationIcon ?: preview.smallIcon, 32.dp)
-            Text(title, Modifier.weight(1f).padding(horizontal = 12.dp), style = MaterialTheme.typography.titleMedium,
+            Text(title, Modifier.weight(1f).padding(start = 8.dp), style = MaterialTheme.typography.titleLarge,
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
-            IconButton(onClick = onClose) { Icon(Icons.Outlined.Close, stringResource(R.string.action_close)) }
         }
         NotificationHistory(preview, Modifier.weight(1f), open)
         if (failed) Text(stringResource(R.string.notification_failed), Modifier.padding(horizontal = 16.dp),

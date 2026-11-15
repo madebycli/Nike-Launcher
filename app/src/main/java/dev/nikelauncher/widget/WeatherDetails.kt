@@ -48,7 +48,7 @@ internal fun RainChanceCard(chance: Int?, period: String, config: ClockWidgetCon
     if (chance == null && upcoming.none { it.rain != null }) return
     val scale = LocalDensity.current.fontScale.coerceAtLeast(1f)
     Surface(Modifier.fillMaxWidth().testTag("weather-rain-card"), MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainer) {
+        color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Icon(Icons.Outlined.WaterDrop, null, tint = MaterialTheme.colorScheme.primary)
@@ -119,7 +119,7 @@ internal fun WeatherMetricGrid(metrics: WeatherMetrics, config: ClockWidgetConfi
             verticalArrangement = Arrangement.spacedBy(8.dp), maxItemsInEachRow = 2) {
             values.forEach { (label, value) ->
                 Surface(Modifier.weight(1f).widthIn(min = 136.dp), MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surfaceContainer) {
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(value, style = MaterialTheme.typography.titleLarge)
@@ -132,7 +132,7 @@ internal fun WeatherMetricGrid(metrics: WeatherMetrics, config: ClockWidgetConfi
         if (aq.pollutants.isNotEmpty() || aq.indices.isNotEmpty()) {
             if (values.isNotEmpty()) Spacer(Modifier.height(8.dp))
             Surface(Modifier.fillMaxWidth(), MaterialTheme.shapes.extraLarge,
-                color = MaterialTheme.colorScheme.surfaceContainer) {
+                color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(stringResource(R.string.weather_air_quality), style = MaterialTheme.typography.titleMedium)
                     Text(stringResource(R.string.weather_aqi_source), style = MaterialTheme.typography.bodySmall,
@@ -173,13 +173,13 @@ internal fun SunCycleCard(
     val animated by animateFloatAsState(progress ?: 0f, AppMotion.effects(), label = "sun-cycle")
     val primary = MaterialTheme.colorScheme.primary
     val muted = MaterialTheme.colorScheme.outlineVariant
-    val surface = MaterialTheme.colorScheme.surfaceContainer
+    val surface = MaterialTheme.colorScheme.surfaceContainerHigh
     val description = listOfNotNull(
         rise?.let { stringResource(R.string.clock_weather_sunrise) + " " + weatherClock(context, it, config.hourFormat, zone) },
         set?.let { stringResource(R.string.clock_weather_sunset) + " " + weatherClock(context, it, config.hourFormat, zone) },
     ).joinToString(", ")
     Surface(Modifier.fillMaxWidth(), MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainer) {
+        color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.WbTwilight, null)

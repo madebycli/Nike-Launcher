@@ -52,7 +52,7 @@ internal fun ForecastCard(
     }
     val active = metric.takeIf { it in options } ?: ForecastMetric.TEMPERATURE
     Surface(Modifier.fillMaxWidth(), MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainer) {
+        color = MaterialTheme.colorScheme.surfaceContainerHigh) {
         Column(Modifier.padding(top = 8.dp, bottom = 4.dp)) {
             Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(icon, null, Modifier.size(22.dp))

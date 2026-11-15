@@ -188,7 +188,7 @@ internal fun WeatherOverview(
                         }
                         item("summary") {
                             Surface(Modifier.fillMaxWidth(), MaterialTheme.shapes.extraLarge,
-                                color = MaterialTheme.colorScheme.surfaceContainer) {
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                     Text(AgendaText.date(context, day.date), style = MaterialTheme.typography.titleLarge)
                                     FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -231,7 +231,7 @@ internal fun WeatherOverview(
                         item("summary") {
                             val selectedPoint = hourPoints(listOf(hour)).single()
                             Surface(Modifier.fillMaxWidth(), MaterialTheme.shapes.extraLarge,
-                                color = MaterialTheme.colorScheme.secondaryContainer) {
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                     Text(AgendaText.date(context, hour.at.atZone(zone).toLocalDate()) + " · " +
                                         weatherClock(context, hour.at, c.hourFormat, zone), modifier = Modifier.testTag("weather-hour-selected-time"),
@@ -291,15 +291,33 @@ private fun CurrentWeather(state: ClockLiveState, connection: BreezyWeatherConne
     val currentNight = w?.hours?.minByOrNull { kotlin.math.abs(it.at.epochSecond - state.now.epochSecond) }
         ?.takeIf { kotlin.math.abs(it.at.epochSecond - state.now.epochSecond) <= 3600 }
         ?.providerNight ?: sunWindowNight(state.now, w?.sunrise, w?.sunset, zone)
-    Surface(Modifier.fillMaxWidth(), MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.secondaryContainer) {
-        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    // Orion lead block, not a banner: the temperature and the sky lead, the place and the time of the
+    // reading follow in one quiet line with the refresh beside it.
+    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                WeatherConditionIcon(w?.code ?: 3200, currentNight == true,
-                    Modifier.size(48.dp))
-                Spacer(Modifier.width(12.dp))
-                Text(w?.location?.takeIf { it.isNotBlank() } ?: stringResource(R.string.clock_weather_current),
-                    style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                Column(Modifier.weight(1f)) {
+                    if (current != null) {
+                        Text(ClockWidgetWeather.degrees(current.tempK, c.weatherFahrenheit) +
+                            if (c.weatherFahrenheit) "F" else "C", style = MaterialTheme.typography.displayLarge)
+                        Text(current.condition.ifBlank { stringResource(weatherLabel(w?.code ?: 3200)) },
+                            style = MaterialTheme.typography.titleMedium)
+                    } else Text(stringResource(R.string.clock_weather_stale), style = MaterialTheme.typography.titleMedium)
+                }
+                WeatherConditionIcon(w?.code ?: 3200, currentNight == true, Modifier.size(72.dp))
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val place = w?.location?.takeIf { it.isNotBlank() } ?: stringResource(R.string.clock_weather_current)
+                val updated = w?.let {
+                    stringResource(R.string.weather_data_updated,
+                        buildString {
+                            if (it.updatedAt.atZone(zone).toLocalDate() != state.now.atZone(zone).toLocalDate())
+                                append(AgendaText.date(LocalContext.current, it.updatedAt.atZone(zone).toLocalDate()) + " · ")
+                            append(weatherClock(LocalContext.current, it.updatedAt, c.hourFormat, zone))
+                        })
+                }
+                Text(if (updated != null) stringResource(R.string.weather_place_and_update, place, updated) else place,
+                    Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
                 if (c.weatherPackage != null || connection.result != null &&
                     connection.result != BreezyWeatherProvider.Result.Unsupported) {
                     IconButton(onClick = connection.refresh, enabled = !connection.loading,
@@ -307,22 +325,6 @@ private fun CurrentWeather(state: ClockLiveState, connection: BreezyWeatherConne
                         Icon(Icons.Outlined.Refresh, stringResource(R.string.weather_refresh_local))
                     }
                 }
-            }
-            if (current != null) {
-                Text(ClockWidgetWeather.degrees(current.tempK, c.weatherFahrenheit) +
-                    if (c.weatherFahrenheit) "F" else "C", style = MaterialTheme.typography.displayMedium)
-                Text(current.condition.ifBlank { stringResource(weatherLabel(w?.code ?: 3200)) },
-                    style = MaterialTheme.typography.titleMedium)
-            } else Text(stringResource(R.string.clock_weather_stale))
-            w?.let {
-                Text(stringResource(R.string.weather_data_updated,
-                    buildString {
-                        if (it.updatedAt.atZone(zone).toLocalDate() !=
-                            state.now.atZone(zone).toLocalDate())
-                            append(AgendaText.date(LocalContext.current, it.updatedAt.atZone(zone).toLocalDate()) + " · ")
-                        append(weatherClock(LocalContext.current, it.updatedAt, c.hourFormat, zone))
-                    }),
-                    style = MaterialTheme.typography.bodySmall)
             }
             if (connection.result is BreezyWeatherProvider.Result.PermissionRequired) {
                 TextButton(onClick = connection.connect, modifier = Modifier.testTag("weather-breezy-connect")) {
@@ -338,6 +340,5 @@ private fun CurrentWeather(state: ClockLiveState, connection: BreezyWeatherConne
                         R.string.weather_breezy_location else R.string.weather_breezy_unavailable))
                 }
             }
-        }
     }
 }

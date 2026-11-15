@@ -55,6 +55,7 @@ class SettingsScreensTest {
                 val rows = listOf(
                     SettingsEntry(SettingsSection.APPEARANCE, settingsSwitch("Icons on favourites", on, { on = it }, Icons.Filled.Apps)),
                     SettingsEntry(SettingsSection.APPEARANCE, settingsItem(title = "Icon pack", onClick = {}, value = "System")),
+                    SettingsEntry(SettingsSection.APPEARANCE, settingsItem(title = "Font", onClick = {}, icon = Icons.Filled.Apps, value = "Google Sans Flex")).inGroup(dev.nikelauncher.R.string.settings_group_background),
                 )
                 val page = open
                 if (page == null) {
@@ -65,9 +66,11 @@ class SettingsScreensTest {
             }
         }
         rule.onNodeWithTag("settings-tile-APPEARANCE").assertIsDisplayed()
+        rule.mainClock.advanceTimeBy(2_000)
         rule.shoot("$prefix-hub")
         rule.onNodeWithTag("settings-tile-APPEARANCE").performClick()
         rule.onNodeWithText("Icon pack").assertIsDisplayed()
+        rule.mainClock.advanceTimeBy(2_000)
         rule.shoot("$prefix-page")
     }
 }

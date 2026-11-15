@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import dev.nikelauncher.R
@@ -23,6 +24,7 @@ import dev.nikelauncher.ui.kit.orion.OrionSwipeRow
 internal fun NotificationDismissBox(
     preview: NotificationPreview,
     onDismiss: (NotificationPreview) -> Boolean,
+    shape: Shape,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -37,7 +39,7 @@ internal fun NotificationDismissBox(
         removes = true,
         run = { dismiss(current) },
     )
-    OrionSwipeRow(MaterialTheme.shapes.large, modifier.testTag("notification-dismiss-${preview.key}"), right = action, left = action) {
+    OrionSwipeRow(shape, modifier.testTag("notification-dismiss-${preview.key}"), right = action, left = action) {
         content()
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import dev.nikelauncher.R
 import dev.nikelauncher.data.EdgeSide
 import dev.nikelauncher.ui.kit.motion.AppMotion
 import dev.nikelauncher.ui.kit.orion.OrionSharedScreen
@@ -56,10 +57,10 @@ fun SettingsScreen(env: SettingsEnv, onBack: () -> Unit, modifier: Modifier = Mo
     val entries =
         (appearanceEntries(env) +
                 homeEntries(env) +
-                widgetPageEntries(env) +
+                widgetPageEntries(env).map { it.inGroup(R.string.settings_section_widgets) } +
                 appListEntries(env) +
-                backgroundEntries(env) +
-                searchButtonEntries(env) +
+                backgroundEntries(env).map { it.inGroup(R.string.settings_group_background) } +
+                searchButtonEntries(env).map { it.inGroup(R.string.settings_group_search) } +
                 stripEntries(env) +
                 gesturesEntries(env) +
                 notificationEntries(env) +

@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -46,7 +48,8 @@ fun OrionPageHero(
     Box(modifier.fillMaxWidth().clipToBounds().background(Brush.verticalGradient(listOf(bg, background)))) {
         OrionSpinner(shape, fg.copy(.08f), 260.dp, Modifier.align(Alignment.TopEnd).offset(70.dp, (-30).dp), periodMs = 40_000)
         Column(Modifier.padding(bottom = 12.dp)) {
-            top()
+            // The hero is no Surface, so the back button would otherwise take the default (black) content colour.
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) { top() }
             Box(Modifier.padding(start = 24.dp, top = 8.dp).size(72.dp), contentAlignment = Alignment.Center) {
                 OrionSpinner(shape, fg.copy(.16f), 72.dp, periodMs = 18_000)
                 Icon(icon, null, Modifier.size(34.dp), tint = fg)

@@ -731,6 +731,7 @@
     <string name="home_folder_delete_confirm_body">Die Apps darin bleiben installiert. Anordnung und Widgets werden entfernt.</string>
     <string name="notification_age_separator">" · %1$s"</string>
     <string name="notification_app_and_age">%1$s · %2$s</string>
+    <string name="weather_place_and_update">%1$s · %2$s</string>
     <string name="settings_section_appearance_desc">Symbole, Schrift, Farben</string>
     <string name="settings_section_home_desc">Uhr, Widgets, Statusleiste</string>
     <string name="settings_section_app_list_desc">Suche, Hintergrund, Überschriften</string>
@@ -740,4 +741,9 @@
     <string name="settings_section_apps_desc">Favoriten, versteckte Apps, Launcher</string>
     <string name="settings_section_backup_desc">Exportieren und wiederherstellen</string>
     <string name="settings_section_about_desc">Version und Absturzbericht</string>
+    <string name="settings_group_look">Aussehen</string>
+    <string name="settings_group_handling">Bedienung</string>
+    <string name="settings_group_data">Daten</string>
+    <string name="settings_group_background">Hintergrund</string>
+    <string name="settings_group_search">Suche</string>
 </resources>

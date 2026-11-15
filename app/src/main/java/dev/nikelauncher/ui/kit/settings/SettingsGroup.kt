@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.selection.selectableGroup
-import dev.nikelauncher.ui.kit.onboarding.IconBlob
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -13,7 +12,14 @@ import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 
 /**
  * A group of settings rows drawn with Material 3 Expressive's [SegmentedListItem]: the first and
@@ -66,7 +72,7 @@ private fun SettingsRowContent(row: SettingsRow, index: Int, count: Int) {
             shapes = shapes,
             colors = colors,
             enabled = row.enabled,
-            leadingContent = row.icon?.let { icon -> { IconBlob(icon) } },
+            leadingContent = row.icon?.let { icon -> { RowIcon(icon, row.enabled) } },
             supportingContent = row.value?.let { value -> { Text(value) } },
             trailingContent = row.trailing,
             content = { Text(row.title) },
@@ -78,7 +84,7 @@ private fun SettingsRowContent(row: SettingsRow, index: Int, count: Int) {
             shapes = shapes,
             colors = colors,
             enabled = row.enabled,
-            leadingContent = row.icon?.let { icon -> { IconBlob(icon) } },
+            leadingContent = row.icon?.let { icon -> { RowIcon(icon, row.enabled) } },
             supportingContent = row.value?.let { value -> { Text(value) } },
             trailingContent = {
                 Switch(checked = row.checked, onCheckedChange = null, enabled = row.enabled)
@@ -99,7 +105,7 @@ private fun SettingsRowContent(row: SettingsRow, index: Int, count: Int) {
         is SettingsRow.Block -> SegmentedListItem(
             shapes = shapes,
             colors = colors,
-            leadingContent = row.icon?.let { icon -> { IconBlob(icon) } },
+            leadingContent = row.icon?.let { icon -> { RowIcon(icon, true) } },
             supportingContent = {
                 Column {
                     row.value?.let { Text(it) }
@@ -108,5 +114,17 @@ private fun SettingsRowContent(row: SettingsRow, index: Int, count: Int) {
             },
             content = { Text(row.title) },
         )
+    }
+}
+
+/** The tonal square that leads a row (iris SettingsItem): primary on a soft primary container. */
+@Composable
+private fun RowIcon(icon: ImageVector, enabled: Boolean) {
+    val cs = MaterialTheme.colorScheme
+    Box(
+        Modifier.size(40.dp).background(cs.primaryContainer.copy(alpha = if (enabled) .55f else .2f), MaterialTheme.shapes.medium),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(icon, null, tint = if (enabled) cs.primary else cs.onSurfaceVariant.copy(alpha = .38f))
     }
 }

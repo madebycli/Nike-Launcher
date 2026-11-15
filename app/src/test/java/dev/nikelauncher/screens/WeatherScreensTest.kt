@@ -28,6 +28,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
+import dev.nikelauncher.widget.CalendarEvent
+import dev.nikelauncher.widget.CalendarLoad
 
 /** The weather pages with invented data, at Pixel 9 size. */
 @RunWith(RobolectricTestRunner::class)
@@ -71,5 +73,23 @@ class WeatherScreensTest {
             rule.shoot("weather-de-large-" + name)
             rule.onNodeWithContentDescription(rule.activity.getString(R.string.action_back)).performClick()
         }
+    }
+
+    /** The agenda: today with two events, an all-day one tomorrow, and the add button. */
+    @Test fun agenda() {
+        val now = Instant.parse("2026-10-30T09:15:00Z")
+        val events = listOf(
+            CalendarEvent(1, 1, "Standup", now.plus(45, ChronoUnit.MINUTES), now.plus(75, ChronoUnit.MINUTES), false, 0xFF3B82F6.toInt()),
+            CalendarEvent(2, 2, "Dentist", now.plus(5, ChronoUnit.HOURS), now.plus(6, ChronoUnit.HOURS), false, 0xFF22C55E.toInt(), location = "Main Street 4"),
+            CalendarEvent(3, 1, "Day off", now.plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS), now.plus(2, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS), true, 0xFFF97316.toInt()),
+        )
+        rule.setContent {
+            val context = LocalContext.current
+            val state = ClockLiveState(ClockWidgetConfig.read(context, 1), now, CalendarLoad.Ready(events), null, null, null)
+            NikeTheme { ClockOverviewSheet(1, "agenda", {}, liveStateOverride = state) }
+        }
+        rule.onNodeWithText("Standup").assertExists()
+        rule.onNodeWithTag("calendar-new-event").assertExists()
+        rule.shoot("calendar-de-agenda")
     }
 }

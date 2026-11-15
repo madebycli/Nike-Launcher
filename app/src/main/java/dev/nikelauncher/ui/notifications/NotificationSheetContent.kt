@@ -12,6 +12,9 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.runtime.saveable.rememberSaveable
 import dev.nikelauncher.media.NotificationPreview
 import dev.nikelauncher.ui.kit.motion.AppMotion
+import kotlinx.coroutines.delay
+
+private const val EMPTY_CLOSE_DELAY_MS = 700L
 
 /** Presentation and page selection, shared by the live sheet and invented-data render tests. */
 @Composable
@@ -25,6 +28,12 @@ internal fun NotificationSheetContent(
     val current = notifications.firstOrNull { it.key == selected }
     LaunchedEffect(current == null) { if (current == null) selected = null }
     BackHandler(selected != null) { selected = null }
+    // Clearing the last notification closes the sheet once the row has folded away; one opened empty stays open.
+    var hadAny by remember { mutableStateOf(notifications.isNotEmpty()) }
+    LaunchedEffect(notifications.isEmpty()) {
+        if (notifications.isNotEmpty()) hadAny = true
+        else if (hadAny) { delay(EMPTY_CLOSE_DELAY_MS); onClose() }
+    }
     val effects = AppMotion.effects<Float>()
     val offset = AppMotion.offset()
     val size = AppMotion.size()
@@ -47,7 +56,6 @@ internal fun NotificationSheetContent(
                 onSelect = { selected = it.key },
                 onDismiss = { controller.dismiss(it) },
                 onClearAll = { notifications.toList().forEach { controller.dismiss(it) } },
-                onClose = onClose,
             )
         } else {
             NotificationDetail(preview, controller, onBack = { selected = null }, onClose = onClose)
