@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Tapping the clock widget opens the alarm app. Some OEM clocks gate their own
+         SHOW_ALARMS activity behind this, and it is granted at install with no prompt. -->
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+    <!-- Lets the system present its confirmation when a user requests an app uninstall. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <!-- A launcher must be able to see every installed app, icon pack, and widget provider
+         on the device; without this, PackageManager silently filters almost everything out
+         on Android 11+. This is one of Google's own documented justified uses of the permission. -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+    <!-- Android 15 hides a private space from every app that does not ask for this. Without
+         it the profile is missing from LauncherApps entirely, so its apps can never be listed
+         and the space can never be unlocked from here. Granted at install time, no prompt,
+         and it only takes effect while this launcher holds the home role. -->
+    <uses-permission android:name="android.permission.ACCESS_HIDDEN_PROFILES" />
+
+    <!-- Asked for at the moment the clock widget is set to show what is coming up, never at
+         install. Read only, and nothing read here leaves the phone: there is no network
+         permission to send it with. -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
+    <!-- Optional local forecast access. Requested only when connecting the installed Breezy app. -->
+    <uses-permission android:name="org.breezyweather.READ_PROVIDER" />
+    <uses-permission android:name="org.breezyweather.debug.READ_PROVIDER" />
+
+    <application
+        android:name=".NikeApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:theme="@style/Theme.NikeLauncher"
+        android:supportsRtl="true">
+
+        <!-- Lets a profiler or Perfetto attach to the optimised build over adb shell. -->
+        <profileable android:shell="true" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:stateNotNeeded="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.NikeLauncher"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".widget.WidgetRestoreActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.NikeLauncher.PinShortcut" />
+
+        <activity
+            android:name=".widget.WidgetPickerActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.NikeLauncher" />
+
+        <!-- The one component another app can reach, and the only way in is the system
+             raising it on behalf of an app that asked for a shortcut to be pinned. It is
+             answered and gone, so it stays out of recents and off the back stack, and it
+             keeps its own task affinity rather than joining the HOME task it appears over. -->
+        <activity
+            android:name=".shortcut.PinShortcutActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.NikeLauncher.PinShortcut">
+            <intent-filter>
+                <action android:name="android.content.pm.action.CONFIRM_PIN_SHORTCUT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".service.NikeAccessibilityService"
+            android:exported="true"
+            android:label="Nike Launcher gestures"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- The clock widget's own settings. Exported because the system starts it on behalf
+             of whichever launcher is showing the widget, including this one. -->
+        <activity
+            android:name=".widget.ClockWidgetConfigActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.NikeLauncher">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".widget.ClockOverviewActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.NikeLauncher.PinShortcut" />
+
+        <!-- The launcher's own clock widget. Exported because every widget provider is: the
+             system reads it on behalf of whichever host is showing it. -->
+        <receiver
+            android:name=".widget.ClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_clock_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_clock_info" />
+        </receiver>
+
+        <!-- Weather from whichever app already fetches it. Exported because the sender has to
+             be able to reach it, and disabled until a widget is actually set to show weather:
+             a receiver a stranger can reach should not exist while the feature is off. -->
+        <receiver
+            android:name=".widget.ClockWidgetWeatherReceiver"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="nodomain.freeyourgadget.gadgetbridge.ACTION_GENERIC_WEATHER" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".media.NowPlayingListenerService"
+            android:exported="true"
+            android:label="Nike Launcher Now Playing"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+    </application>
+</manifest>

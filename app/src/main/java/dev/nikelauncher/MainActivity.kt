@@ -1,0 +1,342 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+package dev.nikelauncher
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
+import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.os.Build
+import android.os.Bundle
+import android.view.KeyEvent
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowCompat
+import dev.nikelauncher.data.AppFont
+import dev.nikelauncher.data.IconShape
+import dev.nikelauncher.media.NowPlayingListenerService
+import dev.nikelauncher.service.StatusBarFader
+import dev.nikelauncher.service.StatusBarControlWatcher
+import dev.nikelauncher.widget.ClockWidgetProvider
+import dev.nikelauncher.ui.NikeNavHost
+import dev.nikelauncher.ui.common.IconConfig
+import dev.nikelauncher.ui.common.LocalIconConfig
+import dev.nikelauncher.ui.theme.NikeTheme
+import dev.nikelauncher.ui.theme.widgetTypeface
+import kotlinx.coroutines.delay
+
+/** One keystroke taken on the home screen; a null character is a backspace. */
+data class TypedKey(val seq: Long, val char: Char?)
+
+/** Smallest width that counts as a tablet, which is the platform's own threshold. */
+private const val TABLET_WIDTH_DP = 600
+
+class MainActivity : ComponentActivity() {
+
+    /** Bumped whenever HOME is pressed while we're already showing, so overlays can close. */
+    private var homeIntentTick by mutableStateOf(0)
+    private var lockResetTick by mutableStateOf(0)
+    private var currentAppListVisible = false
+    private var statusBarWatcher: StatusBarControlWatcher? = null
+    private val screenOffReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Intent.ACTION_SCREEN_OFF) {
+                lockResetTick++
+                currentAppListVisible = false
+                homeStatusBarHidden?.let { hidden ->
+                    desiredStatusBarVisible = !hidden
+                    StatusBarFader.setVisible(window, visible = !hidden, instant = true)
+                }
+            } else if (intent.action == Intent.ACTION_USER_PRESENT && shouldReassertHiddenHome()) {
+                reassertHiddenHome()
+            }
+        }
+    }
+
+    /**
+     * What the status bar was last asked to be, so it can be asked again if it stopped obeying.
+     *
+     * Fully expanding the notification shade hands the system bars to the system, which cancels
+     * the control this app holds over them. Collapsing the shade does not hand them back, and
+     * nothing here had changed its mind — so the bar stayed up with the app still believing it
+     * was hidden, until some setting changed and the request was made afresh.
+     */
+    private var desiredStatusBarVisible: Boolean? = null
+
+    /** A peek of 0: the bar is hidden at once rather than faded out. */
+    private var hideStatusBarInstantly = false
+    private var homeStatusBarHidden: Boolean? = null
+    private var statusBarInitialized = false
+
+    /**
+     * Keystrokes taken on the home screen, as a growing list so none is dropped.
+     *
+     * Each is stamped with a count rather than replacing the last: typing quickly produced two
+     * characters before the first had been read, and the second overwrote it.
+     */
+    private var typedToSearch by mutableStateOf<List<TypedKey>>(emptyList())
+    private var nextTypedSeq = 0L
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        ContextCompat.registerReceiver(this, screenOffReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_USER_PRESENT)
+        }, ContextCompat.RECEIVER_NOT_EXPORTED)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        allowDrawingBehindTheCutout()
+        // Start hidden until the stored choice arrives; never draw the wrong visible default.
+        StatusBarFader.setVisible(window, visible = false, instant = true)
+        // Portrait until told otherwise on a phone, free on a tablet: this is a list down the
+        // side of the screen, and a phone sideways has about a third of the height it needs.
+        // The setting exists because that is a judgement about a screen rather than about a
+        // person — a phone in a car mount wants it anyway.
+        val rotatesByDefault = resources.configuration.smallestScreenWidthDp >= TABLET_WIDTH_DP
+        val app = application as NikeApp
+
+        setContent {
+            val hideStatusBar by app.prefs.appearance.hideStatusBar.collectAsState(initial = null)
+            val hideStatusBarAppList by app.prefs.appearance.hideStatusBarAppList.collectAsState(initial = null)
+            val peekSeconds by app.prefs.appearance.statusBarPeekSeconds.collectAsState(initial = -1)
+            // A short pull-down peeks the status bar, then it slides away again.
+            var statusBarPeek by remember { mutableStateOf(false) }
+            // The two surfaces choose separately, so the overlay can keep the bar the home
+            // screen hides.
+            var appListOpen by remember { mutableStateOf(false) }
+            LaunchedEffect(statusBarPeek, peekSeconds) {
+                if (statusBarPeek && peekSeconds >= 0) {
+                    delay(peekSeconds * 1000L)
+                    statusBarPeek = false
+                }
+            }
+            LaunchedEffect(lockResetTick) {
+                if (lockResetTick > 0) { statusBarPeek = false; appListOpen = false; currentAppListVisible = false }
+            }
+            val hideHere = if (appListOpen) hideStatusBarAppList else hideStatusBar
+            val statusBarVisible = hideHere?.let { !it || (!appListOpen && statusBarPeek) }
+            // Keyed on the answer, not on what went into it. Re-asking for a state the bar is
+            // already in restarts the fade, and a fade out begins by holding the bar fully
+            // shown — so opening the list with both set to hide flashed it into view.
+            // A peek of 0 is someone who wants the bar gone, and a fade is the bar lingering.
+            LaunchedEffect(hideStatusBar, peekSeconds) {
+                homeStatusBarHidden = hideStatusBar
+                hideStatusBarInstantly = peekSeconds == 0
+            }
+            LaunchedEffect(statusBarVisible, peekSeconds, appListOpen) {
+                if (statusBarVisible != null && peekSeconds >= 0) {
+                    val unchanged = desiredStatusBarVisible == statusBarVisible
+                    desiredStatusBarVisible = statusBarVisible
+                    StatusBarFader.setVisible(window, visible = statusBarVisible,
+                        instant = (appListOpen && !statusBarVisible) || peekSeconds == 0 || !statusBarInitialized || unchanged)
+                    statusBarInitialized = true
+                }
+            }
+
+            val font by app.prefs.appearance.font.collectAsState(initial = AppFont.GOOGLE_SANS_FLEX)
+            val fontFile by app.prefs.appearance.fontFile.collectAsState(initial = null)
+            LaunchedEffect(font, fontFile) { app.widgetHost.typeface = widgetTypeface(font, fontFile, this@MainActivity) }
+            val allowRotation by app.prefs.home.allowRotation.collectAsState(initial = null)
+            LaunchedEffect(allowRotation, rotatesByDefault) {
+                requestedOrientation = if (allowRotation ?: rotatesByDefault) {
+                    ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                } else {
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+            val iconPackPackage by app.prefs.appearance.iconPackPackage.collectAsState(initial = null)
+            val iconOverrides by app.prefs.library.iconOverrides.collectAsState(initial = emptyMap())
+            val showAppIcons by app.prefs.appearance.showAppIcons.collectAsState(initial = true)
+            val themedIcons by app.prefs.appearance.themedIcons.collectAsState(initial = false)
+            val notificationBadges by app.prefs.appList.notificationBadges.collectAsState(initial = false)
+            val notificationPreviews by app.prefs.appList.notificationPreviews.collectAsState(initial = false)
+            val notificationPreviewsHome by app.prefs.appList.notificationPreviewsHome.collectAsState(initial = true)
+            val notificationPreviewsList by app.prefs.appList.notificationPreviewsList.collectAsState(initial = true)
+            val notificationTextSp by app.prefs.appList.notificationTextSp.collectAsState(initial = 12)
+            val iconShape by app.prefs.appearance.iconShape.collectAsState(initial = IconShape.SYSTEM)
+            val iconConfig = remember(
+                iconPackPackage,
+                iconOverrides,
+                showAppIcons,
+                themedIcons,
+                notificationBadges,
+                notificationPreviews,
+                notificationPreviewsHome,
+                notificationPreviewsList,
+                notificationTextSp,
+                iconShape,
+            ) {
+                IconConfig(
+                    pack = iconPackPackage,
+                    overrides = iconOverrides,
+                    showIcons = showAppIcons,
+                    themed = themedIcons,
+                    notificationBadges = notificationBadges,
+                    notificationPreviews = notificationPreviews,
+                    notificationPreviewsHome = notificationPreviewsHome,
+                    notificationPreviewsList = notificationPreviewsList,
+                    notificationTextSp = notificationTextSp,
+                    shape = iconShape,
+                )
+            }
+
+            NikeTheme(font = font, fontFile = fontFile) {
+                CompositionLocalProvider(LocalIconConfig provides iconConfig) {
+                    NikeNavHost(
+                        app = app,
+                        homeIntentTick = homeIntentTick,
+                        lockResetTick = lockResetTick,
+                        typedToSearch = typedToSearch,
+                        onTypedToSearchHandled = { handled -> typedToSearch = typedToSearch - handled.toSet() },
+                        iconPackPackage = iconPackPackage,
+                        iconOverrides = iconOverrides,
+                        onPeekStatusBar = { if (peekSeconds > 0) statusBarPeek = true },
+                        onAppListVisibleChange = { currentAppListVisible = it; appListOpen = it },
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Lets the window reach the whole screen, cutout included.
+     *
+     * Drawing edge to edge is not on its own enough to be allowed up there. The default rule is
+     * that a window may extend into the cutout only while the cutout is covered by a system bar
+     * — so with the status bar hidden the window is pushed below it instead, and the strip it
+     * leaves behind belongs to nobody: the wallpaper shows through the dim on the home screen
+     * and through the settings screen's own background.
+     *
+     * ALWAYS rather than SHORT_EDGES wherever there is one, because this rotates: sideways the
+     * cutout is on a long edge, which SHORT_EDGES does not cover and which would letterbox the
+     * window all over again. What the insets mean is unchanged — the screens that must keep
+     * clear of the cutout already pad themselves by it.
+     */
+    private fun allowDrawingBehindTheCutout() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return
+        window.attributes = window.attributes.apply {
+            layoutInDisplayCutoutMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+            } else {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
+        }
+    }
+
+    /**
+     * Typing on a hardware keyboard opens the app list and starts searching.
+     *
+     * A phone with keys has nowhere else for a keystroke to go on a home screen, and reaching
+     * for the search field first is the long way round to the thing you already started
+     * spelling. Only printable characters count: the volume keys, the arrows and everything
+     * else keep doing their own jobs.
+     */
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (event.isCtrlPressed || event.isAltPressed || event.isMetaPressed) {
+            return super.onKeyDown(keyCode, event)
+        }
+        // Backspace once something has been typed, or the only way to fix a typo is to throw
+        // the whole search away and start it again.
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
+            typedToSearch = typedToSearch + TypedKey(nextTypedSeq++, null)
+            return true
+        }
+        val typed = event.unicodeChar.takeIf { it != 0 }?.toChar()
+        if (typed == null || typed.isISOControl()) return super.onKeyDown(keyCode, event)
+        // A space is a character in half the app names there are, but it is not something to
+        // open a search with — on its own it would start a query that looks like nothing.
+        if (typed == ' ' && typedToSearch.isEmpty()) return super.onKeyDown(keyCode, event)
+        typedToSearch = typedToSearch + TypedKey(nextTypedSeq++, typed)
+        return true
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // Focus comes back when the shade closes, which is exactly when the bar may have been
+        // left behind. Asked again only when it is actually wrong: asking for the state it is
+        // already in restarts the fade, and a fade out begins by showing the bar in full.
+        if (!hasFocus) return
+        dev.nikelauncher.media.NotificationPreviewBus.requestRefresh()
+        attachStatusBarWatcher()
+        val want = desiredStatusBarVisible ?: return
+        // Returning from the lock screen or another app must not replay a hide animation.
+        // The insets can already report hidden while the system still fades the bar out.
+        if (!want) {
+            StatusBarFader.setVisible(window, visible = false, instant = true)
+            return
+        }
+        val actual = ViewCompat.getRootWindowInsets(window.decorView)
+            ?.isVisible(WindowInsetsCompat.Type.statusBars()) ?: return
+        if (actual != want) StatusBarFader.setVisible(window, visible = want, instant = hideStatusBarInstantly)
+    }
+
+    private fun shouldReassertHiddenHome(): Boolean =
+        homeStatusBarHidden == true && desiredStatusBarVisible == false && !currentAppListVisible
+
+    private fun reassertHiddenHome() {
+        StatusBarFader.setVisible(window, visible = false, instant = true)
+    }
+
+    private fun reassertHiddenSurface() {
+        StatusBarFader.setVisible(window, visible = false, instant = true)
+    }
+
+    private fun attachStatusBarWatcher() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+        val watcher = statusBarWatcher ?: StatusBarControlWatcher(window, { desiredStatusBarVisible == false }, ::reassertHiddenSurface)
+            .also { statusBarWatcher = it }
+        watcher.attach()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dev.nikelauncher.media.NotificationPreviewBus.requestRefresh()
+        attachStatusBarWatcher()
+        // Request the hidden state before this window becomes visible again.
+        if (desiredStatusBarVisible == false)
+            StatusBarFader.setVisible(window, visible = false, instant = true)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        // Pressing HOME re-delivers the intent to us; treat it as "go back to the home screen".
+        homeIntentTick++
+    }
+
+    override fun onDestroy() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) statusBarWatcher?.detach()
+        statusBarWatcher = null
+        unregisterReceiver(screenOffReceiver)
+        super.onDestroy()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        (application as NikeApp).widgetHost.startListening()
+        NowPlayingListenerService.rebindIfPermitted(this)
+        // The clock widget's own rows go stale on their own — an event passes, an alarm is
+        // set, "in 20 minutes" stops being true. Half an hour is the shortest the system will
+        // wake a widget on a schedule, so the other half of keeping it honest is redrawing it
+        // whenever the home screen is actually being looked at, which costs nothing when it
+        // has not changed.
+        ClockWidgetProvider.renderAll(this)
+    }
+
+    override fun onStop() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) statusBarWatcher?.detach()
+        (application as NikeApp).widgetHost.stopListening()
+        // The fader holds a static controller for this window; don't outlive the Activity.
+        StatusBarFader.release()
+        super.onStop()
+    }
+}

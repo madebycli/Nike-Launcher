@@ -1,0 +1,201 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+package dev.nikelauncher.ui
+
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import dev.nikelauncher.ui.kit.motion.AppMotion
+import dev.nikelauncher.ui.kit.motion.sharedAxisEnter
+import dev.nikelauncher.ui.kit.motion.sharedAxisExit
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import dev.nikelauncher.NikeApp
+import dev.nikelauncher.TypedKey
+import dev.nikelauncher.data.EntryKeys
+import dev.nikelauncher.data.folderIdFromToken
+import dev.nikelauncher.ui.apps.rememberAppsState
+import dev.nikelauncher.ui.home.HomeData
+import dev.nikelauncher.ui.home.HomeRoute
+import dev.nikelauncher.ui.home.setup.SetupFlow
+import dev.nikelauncher.ui.nav.EnsureDefaultWidget
+import dev.nikelauncher.ui.nav.WarmIconCache
+import dev.nikelauncher.ui.nav.iconPickerDestination
+import dev.nikelauncher.ui.nav.listDestinations
+import dev.nikelauncher.ui.nav.rememberGalleryIconPicker
+import dev.nikelauncher.ui.nav.rememberWidgetActions
+import dev.nikelauncher.ui.settings.SettingsNav
+import dev.nikelauncher.ui.settings.SettingsRoute
+import dev.nikelauncher.ui.state.buildFavoriteEntries
+import dev.nikelauncher.ui.state.rememberHomeSettings
+import dev.nikelauncher.ui.state.rememberLibraryState
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+
+/** The navigation graph. What the destinations share is read here, once, and handed down. */
+@Composable
+fun NikeNavHost(
+    app: NikeApp,
+    homeIntentTick: Int,
+    lockResetTick: Int,
+    typedToSearch: List<TypedKey>,
+    onTypedToSearchHandled: (List<TypedKey>) -> Unit,
+    iconPackPackage: String?,
+    iconOverrides: Map<String, String>,
+    onPeekStatusBar: () -> Unit,
+    /** Reported up so the status bar can stay put while the overlay is showing. */
+    onAppListVisibleChange: (Boolean) -> Unit,
+) {
+    val nav = rememberNavController()
+    val pagesConfig by app.prefs.pages.config.collectAsState(initial = null)
+    var resettingForLock by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    // Before anything the user does can write to the store, so "the store is empty" still means
+    // "this is a first run" when it is read.
+    LaunchedEffect(Unit) { app.prefs.home.ensureInstallMarker() }
+
+    val apps = rememberAppsState(app)
+    val library = rememberLibraryState(app.prefs)
+    val appsByKey = remember(apps.apps) { apps.apps.associateBy { it.key } }
+    val settings = rememberHomeSettings(app.prefs, library, appsByKey)
+
+    EnsureDefaultWidget(app, library.layoutDefaultsVersion, library.widgetIds)
+    WarmIconCache(apps.apps, library.favoriteKeys, library.folders, iconPackPackage, iconOverrides, settings.iconSizeDp)
+
+    val foldersById = remember(library.folders) { library.folders.associateBy { it.id } }
+    val favorites = remember(
+        library.favoritesSource, library.favoriteKeys, appsByKey, foldersById,
+        if (library.favoritesSource == dev.nikelauncher.data.FavoritesSource.FREQUENT) library.launchCounts else emptyMap<String, Int>(),
+        library.frequentCount, library.frequentExcluded,
+    ) {
+        buildFavoriteEntries(
+            library.favoritesSource, library.favoriteKeys, appsByKey, foldersById,
+            library.launchCounts, library.frequentCount, library.frequentExcluded,
+        )
+    }
+
+    // Noted the first time there is one, and never unset. Whether the hint is still wanted is a
+    // question about whether someone has done this before, not about the list being empty now.
+    LaunchedEffect(library.favoriteKeys.isNotEmpty()) {
+        if (library.favoriteKeys.isNotEmpty()) app.prefs.library.markFavoritesEverSet()
+    }
+
+    val widgetActions = rememberWidgetActions(app) { nav.navigate("settings") }
+    val pickFromGallery = rememberGalleryIconPicker(app)
+
+    // HOME has to unwind the whole stack. The equivalent effect inside the home destination can't
+    // do this: that destination isn't composed while Settings is on screen.
+    LaunchedEffect(homeIntentTick) {
+        if (homeIntentTick > 0 && nav.currentDestination?.route != "home") nav.popBackStack("home", inclusive = false)
+    }
+
+    LaunchedEffect(lockResetTick) {
+        if (lockResetTick > 0) {
+            resettingForLock = true
+            if (nav.currentDestination?.route != "home") nav.popBackStack("home", inclusive = false)
+            withFrameNanos { }
+            resettingForLock = false
+        }
+    }
+
+    @Composable fun HomeDestination(placing: Boolean = false) {
+            val config = pagesConfig ?: return
+            HomeRoute(
+                app = app,
+                homeIntentTick = homeIntentTick,
+                lockResetTick = lockResetTick,
+                pagesConfig = config,
+                cornerPlacement = placing,
+                onCornerPlacementClose = { nav.popBackStack() },
+                settings = settings,
+                data = HomeData(
+                    favorites = favorites,
+                    appsByKey = appsByKey,
+                    nameOverrides = library.nameOverrides,
+                    widgetIds = library.widgetIds,
+                    widgetHeightDp = library.widgetHeightDp,
+                    nowPlayingHasContent = false,
+                    pins = library.pins,
+                    blockOffsets = library.blockOffsets,
+                ),
+                folders = library.folders,
+                favoriteKeys = library.favoriteKeys,
+                hiddenApps = library.hiddenApps,
+                launchCounts = library.launchCounts,
+                widgetActions = widgetActions,
+                cornerApp = library.cornerButtonKey?.takeIf { it != EntryKeys.SEARCH }?.let { appsByKey[it] },
+                cornerIsSearch = library.cornerButtonKey == EntryKeys.SEARCH,
+                typedToSearch = typedToSearch,
+                onTypedToSearchHandled = onTypedToSearchHandled,
+                // Both flows start at a value that shows nothing, so the dialog can't flash before
+                // the stored answer arrives. A legacy install is stamped 0 and never qualifies.
+                scrubBandFractions = library.scrubBand,
+                onPeekStatusBar = onPeekStatusBar,
+                onAppListVisibleChange = onAppListVisibleChange,
+                onTogglePrivateSpace = apps::togglePrivateSpace,
+                onNavigate = { route -> nav.navigate(route) },
+            )
+    }
+
+    val spatial = AppMotion.offset()
+    val effects = AppMotion.effects<Float>()
+    NavHost(navController = nav, startDestination = "home",
+        enterTransition = { sharedAxisEnter(true, spatial, effects) },
+        exitTransition = { sharedAxisExit(true, spatial, effects) },
+        popEnterTransition = { if (resettingForLock) EnterTransition.None else sharedAxisEnter(false, spatial, effects) },
+        popExitTransition = { if (resettingForLock) ExitTransition.None else sharedAxisExit(false, spatial, effects) },
+    ) {
+        composable("home") { HomeDestination() }
+        composable("corner/place") { HomeDestination(placing = true) }
+        composable("corner/settings") {
+            dev.nikelauncher.ui.home.corner.CornerSettingsSheet(
+                appLabel = library.cornerButtonKey?.let { appsByKey[it]?.label },
+                overWallpaper = settings.contentColor,
+                onPickApp = { nav.navigate("cornerpicker") },
+                onPlace = { nav.navigate("corner/place") },
+                onDismiss = { nav.popBackStack() },
+            )
+        }
+        composable("settings") {
+            SettingsRoute(
+                app = app,
+                allApps = apps.apps,
+                privateSpace = apps.privateSpace,
+                homeTick = homeIntentTick,
+                nav = SettingsNav(
+                    onHiddenApps = { nav.navigate("settings/hidden") },
+                    onFrequentExcluded = { nav.navigate("settings/frequentexcluded") },
+                    onFavorites = { nav.navigate("favorites") },
+                    onQuickLaunchPicker = { slot -> nav.navigate("apppicker/" + slot.name) },
+                    onCornerPicker = { nav.navigate("cornerpicker") },
+                    onCornerSettings = { nav.navigate("corner/settings") },
+                ),
+                onBack = { nav.popBackStack() },
+            )
+        }
+
+        listDestinations(app, nav, apps, library, settings.iconSizeDp)
+        iconPickerDestination(app, nav, apps, library, pickFromGallery)
+    }
+
+    // Both flows start at a value that shows nothing, so this can't flash before the stored
+    // answer arrives. A legacy install is stamped 0 and never qualifies.
+    if (library.layoutDefaultsVersion == 1 && !library.welcomeSeen) {
+        SetupFlow(app, apps, library, settings.iconSizeDp) {
+            scope.launch {
+                // A restored backup already holds the choices a new install would be given.
+                if (!app.prefs.backupRestored.first()) app.prefs.home.applyNewInstallDefaults()
+                app.prefs.home.setWelcomeSeen(true)
+            }
+        }
+    }
+}

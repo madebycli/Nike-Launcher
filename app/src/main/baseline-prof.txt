@@ -1,0 +1,4 @@
+# All of Nike Launcher's own code, so the first optimization pass covers every screen.
+# Taken over from Victoria Launcher 0.93.4 (#150), renamed to this package.
+HSPLdev/nikelauncher/**->**(**)**
+Ldev/nikelauncher/**;

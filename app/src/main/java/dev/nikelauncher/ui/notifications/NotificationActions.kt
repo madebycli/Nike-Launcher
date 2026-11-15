@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+package dev.nikelauncher.ui.notifications
+
+import android.app.Notification
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import dev.nikelauncher.R
+import dev.nikelauncher.media.NotificationPreview
+import dev.nikelauncher.ui.kit.menu.Menu
+
+/** The notification's own actions behind one quiet overflow icon, independent of how many the app offers. */
+@Composable
+internal fun NotificationActions(preview: NotificationPreview, controller: NotificationController,
+    onOpen: () -> Unit, report: (Boolean) -> Unit) {
+    var expanded by remember(preview.key) { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(Icons.Outlined.MoreVert, stringResource(R.string.settings_more), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Menu(expanded, onDismissRequest = { expanded = false }) {
+            item(stringResource(R.string.notification_open), { expanded = false; onOpen() }, leadingIcon = Icons.Outlined.OpenInNew)
+            preview.actions.filter { it.inputs.isEmpty() && it.title.isNotBlank() }.forEach { action ->
+                val symbol = when (action.semanticAction) {
+                    Notification.Action.SEMANTIC_ACTION_MARK_AS_READ -> Icons.Outlined.DoneAll
+                    Notification.Action.SEMANTIC_ACTION_MARK_AS_UNREAD -> Icons.Outlined.MarkEmailUnread
+                    Notification.Action.SEMANTIC_ACTION_ARCHIVE -> Icons.Outlined.Archive
+                    Notification.Action.SEMANTIC_ACTION_DELETE -> Icons.Outlined.DeleteOutline
+                    Notification.Action.SEMANTIC_ACTION_MUTE -> Icons.Outlined.VolumeOff
+                    Notification.Action.SEMANTIC_ACTION_UNMUTE -> Icons.Outlined.VolumeUp
+                    else -> null
+                }
+                item(action.title, { expanded = false; report(controller.run(preview, action.intent)) },
+                    leadingIcon = symbol, leadingImage = if (symbol == null) notificationBitmap(action.icon) else null)
+            }
+        }
+    }
+}

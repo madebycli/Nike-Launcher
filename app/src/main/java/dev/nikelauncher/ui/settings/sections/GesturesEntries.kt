@@ -1,0 +1,92 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+package dev.nikelauncher.ui.settings.sections
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.AspectRatio
+import androidx.compose.material.icons.filled.Gesture
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.SwipeUp
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.Vibration
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import dev.nikelauncher.R
+import dev.nikelauncher.data.QuickLaunchRegion
+import dev.nikelauncher.data.QuickLaunchSlot
+import dev.nikelauncher.data.ShortcutSwipe
+import dev.nikelauncher.ui.kit.settings.ChoiceChips
+import dev.nikelauncher.ui.kit.settings.SettingsSlider
+import dev.nikelauncher.ui.kit.settings.settingsBlock
+import dev.nikelauncher.ui.kit.settings.settingsItem
+import dev.nikelauncher.ui.kit.settings.settingsSwitch
+import dev.nikelauncher.ui.settings.SettingsEntry
+import dev.nikelauncher.ui.settings.SettingsEnv
+import dev.nikelauncher.ui.settings.SettingsSection
+import dev.nikelauncher.ui.settings.labelRes
+
+private val SECTION = SettingsSection.GESTURES
+
+@Composable
+internal fun gesturesEntries(env: SettingsEnv): List<SettingsEntry> {
+    val home = env.prefs.home
+    val haptics by env.prefs.strip.hapticsEnabled.collectAsState(true)
+    val swipeUp by home.swipeUpOpensList.collectAsState(false)
+    val shortcutSwipe by home.shortcutSwipe.collectAsState(ShortcutSwipe.RIGHT)
+    val doubleTap by home.doubleTapToLock.collectAsState(false)
+
+    val region by home.quickLaunchRegion.collectAsState(QuickLaunchRegion())
+    val regionHeightTitle = stringResource(R.string.quick_zone_height)
+    val regionBottomTitle = stringResource(R.string.quick_zone_bottom)
+    val none = stringResource(R.string.settings_quick_launch_none)
+    return listOf(
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_haptics), haptics, { env.write { env.prefs.strip.setHapticsEnabled(it) } }, value = stringResource(R.string.settings_haptics_detail), icon = Icons.Filled.Vibration), "vibrate"),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_swipe_up_list), swipeUp, { env.write { home.setSwipeUpOpensList(it) } }, value = stringResource(R.string.settings_swipe_up_list_detail), icon = Icons.Filled.SwipeUp), "swipe up"),
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_swipe_shortcuts), value = stringResource(R.string.settings_swipe_shortcuts_detail), icon = Icons.Filled.Gesture) {
+            ChoiceChips(ShortcutSwipe.entries, shortcutSwipe, { stringResource(it.labelRes()) }, { env.write { home.setShortcutSwipe(it) } })
+        }, "swipe shortcuts"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_quick_launch_left), { env.nav.onQuickLaunchPicker(QuickLaunchSlot.LEFT) }, value = env.quickLaunchLeftLabel ?: none, icon = Icons.Filled.RocketLaunch), "swipe launch"),
+        SettingsEntry(SECTION, settingsItem(stringResource(R.string.settings_quick_launch_right), { env.nav.onQuickLaunchPicker(QuickLaunchSlot.RIGHT) }, value = env.quickLaunchRightLabel ?: none, icon = Icons.Filled.RocketLaunch), "swipe launch"),
+        // Only while something is bound to the swipe, since the band has no other use.
+        SettingsEntry(SECTION, settingsBlock(regionHeightTitle, value = "${region.height}%", icon = Icons.Filled.AspectRatio) {
+            SettingsSlider(region.height.toFloat(), QuickLaunchRegion.HEIGHT_RANGE.first.toFloat()..QuickLaunchRegion.HEIGHT_RANGE.last.toFloat(), { v -> env.write { home.setQuickLaunchRegion(region.copy(heightPercent = v.toInt())) } })
+        }, "swipe launch band area", visible = env.quickLaunchLeftLabel != null || env.quickLaunchRightLabel != null),
+        SettingsEntry(SECTION, settingsBlock(regionBottomTitle, value = "${region.bottom}%", icon = Icons.Filled.AspectRatio) {
+            SettingsSlider(region.bottom.toFloat(), QuickLaunchRegion.BOTTOM_RANGE.first.toFloat()..QuickLaunchRegion.BOTTOM_RANGE.last.toFloat(), { v -> env.write { home.setQuickLaunchRegion(region.copy(bottomPercent = v.toInt())) } })
+        }, "swipe launch band area", visible = env.quickLaunchLeftLabel != null || env.quickLaunchRightLabel != null),
+        SettingsEntry(SECTION, settingsSwitch(stringResource(R.string.settings_double_tap_lock), doubleTap, { env.write { home.setDoubleTapToLock(it) } }, value = stringResource(R.string.settings_double_tap_lock_detail), icon = Icons.Filled.TouchApp), "lock screen"),
+        // Switching it on does nothing at all without the permission, so the way to grant it
+        // belongs right here rather than in a toast later.
+        SettingsEntry(SECTION, settingsBlock(stringResource(R.string.settings_lock_needs_accessibility), icon = Icons.Filled.Accessibility) { AccessibilityButtons(env) }, "lock accessibility", visible = doubleTap && !env.lockGestureReady),
+        SettingsEntry(
+            SECTION,
+            settingsBlock(
+                stringResource(R.string.settings_shade_gesture),
+                value = stringResource(if (env.shadeGestureReady) R.string.settings_shade_ready else R.string.settings_shade_not_ready), icon = Icons.Filled.Notifications,
+            ) { if (!env.shadeGestureReady) AccessibilityButtons(env) },
+            "notification shade pull",
+        ),
+    )
+}
+
+/**
+ * Getting to the accessibility toggle, and to the screen that unblocks it: Android 13 and later
+ * refuse to switch it on for an app installed outside a store until it is allowed from the app's
+ * own info screen.
+ */
+@Composable
+private fun AccessibilityButtons(env: SettingsEnv) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedButton(onClick = env.actions.onOpenAppInfo) { Text(stringResource(R.string.settings_app_info)) }
+        Button(onClick = env.actions.onOpenAccessibilitySettings) { Text(stringResource(R.string.settings_enable)) }
+    }
+}
